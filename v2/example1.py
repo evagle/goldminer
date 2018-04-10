@@ -19,10 +19,8 @@ class MyStrategy(StrategyBase):
 
 ret = md.init("17611258516", "web4217121")
 ticks = md.get_dailybars("SHSE.600000,SZSE.000001", "2015-10-29", "2015-12-29")
-dividends = get_dividend(symbol='SHSE.600000',start_date='2000-01-01', end_date='2017-12-31')
-print(dividends)
 for tick in ticks:
-    print tick.open
+    print(tick.open)
 print(ticks[0].open)
 if __name__ == '__main____':
     ret = MyStrategy(
