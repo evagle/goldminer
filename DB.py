@@ -31,7 +31,35 @@ class DB():
 #         print(sql)
         self.cursor.execute(sql)
         self.db.commit()
+    
+    def fundamentalToSql(self, code, fundamental, fieldstr):
+        sql = "('%s', '%s' , '%s'" % (code, fundamental['pub_date'], fundamental['end_date'])
+        
+        fields = fieldstr.split(",")
+        
+        for field in fields:
+            if field in fundamental:
+                sql += (", %lf" % fundamental[field])
+            else:
+                sql += ", 0"
 
+        sql = sql + ")"
+        # print(sql)
+        return sql
+        
+    def addFundamental(self, code, fundamentals, table, fieldstr):
+        fields = fieldstr.split(",")
+        sql = "INSERT INTO "+table+"(code, pub_date, end_date,"  + fieldstr + ") VALUES "
+        
+        for fundamental in fundamentals:
+            sql += self.fundamentalToSql(code, fundamental, fieldstr) + ","
+        
+        sql = sql[:-1] + ";"
+
+        # print(sql)
+        self.cursor.execute(sql)
+        self.db.commit()
+        
     def addIndexConstituent(self, code, constituent):
         sql = """INSERT INTO index_constituents(code, trade_date, constituents) VALUES ('%s', '%s', "%s")"""
         print(constituent.keys())
