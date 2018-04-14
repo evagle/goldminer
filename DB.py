@@ -80,4 +80,12 @@ class DB():
         if result is None:
             return datetime(2005, 1, 1)
         return result[0]
-        
+ 
+    def getLastFundamentalsDate(self, code, table):
+        sql = "select pub_date from %s where code = '%s' order by pub_date desc limit 1" % (table, code)
+        self.cursor.execute(sql)
+        result = self.cursor.fetchone()
+        if result is None:
+            return datetime(2005, 1, 1)
+        return result[0] + timedelta(days=1)
+
