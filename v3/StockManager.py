@@ -20,7 +20,7 @@ class StockManager():
         return self.db.getStockList()
     
     def getSymbol(self, code):
-        if code[0:1] == "6":
+        if code[0:1] == "6" or code[0:1] == "9":
             return "SHSE"
         return "SZSE"
     
