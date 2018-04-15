@@ -19,7 +19,9 @@ fieldstr = 'ASSEIMPALOSS,ASSOINVEPROF,AVAIDISTPROF,AVAIDISTSHAREPROF,BASICEPS,BI
 table = 'income_statement'
 providor = FundamentalsManager()
 stockManager = StockManager()
+
 for code in stockManager.getStockList():
     print("##", code, "##")
     fundamentals = providor.getFundamentals(code, table, fieldstr)
     providor.saveFundamentals(code, fundamentals, table, fieldstr)
+    time.sleep(0.1)
