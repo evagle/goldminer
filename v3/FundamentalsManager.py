@@ -6,7 +6,7 @@ import MySQLdb
 import codecs
 from datetime import *
 import time
-
+import sys
 sys.path.append('../')
 from DB import *
 
@@ -30,7 +30,7 @@ class FundamentalsManager():
             start_date=startdate, end_date=enddate, limit=10000,
                 fields=fieldstr)
         return results
-    
+
     def removeDuplicate(self, fundamentals):
         results = {}
         for fundamental in fundamentals:
@@ -53,7 +53,7 @@ class FundamentalsManager():
         count = 0
         if len(fundamentals) > 0:
             count = self.db.addFundamental(code, fundamentals, table, fieldstr)
-            print("Total %s items, successfully insert %d fundamentals" % (len(fundamentals), count))
+            print("Total %s items, successfully insert %d into %s" % (len(fundamentals), count, table))
         else:
             print("%s is up to date" % code)
 
