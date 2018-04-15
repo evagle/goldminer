@@ -59,7 +59,7 @@ class IndexData():
         return "SZSE"
     
     def queryInstituents(self, code):
-        startdate = self.db.getLastIndexDate(code)
+        startdate = self.db.getLastIndexDate(code) + timedelta(days=1)
         enddate = datetime.now()+timedelta(days=1)
         print("start=",startdate, "end=", enddate, "code=", self.getSymbol(code)+ "." +code)
         results = get_history_constituents(index=self.getSymbol(code)+ "." +code, start_date=startdate, end_date=enddate)
@@ -67,9 +67,10 @@ class IndexData():
         return results
     
     def saveConstituents(self, code, constituents):
+        count = 0
         for constituent in constituents:
-            self.db.addIndexConstituent(code, constituent)
-        print("insert %d constituents" % len(constituents)) 
+            count += self.db.addIndexConstituent(code, constituent)
+        print("total %d constituents, success insert %s constituents" % (len(constituents), count))
         
 
 indexData = IndexData()

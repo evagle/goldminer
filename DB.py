@@ -16,6 +16,7 @@ class DB():
     def __init__(self):
         self.db = MySQLdb.connect("unionfight.citypet.cn","pocketpet","3MjdvUuXqxca6cbc","goldminer",charset="utf8")
         self.cursor = self.db.cursor()
+
     def executeSql(self, sql):
         print(sql)
         self.cursor.execute(sql)
@@ -23,14 +24,15 @@ class DB():
         return self.cursor.fetchall()
     
     def addStockDailyBar(self, bar):
-        sql = """INSERT INTO bar_daily_adjust_none(code, trade_date, open, close, high, low, amount, volume, 
+        sql = """INSERT IGNORE INTO bar_daily_adjust_none(code, trade_date, open, close, high, low, amount, volume, 
         adj_factor, pre_close, upper_limit, lower_limit)
          VALUES ('%s', '%s', %f, %f, %f, %f, %f, %f, %f, %f, %f, %f)"""
         sql = sql % (bar.sec_id, DateUtil.toMysqlDatetimeStr(bar.strtime), bar.open, bar.close, bar.high, bar.low, 
                      bar.amount, bar.volume, bar.adj_factor, bar.pre_close, bar.upper_limit, bar.lower_limit)
 #         print(sql)
-        self.cursor.execute(sql)
+        insertcount self.cursor.execute(sql)
         self.db.commit()
+        return insertcount
     
     def fundamentalToSql(self, code, fundamental, fieldstr):
         sql = "('%s', '%s' , '%s'" % (code, fundamental['pub_date'], fundamental['end_date'])
@@ -49,23 +51,23 @@ class DB():
         
     def addFundamental(self, code, fundamentals, table, fieldstr):
         fields = fieldstr.split(",")
-        sql = "INSERT INTO "+table+"(code, pub_date, end_date,"  + fieldstr + ") VALUES "
+        sql = "INSERT IGNORE INTO "+table+"(code, pub_date, end_date,"  + fieldstr + ") VALUES "
         
         for fundamental in fundamentals:
             sql += self.fundamentalToSql(code, fundamental, fieldstr) + ","
-        
         sql = sql[:-1] + ";"
 
         # print(sql)
-        self.cursor.execute(sql)
+        insertcount = self.cursor.execute(sql)
         self.db.commit()
+        return insertcount
         
     def addIndexConstituent(self, code, constituent):
-        sql = """INSERT INTO index_constituents(code, trade_date, constituents) VALUES ('%s', '%s', "%s")"""
-        print(constituent.keys())
+        sql = """INSERT IGNORE INTO index_constituents(code, trade_date, constituents) VALUES ('%s', '%s', "%s")"""
         sql = sql % (code, constituent['trade_date'], constituent['constituents'])
-        self.cursor.execute(sql)
+        insertcount = self.cursor.execute(sql)
         self.db.commit()
+        return insertcount
 
     def getStockList(self):
         sql = "select code from stocks"
