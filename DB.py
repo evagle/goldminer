@@ -30,7 +30,7 @@ class DB():
         sql = sql % (bar.sec_id, DateUtil.toMysqlDatetimeStr(bar.strtime), bar.open, bar.close, bar.high, bar.low, 
                      bar.amount, bar.volume, bar.adj_factor, bar.pre_close, bar.upper_limit, bar.lower_limit)
 #         print(sql)
-        insertcount self.cursor.execute(sql)
+        insertcount = self.cursor.execute(sql)
         self.db.commit()
         return insertcount
     
