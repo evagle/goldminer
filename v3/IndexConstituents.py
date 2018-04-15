@@ -12,7 +12,7 @@ import MySQLdb
 import codecs
 from datetime import *
 import time
-
+import sys
 sys.path.append('../')
 from DB import *
 
