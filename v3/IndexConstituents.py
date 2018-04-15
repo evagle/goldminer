@@ -61,8 +61,9 @@ class IndexData():
     def queryInstituents(self, code):
         startdate = self.db.getLastIndexDate(code)
         enddate = datetime.now()+timedelta(days=1)
-        print(startdate, enddate, self.getSymbol(code)+ "." +code)
+        print("start=",startdate, "end=", enddate, "code=", self.getSymbol(code)+ "." +code)
         results = get_history_constituents(index=self.getSymbol(code)+ "." +code, start_date=startdate, end_date=enddate)
+        print("results len = ", len(results))
         return results
     
     def saveConstituents(self, code, constituents):
