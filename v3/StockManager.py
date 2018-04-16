@@ -24,20 +24,16 @@ class StockManager():
             return "SHSE"
         return "SZSE"
     
-    def queryAllStockBar(self, md, code):
-        startdate = self.db.getStockLatestDate(code)
-        if startdate is None:
-            startdate = self.db.getStockStartDate(code)
-        else:
-            startdate = startdate + timedelta(days=1)
-        enddate = datetime.now()+timedelta(days=1)
-        print(startdate, enddate)
-        bars = md.get_dailybars(self.getSymbol(code) + "." + code, startdate.strftime("%Y-%m-%d"), enddate.strftime("%Y-%m-%d"))
-        return bars
+    # def queryAllStockBar(self, md, code):
+    #     startdate = self.db.getStockLatestDate(code)
+    #     enddate = datetime.now() + timedelta(days=1)
+    #     print(startdate, enddate)
+    #     bars = md.get_dailybars(self.getSymbol(code) + "." + code, startdate.strftime("%Y-%m-%d"), enddate.strftime("%Y-%m-%d"))
+    #     return bars
     
-    def saveBars(self, bars):
-        count = 0
-        for bar in bars:
-            count += self.db.addStockDailyBar(bar)
-        print("Total %s bars, successfully insert %d bars" % (len(bars), count))
+    # def saveBars(self, bars):
+    #     count = 0
+    #     for bar in bars:
+    #         count += self.db.addStockDailyBar(bar)
+    #     print("Total %s bars, successfully insert %d bars" % (len(bars), count))
 

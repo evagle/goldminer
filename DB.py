@@ -29,11 +29,45 @@ class DB():
          VALUES ('%s', '%s', %f, %f, %f, %f, %f, %f, %f, %f, %f, %f)"""
         sql = sql % (bar.sec_id, DateUtil.toMysqlDatetimeStr(bar.strtime), bar.open, bar.close, bar.high, bar.low, 
                      bar.amount, bar.volume, bar.adj_factor, bar.pre_close, bar.upper_limit, bar.lower_limit)
-#         print(sql)
         insertcount = self.cursor.execute(sql)
         self.db.commit()
         return insertcount
-    
+
+    ###############
+    ## Insert index bar
+    ###############
+    def indexBarToSql(self, bar):
+        sql = "('%s', '%s' , %f, %f, %f, %f, %f, %f, %f)"
+        if 'pre_close' not in bar:
+            bar.pre_close = 0
+        if 'amount' not in bar:
+            print(bar)
+            bar.amount = 0
+        if 'open' not in bar:
+            print(bar)
+            bar.open = 0
+        if 'high' not in bar:
+            print(bar)
+            bar.high = 0
+        if 'low' not in bar:
+            print(bar)
+            bar.low = 0
+        sql = sql % (bar.symbol[5:], bar.bob.strftime("%Y-%m-%d"), bar.open, bar.close, bar.high, bar.low, 
+                     bar.amount, bar.volume, bar.pre_close)
+        return sql
+
+    def addIndexDailyBar(self, bars):
+        sql = """INSERT IGNORE INTO index_bar_daily(code, trade_date, open, close, high, low, amount, volume, pre_close)
+         VALUES """
+
+        for bar in bars:
+            sql += self.indexBarToSql(bar) + ","
+        sql = sql[:-1] + ";"
+
+        insertcount = self.cursor.execute(sql)
+        self.db.commit()
+        return insertcount
+
     def fundamentalToSql(self, code, fundamental, fieldstr):
         sql = "('%s', '%s' , '%s'" % (code, fundamental['pub_date'], fundamental['end_date'])
         
@@ -100,15 +134,23 @@ class DB():
         self.cursor.execute(sql)
         result = self.cursor.fetchone()
         if result is None:
-            return None
+            return datetime(2001, 1, 1)
         return result[0]
 
-    def getLastIndexDate(self, code):
+    def getIndexBarLatestDate(self, code):
+        sql = "select trade_date from index_bar_daily where code = '%s' order by trade_date desc limit 1" % code
+        self.cursor.execute(sql)
+        result = self.cursor.fetchone()
+        if result is None:
+            return datetime(2001, 1, 1)
+        return result[0]
+
+    def getLastIndexConstituentsDate(self, code):
         sql = "select trade_date from index_constituents where code = '%s' order by trade_date desc limit 1" % code
         self.cursor.execute(sql)
         result = self.cursor.fetchone()
         if result is None:
-            return datetime(2005, 1, 1)
+            return datetime(2001, 1, 1)
         return result[0]
  
     def getLastFundamentalsDate(self, code, table):
@@ -116,6 +158,6 @@ class DB():
         self.cursor.execute(sql)
         result = self.cursor.fetchone()
         if result is None:
-            return datetime(2005, 1, 1)
+            return datetime(2001, 1, 1)
         return result[0] + timedelta(days=1)
 

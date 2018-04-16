@@ -25,7 +25,7 @@ class IndexManager():
         return "SZSE"
     
     def queryInstituents(self, code):
-        startdate = self.db.getLastIndexDate(code) + timedelta(days=1)
+        startdate = self.db.getLastIndexConstituentsDate(code) + timedelta(days=1)
         enddate = datetime.now()+timedelta(days=1)
         print("start=",startdate, "end=", enddate, "code=", self.getSymbol(code)+ "." +code)
         results = get_history_constituents(index=self.getSymbol(code)+ "." +code, start_date=startdate, end_date=enddate)
@@ -37,4 +37,15 @@ class IndexManager():
         for constituent in constituents:
             count += self.db.addIndexConstituent(code, constituent)
         print("Total %d constituents, successfully insert %s constituents" % (len(constituents), count))
-        
+    
+    def queryAllBars(self, code):
+        startdate = self.db.getIndexBarLatestDate(code)
+        enddate = datetime.now() + timedelta(days=1)
+        print(startdate, enddate, self.getSymbol(code) + "." + code)
+        symbol = self.getSymbol(code) + "." + code
+        bars = history(symbol, "1d", startdate.strftime("%Y-%m-%d"), enddate.strftime("%Y-%m-%d"))
+        return bars
+    
+    def saveBars(self, bars):
+        count = self.db.addIndexDailyBar(bars)
+        print("Total %d index bars, successfully insert %d bars" % (len(bars), count))
