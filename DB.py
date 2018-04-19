@@ -18,7 +18,6 @@ class DB():
         self.cursor = self.db.cursor()
 
     def executeSql(self, sql):
-        print(sql)
         self.cursor.execute(sql)
         self.db.commit()
         return self.cursor.fetchall()
@@ -97,7 +96,8 @@ class DB():
         return insertcount
         
     def addIndexConstituent(self, code, constituent):
-        sql = """INSERT IGNORE INTO index_constituents(code, trade_date, constituents) VALUES ('%s', '%s', "%s")"""
+        constituent['constituents'] = constituent['constituents'].replace("'", "\"")
+        sql = """INSERT IGNORE INTO index_constituents(code, trade_date, constituents) VALUES ('%s', '%s', '%s')"""
         sql = sql % (code, constituent['trade_date'], constituent['constituents'])
         insertcount = self.cursor.execute(sql)
         self.db.commit()
