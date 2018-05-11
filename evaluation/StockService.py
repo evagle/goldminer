@@ -6,15 +6,9 @@
 
 from __future__ import print_function, absolute_import, unicode_literals
 
-import MySQLdb
-import codecs
-from datetime import *
-import time
-import json
-
 import sys
 sys.path.append('../')
-from DB import *
+from storage.DB import *
 from IndexConstituentManager import *
 
 

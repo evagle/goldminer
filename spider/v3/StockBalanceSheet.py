@@ -7,14 +7,10 @@
 # coding=utf-8
 from __future__ import print_function, absolute_import, unicode_literals
 from gm.api import *
-import MySQLdb
-import codecs
-from datetime import *
-import time
 
 import sys
 sys.path.append('../')
-from DB import *
+from storage.DB import *
 from StockManager import *
 from IndexManager import *
 from FundamentalsManager import *

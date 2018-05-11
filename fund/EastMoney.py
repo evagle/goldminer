@@ -1,14 +1,10 @@
 # coding=utf-8
-import MySQLdb
-import codecs
-from datetime import *
-import time
 import urllib
 import json
 
 import sys
 sys.path.append('../')
-from DB import *
+from storage.DB import *
 
 ## EastMoney's fund api:
 # history: http://fund.eastmoney.com/pingzhongdata/512580.js

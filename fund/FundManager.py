@@ -5,15 +5,11 @@
 
 
 # coding=utf-8
-import MySQLdb
-import codecs
-from datetime import *
-import time
 from EastMoney import EastMoney
 
 import sys
 sys.path.append('../')
-from DB import *
+from storage.DB import *
 
 
 class FundManager:

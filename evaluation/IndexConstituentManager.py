@@ -5,15 +5,9 @@
 
 from __future__ import print_function, absolute_import, unicode_literals
 
-import MySQLdb
-import codecs
-from datetime import *
-import time
-import pandas as pd
-
 import sys
 sys.path.append('../')
-from DB import *
+from storage.DB import *
 import json
 
 class IndexConstituentManager:
