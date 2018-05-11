@@ -5,6 +5,15 @@ import MySQLdb
 import codecs
 from datetime import *
 import time
+from models.models import *
+
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, String, Integer
+from sqlalchemy.orm import sessionmaker
+
+engine = create_engine('mysql+mysqldb://pocketpet:3MjdvUuXqxca6cbc@unionfight.citypet.cn:3306/goldminer?charset=utf8')
+Base = declarative_base()
 
 class DateUtil():
     @staticmethod
@@ -16,7 +25,18 @@ class DB():
     def __init__(self):
         self.db = MySQLdb.connect("unionfight.citypet.cn","pocketpet","3MjdvUuXqxca6cbc","goldminer",charset="utf8")
         self.cursor = self.db.cursor()
-
+        
+        DBSession = sessionmaker(bind=engine)
+        self.session = DBSession()
+    
+    def getStockList(self):
+        result = self.session.query(Stocks.code).all()
+        return [i[0] for i in result]
+    
+    def getIndexList(self):
+        result = self.session.query(Indexes.code).all()
+        return [i[0] for i in result]
+        
     def executeSql(self, sql):
         self.cursor.execute(sql)
         self.db.commit()
@@ -103,55 +123,41 @@ class DB():
         self.db.commit()
         return insertcount
 
-    def getStockList(self):
-        sql = "select code from stocks"
-        self.cursor.execute(sql)
-        self.db.commit()
-        results = self.cursor.fetchall()
-        stocks = []
-        for row in results:
-            stocks.append(row[0])
-        return stocks
-
-    def getIndexList(self):
-        sql = "select code from indexes"
-        self.cursor.execute(sql)
-        self.db.commit()
-        results = self.cursor.fetchall()
-        stocks = []
-        for row in results:
-            stocks.append(row[0])
-        return stocks
-        
+    
     def getStockStartDate(self, code):
-        sql = "select pub_date from stocks where code = '%s'" % code
-        self.cursor.execute(sql)
-        self.db.commit()
-        return self.cursor.fetchone()[0]
+        result = self.session.query(Stocks.pub_date).filter(Stocks.code == code)\
+                     .order_by(Stocks.pub_date.desc()).first()
+        return result[0]
     
     def getStockLatestDate(self, code):
-        sql = "select trade_date from bar_daily_adjust_none where code = '%s' order by trade_date desc limit 1" % code
-        self.cursor.execute(sql)
-        result = self.cursor.fetchone()
-        if result is None:
-            return datetime(2001, 1, 1)
-        return result[0]
+        result = self.session.query(BarDailyAdjustNone.trade_date)\
+                     .filter(BarDailyAdjustNone.code == code)\
+                     .order_by(BarDailyAdjustNone.trade_date.desc()).first()
+                     
+        return datetime(2001, 1, 1) if result is None else result[0]
 
     def getIndexBarLatestDate(self, code):
-        sql = "select trade_date from index_bar_daily where code = '%s' order by trade_date desc limit 1" % code
-        self.cursor.execute(sql)
-        result = self.cursor.fetchone()
-        if result is None:
-            return datetime(2001, 1, 1)
-        return result[0]
+        result = self.session.query(IndexBarDaily.trade_date)\
+                     .filter(IndexBarDaily.code == code)\
+                     .order_by(IndexBarDaily.trade_date.desc()).first()
+                     
+        return datetime(2001, 1, 1) if result is None else result[0]
+    
+    def getIndexConstituentsLatestDate(self, code):
+        result = self.session.query(IndexConstituents.trade_date)\
+                     .filter(IndexConstituents.code == code)\
+                     .order_by(IndexConstituents.trade_date.desc()).first()
+                     
+        return datetime(2001, 1, 1) if result is None else result[0]
 
-    def getLastIndexConstituentsDate(self, code):
-        sql = "select trade_date from index_constituents where code = '%s' order by trade_date desc limit 1" % code
-        self.cursor.execute(sql)
-        result = self.cursor.fetchone()
-        if result is None:
-            return datetime(2001, 1, 1)
-        return result[0]
+    def getFundamentalsLatestDate(self, table, code):
+        result = self.session.query(table.trade_date)\
+                     .filter(table.code == code)\
+                     .order_by(table.trade_date.desc()).first()
+                     
+        return datetime(2001, 1, 1) if result is None else result[0]
+
+  
  
     def getLastFundamentalsDate(self, code, table):
         sql = "select pub_date from %s where code = '%s' order by pub_date desc limit 1" % (table, code)
@@ -161,3 +167,6 @@ class DB():
             return datetime(2001, 1, 1)
         return result[0] + timedelta(days=1)
 
+db = DB()
+print(db.getIndexConstituentsLatestDate('00000x'))
+print(db.getIndexBarLatestDate('000001'))

@@ -23,7 +23,7 @@ class DB():
         self.cursor = self.db.cursor()
     
     def addStockDailyBar(self, bar):
-        sql = """INSERT INTO bar_daily_adjust_none(code, trade_date, open, close, high, low, amount, volume, 
+        sql = """INSERT INTO BarDailyAdjustNone(code, trade_date, open, close, high, low, amount, volume, 
         adj_factor, pre_close, upper_limit, lower_limit)
          VALUES ('%s', '%s', %f, %f, %f, %f, %f, %f, %f, %f, %f, %f)"""
         sql = sql % (bar.sec_id, DateUtil.toMysqlDatetimeStr(bar.strtime), bar.open, bar.close, bar.high, bar.low, 
@@ -33,7 +33,7 @@ class DB():
         self.db.commit()
         
     def getStockList(self):
-        sql = "select code from stocks"
+        sql = "select code from Stocks"
         self.cursor.execute(sql)
         self.db.commit()
         results = self.cursor.fetchall()
@@ -43,13 +43,13 @@ class DB():
         return stocks
         
     def getStockStartDate(self, code):
-        sql = "select pub_date from stocks where code = '%s'" % code
+        sql = "select pub_date from Stocks where code = '%s'" % code
         self.cursor.execute(sql)
         self.db.commit()
         return self.cursor.fetchone()[0]
     
     def getStockLatestDate(self, code):
-        sql = "select trade_date from bar_daily_adjust_none where code = '%s' order by trade_date desc limit 1" % code
+        sql = "select trade_date from BarDailyAdjustNone where code = '%s' order by trade_date desc limit 1" % code
         self.cursor.execute(sql)
         result = self.cursor.fetchone()
         if result is None:
