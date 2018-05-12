@@ -4,10 +4,11 @@
 # In[26]:
 
 
+import sys
+
 # coding=utf-8
 from EastMoney import EastMoney
 
-import sys
 sys.path.append('../')
 from storage.DB import *
 

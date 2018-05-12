@@ -3,9 +3,10 @@
 
 # In[73]:
 
-from __future__ import print_function, absolute_import, unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
 import sys
+
 sys.path.append('../')
 from storage.DB import *
 import json

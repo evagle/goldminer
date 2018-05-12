@@ -1,8 +1,8 @@
 # coding=utf-8
-import urllib
 import json
-
 import sys
+import urllib
+
 sys.path.append('../')
 from storage.DB import *
 
@@ -13,7 +13,7 @@ from storage.DB import *
 class EastMoney:
     def __init__(self):
         self.db = DB()
-    
+
     def fundHistory(self, code):
         data = {}
         response = urllib.request.urlopen("http://fund.eastmoney.com/pingzhongdata/"+code+".js") 

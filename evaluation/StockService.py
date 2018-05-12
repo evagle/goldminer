@@ -4,19 +4,18 @@
 # In[ ]:
 
 
-from __future__ import print_function, absolute_import, unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
 import sys
+
 sys.path.append('../')
 from storage.DB import *
-from IndexConstituentManager import *
-
 
 class StockService:
     def __init__(self):
         self.db = DB()
         self.stockPETTMCache = {}
-    
+
     def _dateToStr(self, date):
         return date.strftime("%Y-%m-%d")
     
@@ -36,4 +35,5 @@ class StockService:
         if stockCode not in self.stockPETTMCache:
             self._loadStockPETTM(stockCode)
         return self.stockPETTMCache[stockCode][self._dateToStr(date)]
+
 

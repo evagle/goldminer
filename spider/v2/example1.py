@@ -7,8 +7,9 @@
 # @version 1.0
 # @date 2018-03-29
 
-from gmsdk.api import StrategyBase
 from gmsdk import md
+from gmsdk.api import StrategyBase
+
 
 class MyStrategy(StrategyBase):
     def __init__(self, *args, **kwargs):

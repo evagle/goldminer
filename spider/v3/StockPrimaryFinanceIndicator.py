@@ -5,10 +5,12 @@
 
 
 # coding=utf-8
-from __future__ import print_function, absolute_import, unicode_literals
-from gm.api import *
+from __future__ import absolute_import, print_function, unicode_literals
 
 import sys
+
+from gm.api import *
+
 sys.path.append('../')
 from storage.DB import *
 from StockManager import *
