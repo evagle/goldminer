@@ -40,7 +40,7 @@ class HTMLTestSuite(unittest.TestCase):
             ])
 
         # Invoke TestRunner
-        file_path = "result.html"
+        file_path = "UnitTestResult.html"
         file_result = open(file_path, 'w')
         runner = HTMLTestRunner(
                     stream=file_result,
