@@ -15,8 +15,8 @@ class BalanceSheet(Base):
 
     id = Column(Integer, primary_key=True)
     code = Column(String(16), nullable=False)
-    pub_date = Column(DateTime, nullable=False)
-    end_date = Column(DateTime, nullable=False)
+    pub_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
     ACCHELDFORS = Column(Float(asdecimal=True))
     ACCOPAYA = Column(Float(asdecimal=True))
     ACCORECE = Column(Float(asdecimal=True))
@@ -166,15 +166,15 @@ class BalanceSheet(Base):
     WARLIABRESE = Column(Float(asdecimal=True))
 
 
-class BarDailyAdjustNone(Base):
-    __tablename__ = 'BarDailyAdjustNone'
+class StockDailyBarAdjustNone(Base):
+    __tablename__ = 'StockDailyBarAdjustNone'
     __table_args__ = (
         Index('code_date', 'code', 'trade_date', unique=True),
     )
 
     id = Column(Integer, primary_key=True)
     code = Column(String(16), nullable=False)
-    trade_date = Column(DateTime, nullable=False)
+    trade_date = Column(Date, nullable=False)
     open = Column(Float, nullable=False)
     close = Column(Float, nullable=False)
     high = Column(Float, nullable=False)
@@ -182,8 +182,6 @@ class BarDailyAdjustNone(Base):
     amount = Column(Float(asdecimal=True), nullable=False)
     volume = Column(BigInteger, nullable=False)
     position = Column(Float)
-    begin_time = Column(DateTime)
-    end_time = Column(DateTime)
     sec_level = Column(Integer)
     is_suspended = Column(Integer)
     pre_close = Column(Float)
@@ -213,8 +211,8 @@ class CashflowStatement(Base):
 
     _1 = Column('1', Integer, primary_key=True)
     code = Column(String(16), nullable=False)
-    pub_date = Column(DateTime, nullable=False)
-    end_date = Column(DateTime, nullable=False)
+    pub_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
     ACCREXPEINCR = Column(Float(asdecimal=True))
     ACQUASSETCASH = Column(Float(asdecimal=True))
     ASSEDEPR = Column(Float(asdecimal=True))
@@ -352,8 +350,8 @@ class DerivativeFinanceIndicator(Base):
 
     id = Column(Integer, primary_key=True)
     code = Column(String(16), nullable=False)
-    pub_date = Column(DateTime, nullable=False)
-    end_date = Column(DateTime, nullable=False)
+    pub_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
     ACCDEPRT = Column(Float(asdecimal=True))
     ACCPAYRT = Column(Float(asdecimal=True))
     ACCPAYTDAYS = Column(Float(asdecimal=True))
@@ -569,8 +567,8 @@ class IncomeStatement(Base):
 
     _1 = Column('1', Integer, primary_key=True)
     code = Column(String(16), nullable=False)
-    pub_date = Column(DateTime, nullable=False)
-    end_date = Column(DateTime, nullable=False)
+    pub_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
     ASSEIMPALOSS = Column(Float(asdecimal=True))
     ASSOINVEPROF = Column(Float(asdecimal=True))
     AVAIDISTPROF = Column(Float(asdecimal=True))
@@ -691,15 +689,15 @@ class IncomeStatement(Base):
     VALUECHGLOSS = Column(Float(asdecimal=True))
 
 
-class IndexBarDaily(Base):
-    __tablename__ = 'IndexBarDaily'
+class IndexDailyBar(Base):
+    __tablename__ = 'IndexDailyBar'
     __table_args__ = (
         Index('code_date', 'code', 'trade_date', unique=True),
     )
 
     _1 = Column('1', Integer, primary_key=True)
     code = Column(String(16), nullable=False)
-    trade_date = Column(DateTime, nullable=False)
+    trade_date = Column(Date, nullable=False)
     open = Column(Float, nullable=False)
     close = Column(Float, nullable=False)
     high = Column(Float, nullable=False)
@@ -717,8 +715,8 @@ class IndexBarDaily(Base):
     adj_factor = Column(Float)
 
 
-class IndexConstituents(Base):
-    __tablename__ = 'IndexConstituents'
+class IndexConstituent(Base):
+    __tablename__ = 'IndexConstituent'
     __table_args__ = (
         Index('code', 'code', 'trade_date', unique=True),
     )
@@ -767,8 +765,8 @@ class PrimaryFinanceIndicator(Base):
 
     id = Column(Integer, primary_key=True)
     code = Column(String(16), nullable=False)
-    pub_date = Column(DateTime, nullable=False)
-    end_date = Column(DateTime, nullable=False)
+    pub_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
     EBIT = Column(Float(asdecimal=True))
     EBITDA = Column(Float(asdecimal=True))
     EBITDASCOVER = Column(Float(asdecimal=True))
@@ -824,7 +822,7 @@ class SecurityType(Base):
     description = Column(String(255), nullable=False)
 
 
-class Stocks(Base):
+class Stock(Base):
     __tablename__ = 'Stocks'
 
     code = Column(String(16), primary_key=True)
@@ -844,8 +842,8 @@ class TradingDerivativeIndicator(Base):
 
     id = Column(Integer, primary_key=True)
     code = Column(String(16), nullable=False)
-    pub_date = Column(DateTime, nullable=False)
-    end_date = Column(DateTime, nullable=False)
+    pub_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
     DY = Column(Float, nullable=False)
     EV = Column(Float(asdecimal=True), nullable=False)
     EVEBITDA = Column(Float, nullable=False)
