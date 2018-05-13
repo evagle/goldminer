@@ -695,7 +695,7 @@ class IndexDailyBar(Base):
         Index('code_date', 'code', 'trade_date', unique=True),
     )
 
-    _1 = Column('1', Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     code = Column(String(16), nullable=False)
     trade_date = Column(Date, nullable=False)
     open = Column(Float, nullable=False)
