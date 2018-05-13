@@ -19,6 +19,9 @@ class IndexBarSpider(GMBaseSpiderV3):
         model = self._rawDataToModel(code, rawBar, IndexDailyBar)
         model.code = code
         model.trade_date = rawBar['eob'].date()
+        for key in ['pre_close', 'amount', 'open', 'close', 'high', 'low']:
+            if getattr(model, key) is None:
+                setattr(model, key, 0)
         return model
 
     def downloadBars(self, code):

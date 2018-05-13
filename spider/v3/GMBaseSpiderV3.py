@@ -77,3 +77,14 @@ class GMBaseSpiderV3:
         if code[0:1] == "0":
             return "SHSE"
         return "SZSE"
+
+    def codeToIndexSymbol(self, code):
+        return self.getIndexSymbol(code) + "." + code
+
+    def getStockSymbol(self, code):
+        if code[0:1] == "6" or code[0:1] == "9":
+            return "SHSE"
+        return "SZSE"
+
+    def codeToStockSymbol(self, code):
+        return self.getStockSymbol(code) + "." + code
