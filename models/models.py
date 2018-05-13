@@ -187,29 +187,37 @@ class StockDailyBarAdjustNone(Base):
     pre_close = Column(Float)
     upper_limit = Column(Float)
     lower_limit = Column(Float)
-    adj_factor = Column(Float, nullable=False)
+    adj_factor = Column(Float(asdecimal=True), nullable=False)
 
 
-class BarDailyAdjustPrev(Base):
-    __tablename__ = 'BarDailyAdjustPrev'
+class StockDailyBarAdjustPrev(Base):
+    __tablename__ = 'StockDailyBarAdjustPrev'
+    __table_args__ = (
+        Index('code_date', 'code', 'trade_date', unique=True),
+    )
 
     id = Column(Integer, primary_key=True)
     code = Column(String(16), nullable=False)
+    trade_date = Column(Date, nullable=False)
     open = Column(Float, nullable=False)
     close = Column(Float, nullable=False)
     high = Column(Float, nullable=False)
     low = Column(Float, nullable=False)
     amount = Column(Float(asdecimal=True), nullable=False)
     volume = Column(BigInteger, nullable=False)
-    position = Column(Float, nullable=False)
-    begin_time = Column(DateTime, nullable=False)
-    end_time = Column(DateTime, nullable=False)
+    position = Column(Float)
+    sec_level = Column(Integer)
+    is_suspended = Column(Integer)
+    pre_close = Column(Float)
+    upper_limit = Column(Float)
+    lower_limit = Column(Float)
+    adj_factor = Column(Float(asdecimal=True))
 
 
 class CashflowStatement(Base):
     __tablename__ = 'CashflowStatement'
 
-    _1 = Column('1', Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     code = Column(String(16), nullable=False)
     pub_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
@@ -526,7 +534,7 @@ class DerivativeFinanceIndicator(Base):
 class Dividend(Base):
     __tablename__ = 'Dividend'
 
-    _1 = Column('1', Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     code = Column(String(16), nullable=False)
     pub_date = Column(DateTime, nullable=False)
     cash_div = Column(Float, nullable=False)
@@ -551,7 +559,7 @@ class FundDailyBar(Base):
         Index('code_date', 'code', 'trade_date', unique=True),
     )
 
-    _1 = Column('1', Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     code = Column(String(16), nullable=False)
     trade_date = Column(Date, nullable=False)
     net_asset_value = Column(Float(asdecimal=True), nullable=False)
@@ -565,7 +573,7 @@ class IncomeStatement(Base):
         Index('code_pub_date_end_date', 'code', 'pub_date', 'end_date', unique=True),
     )
 
-    _1 = Column('1', Integer, primary_key=True)
+    id = Column( Integer, primary_key=True)
     code = Column(String(16), nullable=False)
     pub_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
@@ -721,7 +729,7 @@ class IndexConstituent(Base):
         Index('code', 'code', 'trade_date', unique=True),
     )
 
-    _1 = Column('1', Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     code = Column(String(16), nullable=False)
     trade_date = Column(Date, nullable=False)
     constituents = Column(Text, nullable=False)

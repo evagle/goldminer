@@ -162,6 +162,6 @@ class DB:
         return result[0] + timedelta(days=1)
 
 
-db = DB()
-print(db.getIndexConstituentsLatestDate('00000x'))
-print(db.getIndexBarLatestDate('000001'))
+# db = DB()
+# print(db.getIndexConstituentsLatestDate('00000x'))
+# print(db.getIndexBarLatestDate('000001'))
