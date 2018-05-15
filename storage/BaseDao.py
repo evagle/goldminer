@@ -7,7 +7,11 @@ class BaseDao:
     def __init__(self):
         self.session = DBHelper.getSession()
 
-    def _addAll(self, modelClazz, instances):
+    def addAll(self, instances):
+        if len(instances) == 0:
+            return
+        modelClazz = instances[0].__class__
+
         properties = Utils.getPropertiesOfClazz(modelClazz)
         items = []
         for instance in instances:

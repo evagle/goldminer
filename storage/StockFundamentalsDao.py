@@ -11,12 +11,6 @@ class StockFundamentalsDao(BaseDao):
         self.session.add(model)
         self.session.commit()
 
-    def addAll(self, models):
-        if len(models) == 0:
-            return
-        clazz = models[0].__class__
-        self._addAll(clazz, models)
-
     def getLatestDate(self, code: str, modelClazz):
         result = self.session.query(modelClazz.end_date)\
                              .filter(modelClazz.code == code)\

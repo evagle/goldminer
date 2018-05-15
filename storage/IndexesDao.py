@@ -19,10 +19,6 @@ class IndexesDao(BaseDao):
         self.session.add(index)
         self.session.commit()
 
-    def addAll(self, indexes):
-        self.session.add_all(indexes)
-        self.session.commit()
-
     def getIndexPublishDate(self, code: str):
         result = self.session.query(Indexes.pub_date).filter(Indexes.code == code).first()
         if result is not None:

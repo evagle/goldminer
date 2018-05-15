@@ -8,13 +8,13 @@ from spider.v3.StockIncomeStatementSpider import StockIncomeStatementSpider
 from spider.v3.StockPrimaryFinanceIndicatorSpider import StockPrimaryFinanceIndicatorSpider
 from spider.v3.StockTradingDerivativeIndicatorSpider import StockTradingDerivativeIndicatorSpider
 
-'''
-Download all index constituents
-'''
-spider = IndexConstituentsSpider()
-spider.downloadAllIndexConstituents()
-
-
+# '''
+# Download all index constituents
+# '''
+# spider = IndexConstituentsSpider()
+# spider.downloadAllIndexConstituents()
+#
+#
 # '''
 # Download all index bars
 # '''
@@ -29,11 +29,11 @@ spider.downloadAllIndexConstituents()
 # spider.downloadAll()
 
 
-# '''
-# Download all stock bars with prev adjustment
-# '''
-# spider = StockDailyBarAdjustPrevSpider()
-# spider.downloadAll()
+'''
+Download all stock bars with prev adjustment
+'''
+spider = StockDailyBarAdjustPrevSpider()
+spider.downloadAll()
 
 
 # '''

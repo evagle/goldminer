@@ -11,10 +11,6 @@ class StockDailyBarAdjustNoneDao(BaseDao):
         self.session.add(stockBar)
         self.session.commit()
 
-    def addAll(self, stockBars):
-        self.session.add_all(stockBars)
-        self.session.commit()
-
     def getLatestDate(self, code: str):
         result = self.session.query(StockDailyBarAdjustNone.trade_date)\
                              .filter(StockDailyBarAdjustNone.code == code)\

@@ -11,10 +11,6 @@ class IndexDailyBarDao(BaseDao):
         self.session.add(indexBar)
         self.session.commit()
 
-    def addAll(self, indexBars):
-        self.session.add_all(indexBars)
-        self.session.commit()
-
     def getLatestDate(self, code: str):
         result = self.session.query(IndexDailyBar.trade_date)\
                              .filter(IndexDailyBar.code == code)\

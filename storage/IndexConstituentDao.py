@@ -15,8 +15,7 @@ class IndexConstituentDao(BaseDao):
     def addAll(self, constituents):
         for constituent in constituents:
             constituent.constituents = constituent.constituents.replace("'", "\"")
-        self.session.add_all(constituents)
-        self.session.commit()
+        super(IndexConstituentDao, self).addAll(constituents)
 
     def getLatestDate(self, code: str):
         result = self.session.query(IndexConstituent.trade_date) \

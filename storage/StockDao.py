@@ -19,10 +19,6 @@ class StockDao(BaseDao):
         self.session.add(stock)
         self.session.commit()
 
-    def addAll(self, stocks):
-        self.session.add_all(stocks)
-        self.session.commit()
-
     # get stock publish date, return None when stock not fund
     def getStockPublishDate(self, code: str):
         result = self.session.query(Stock.pub_date).filter(Stock.code == code).first()
