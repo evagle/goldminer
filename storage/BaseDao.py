@@ -7,6 +7,10 @@ class BaseDao:
     def __init__(self):
         self.session = DBHelper.getSession()
 
+    def add(self, instance):
+        self.session.add(instance)
+        self.session.commit()
+
     def addAll(self, instances):
         if len(instances) == 0:
             return
