@@ -46,9 +46,6 @@ class IndexConstituentDao(BaseDao):
         return result
 
 
-
-
-
 if __name__ == "__main__":
     constituentDao = IndexConstituentDao()
     print(constituentDao.getConstituents('000001', date(2005, 1, 1)))

@@ -12,8 +12,7 @@ class StockDailyBarAdjustPrevDao(BaseDao):
         self.session.commit()
 
     def addAll(self, stockBars):
-        self.session.add_all(stockBars)
-        self.session.commit()
+        self._addAll(StockDailyBarAdjustPrev, stockBars)
 
     def getLatestDate(self, code: str):
         result = self.session.query(StockDailyBarAdjustPrev.trade_date)\
@@ -21,4 +20,3 @@ class StockDailyBarAdjustPrevDao(BaseDao):
                              .order_by(StockDailyBarAdjustPrev.trade_date.desc())\
                              .first()
         return date(2001, 1, 1) if result is None else result[0]
-

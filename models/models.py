@@ -736,13 +736,15 @@ class IndexConstituent(Base):
     no_weight = Column(Integer, nullable=False, server_default=text("'0'"))
 
 
-class IndexDerivativeIndicator(Base):
+class IndexPrimaryIndicator(Base):
     __tablename__ = 'IndexDerivativeIndicator'
+    __table_args__ = (
+        Index('code_trade_date', 'code', 'trade_date', unique=True),
+    )
 
     id = Column(Integer, primary_key=True)
     code = Column(String(16), nullable=False)
-    pub_date = Column(DateTime, nullable=False)
-    end_date = Column(DateTime, nullable=False)
+    trade_date = Column(Date, nullable=False)
     equal_weight_pe = Column(Float(asdecimal=True))
     weighted_pe = Column(Float(asdecimal=True))
     median_pe = Column(Float(asdecimal=True))
