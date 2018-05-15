@@ -1,21 +1,13 @@
 # coding: utf-8
-
-# In[73]:
-
-from __future__ import absolute_import, print_function, unicode_literals
-
-import sys
+from datetime import date
 
 from storage.IndexConstituentDao import IndexConstituentDao
 
-sys.path.append('../')
-from storage.DB import *
 import json
 
 
 class IndexConstituentManager:
     def __init__(self):
-        self.db = DB()
         self.indexConstituentDao = IndexConstituentDao()
 
     def getWeights(self, code, date):
@@ -65,60 +57,3 @@ class IndexConstituentManager:
         for c in data:
             constituents.append(c[5:])
         return constituents
-
-
-# In[76]:
-
-
-class IndexConstituentManagerTest:
-    def __init__(self):
-        self.instance = IndexConstituentManager()
-
-    def testGetConstituents(self):
-        d = self.instance._getConstituentsForTest('000001', datetime(1999, 12, 1))
-        print("expect ", date(2001, 1, 1), " real =", d)
-        assert (d == date(2001, 1, 1))
-
-        d = self.instance._getConstituentsForTest('000001', datetime(2001, 1, 1))
-        print("expect ", date(2001, 1, 1), " real =", d)
-        assert (d == date(2001, 1, 1))
-
-        d = self.instance._getConstituentsForTest('000001', datetime(2001, 1, 4))
-        print("expect ", date(2001, 1, 5), " real =", d)
-        assert (d == date(2001, 1, 5))
-
-        d = self.instance._getConstituentsForTest('000001', datetime(2001, 2, 26))
-        print("expect ", date(2001, 2, 27), " real =", d)
-        assert (d == date(2001, 2, 27))
-
-        d = self.instance._getConstituentsForTest('000001', datetime(2009, 8, 28))
-        print("expect ", date(2009, 8, 28), " real =", d)
-        assert (d == date(2009, 8, 28))
-
-        d = self.instance._getConstituentsForTest('000001', datetime(2011, 4, 23))
-        print("expect ", date(2011, 5, 13), " real =", d)
-        assert (d == date(2011, 5, 13))
-
-        d = self.instance._getConstituentsForTest('000001', datetime(2011, 5, 10))
-        print("expect ", date(2011, 5, 13), " real =", d)
-        assert (d == date(2011, 5, 13))
-
-        d = self.instance._getConstituentsForTest('000001', datetime(2011, 5, 20))
-        print("expect ", date(2011, 5, 20), " real =", d)
-        assert (d == date(2011, 5, 20))
-
-        d = self.instance._getConstituentsForTest('000001', datetime(2011, 5, 25))
-        print("expect ", date(2011, 5, 31), " real =", d)
-        assert (d == date(2011, 5, 31))
-
-        d = self.instance._getConstituentsForTest('000001', datetime(2011, 6, 1))
-        print("expect ", date(2011, 6, 30), " real =", d)
-        assert (d == date(2011, 6, 30))
-
-        d = self.instance._getConstituentsForTest('000001', datetime(2018, 3, 20))
-        print("expect ", date(2018, 3, 30), " real =", d)
-        assert (d == date(2018, 3, 30))
-
-
-test = IndexConstituentManagerTest()
-test.testGetConstituents()
