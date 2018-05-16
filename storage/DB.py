@@ -3,12 +3,9 @@
 from datetime import *
 
 import MySQLdb
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
+import time
 from models.models import *
 
-engine = create_engine('mysql+mysqldb://pocketpet:3MjdvUuXqxca6cbc@unionfight.citypet.cn:3306/goldminer?charset=utf8')
 
 
 class DateUtil():
@@ -20,11 +17,9 @@ class DateUtil():
 
 class DB:
     def __init__(self):
-        self.db = MySQLdb.connect("unionfight.citypet.cn", "pocketpet", "3MjdvUuXqxca6cbc", "goldminer", charset="utf8")
+        # self.db = MySQLdb.connect("unionfight.citypet.cn", "pocketpet", "3MjdvUuXqxca6cbc", "goldminer", charset="utf8")
+        self.db = MySQLdb.connect(host="127.0.0.1", port=3307, user="pocketpet", password="3MjdvUuXqxca6cbc", db="goldminer", charset="utf8")
         self.cursor = self.db.cursor()
-
-        DBSession = sessionmaker(bind=engine)
-        self.session = DBSession()
 
     def getStockList(self):
         result = self.session.query(Stock.code).all()
@@ -162,6 +157,10 @@ class DB:
         return result[0] + timedelta(days=1)
 
 
-# db = DB()
+db = DB()
+print(time.ctime())
+result = db.executeSql("SELECT `IndexConstituent`.id AS `IndexConstituent_id`, `IndexConstituent`.code AS `IndexConstituent_code`, `IndexConstituent`.trade_date AS `IndexConstituent_trade_date`, `IndexConstituent`.constituents AS `IndexConstituent_constituents`, `IndexConstituent`.no_weight AS `IndexConstituent_no_weight` FROM `IndexConstituent` WHERE `IndexConstituent`.code = '000001' ORDER BY trade_date ASC")
+print(result)
+print(time.ctime())
 # print(db.getIndexConstituentsLatestDate('00000x'))
 # print(db.getIndexBarLatestDate('000001'))
