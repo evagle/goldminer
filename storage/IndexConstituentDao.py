@@ -29,16 +29,14 @@ class IndexConstituentDao(BaseDao):
     2. If date > all record, return latest one
     '''
     def getConstituents(self, code, tradeDate):
-        result = self.session.query(IndexConstituent.code, IndexConstituent.trade_date, IndexConstituent.constituents,
-                                    IndexConstituent.no_weight) \
+        result = self.session.query(IndexConstituent) \
                              .filter(IndexConstituent.code == code, IndexConstituent.trade_date >= tradeDate) \
                              .order_by(IndexConstituent.trade_date.asc()) \
                              .first()
         if result is not None:
             return result
 
-        result = self.session.query(IndexConstituent.code, IndexConstituent.trade_date, IndexConstituent.constituents,
-                                    IndexConstituent.no_weight) \
+        result = self.session.query(IndexConstituent) \
             .filter(IndexConstituent.code == code, IndexConstituent.trade_date < tradeDate) \
             .order_by(IndexConstituent.trade_date.desc()) \
             .first()

@@ -1,6 +1,7 @@
 # coding: utf-8
 from datetime import date
 
+from models.models import IndexConstituent
 from storage.IndexConstituentDao import IndexConstituentDao
 
 import json
@@ -22,14 +23,13 @@ class IndexConstituentManager:
         print(weights)
         return weights
 
-    def __formatConstituents(self, data):
-        if data[3] == 1:
-            constituents = [c[5:] for c in json.loads(data[2])]
-            return [data[0], data[1], constituents]
+    def __formatConstituents(self, model: IndexConstituent):
+        if model.no_weight == 1:
+            constituents = [c[5:] for c in json.loads(model.constituents)]
         else:
-            keys = list(json.loads(data[2]).keys())
+            keys = list(json.loads(model.constituents).keys())
             constituents = [c[5:] for c in keys]
-            return [data[0], data[1], constituents]
+        return [model.code, model.trade_date, constituents]
 
     # 获取指数成份股，如果能获取到weights则直接返回
     # 否则尝试获取constituents
