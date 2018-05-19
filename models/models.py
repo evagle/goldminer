@@ -2,9 +2,37 @@
 from sqlalchemy import BigInteger, Column, Date, DateTime, Float, Index, Integer, String, Text, text
 from sqlalchemy.ext.declarative import declarative_base
 
+from common.Utils import Utils
 
 Base = declarative_base()
 metadata = Base.metadata
+
+
+def to_dict(self, ignoreNone = True):
+    attributes = Utils.getPropertiesOfClazz(self)
+    dic = {}
+    for attr in attributes:
+        if attr == "metadata" or attr == "toDict":
+            continue
+        val = getattr(self, attr)
+        if val is not None or ignoreNone is False:
+            dic[attr] = val
+    return dic
+
+
+def to_str(self):
+    attributes = Utils.getPropertiesOfClazz(self)
+    str = "[%s] " % self.__name__
+    for attr in attributes:
+        if attr == "metadata" or attr == "toDict":
+            continue
+        val = getattr(self, attr)
+        str = str + ("%s=%s" % (attr, val))
+    return str
+
+
+Base.to_dict = to_dict
+Base.__str__ = to_str
 
 
 class BalanceSheet(Base):
@@ -737,7 +765,7 @@ class IndexConstituent(Base):
 
 
 class IndexPrimaryIndicator(Base):
-    __tablename__ = 'IndexDerivativeIndicator'
+    __tablename__ = 'IndexPrimaryIndicator'
     __table_args__ = (
         Index('code_trade_date', 'code', 'trade_date', unique=True),
     )
