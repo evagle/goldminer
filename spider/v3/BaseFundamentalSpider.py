@@ -47,7 +47,10 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
         symbol = self.codeToStockSymbol(code)
 
         modelName = self.getModelClassName()
-        print("[Download %s][%s] from %s to %s" % (modelName, code, startDate, endDate))
+        if startDate >= datetime.now().date():
+            print("[%s\t%s] is up to date" % (code, modelName))
+            return None
+        print("[%s\t%s] from %s to %s" % (modelName, code, startDate, endDate))
 
         results = self.getFundamentals(table=self.table, symbols=symbol, start_date=startDate, end_date=endDate,
                                      limit=10000, fields=self.fields)
@@ -55,11 +58,12 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
         items = [self.rawDataToModel(code, item) for item in results]
         self.fundamentalsDao.addAll(items)
 
-        print("[Download %s][%s] count = %d\n" % (modelName, code, len(items)))
+        print("[%s\t%s] count = %d\n" % (modelName, code, len(items)))
         return items
 
     def downloadAll(self):
         stocks = self.stockDao.getStockList()
         for code in stocks:
-            self.downloadByCode(code)
-            time.sleep(0.1)
+            result = self.downloadByCode(code)
+            if result is not None:
+                time.sleep(0.1)
