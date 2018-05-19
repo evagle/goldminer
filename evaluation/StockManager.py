@@ -13,7 +13,6 @@ class StockManager:
 
         # load trade dates when initiate
         self.__loadTradeDates()
-        print(self.__tradeDatesCache)
 
     def __loadStockPETTM(self, stockCode):
         if stockCode in self.__stockPETTMCache:
