@@ -28,3 +28,25 @@ class StockDao(BaseDao):
         if result is not None:
             return result[0]
         return None
+
+
+'''
+从上交所下载股票列表然后导入
+'''
+def importFromSH():
+    dao = StockDao()
+    for line in open("/Users/abing/Downloads/ee.txt").readlines():
+        args = line.split()
+
+        old = dao.getByCode(args[0])
+        if old is None:
+            stock = Stock()
+            stock.exchange = 1
+            stock.code = args[0]
+            stock.name = args[1]
+            stock.pub_date = args[4]
+            stock.total_stock = args[5]
+            stock.circulation_stock = args[6]
+            stock.industry = ''
+            dao.add(stock)
+            print(args)
