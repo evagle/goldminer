@@ -11,6 +11,9 @@ class StockDao(BaseDao):
     def all(self) -> List[Stock]:
         return self.session.query(Stock).all()
 
+    def getByCode(self, code) -> Stock:
+        return self.session.query(Stock).filter(Stock.code == code).first()
+
     def getStockList(self) -> List[str]:
         result = self.session.query(Stock.code).all()
         return [i[0] for i in result]
