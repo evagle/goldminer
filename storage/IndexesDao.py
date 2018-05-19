@@ -12,7 +12,8 @@ class IndexesDao(BaseDao):
         return self.session.query(Indexes).all()
 
     def getIndexList(self) -> List[str]:
-        result = self.session.query(Indexes.code).all()
+        excludeIndexTypes = ["债券指数"]
+        result = self.session.query(Indexes.code).filter(Indexes.index_type.notin_(excludeIndexTypes)).all()
         return [i[0] for i in result]
 
     def add(self, index: Indexes):
@@ -24,3 +25,6 @@ class IndexesDao(BaseDao):
         if result is not None:
             return result[0]
         return None
+
+dao = IndexesDao()
+dao.getIndexList()
