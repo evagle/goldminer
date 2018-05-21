@@ -18,3 +18,9 @@ class StockDailyBarAdjustNoneDao(BaseDao):
                              .first()
         return date(2001, 1, 1) if result is None else result[0]
 
+    def getAllTradeDatesByCode(self, code: str):
+        result = self.session.query(StockDailyBarAdjustNone.trade_date)\
+                             .filter(StockDailyBarAdjustNone.code == code)\
+                             .order_by(StockDailyBarAdjustNone.trade_date.asc())\
+                             .all()
+        return [d[0] for d in result]
