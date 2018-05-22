@@ -6,6 +6,7 @@ from evaluation.StockManager import StockManager
 from models.models import IndexPrimaryIndicator
 from storage.IndexPrimaryIndicatorDao import IndexPrimaryIndicatorDao
 from storage.IndexesDao import IndexesDao
+from storage.StockDao import StockDao
 
 
 class IndexPEPBGenerator:
@@ -33,7 +34,13 @@ class IndexPEPBGenerator:
             return result[0][0]
 
     def calcEqualWeightedPE(self, indexCode, startDate = None):
-        d = date(2005, 1, 4) if startDate is None else startDate
+        d = startDate
+        if startDate is None:
+            d = self.indexDao.getIndexPublishDate(indexCode)
+        # stock data starts from 2005-01-04
+        if d < date(2005, 1, 4):
+            d = date(2015, 1, 4)
+
         now = datetime.now().date()
 
         models = []
@@ -61,21 +68,26 @@ class IndexPEPBGenerator:
     def updateAllByCode(self, code):
         now = datetime.now().date().strftime("%Y-%m-%d")
         d = self.indexPrimaryIndicatorDao.getLatestDate(code, "equal_weight_pe")
-        print("[%s] (%s - %s) equal weight pe" % (code, d.strftime("%Y-%m-%d"), now))
+        if d is None:
+            d = self.indexDao.getIndexPublishDate(code)
+
+        print("[%s] (%s ~ %s) equal weight pe" % (code, d, now))
         models = self.calcEqualWeightedPE(code, d)
-        print("[%s] Save %s equal weight pe" % (len(models), code))
+        print("[%s] Save %d equal weight pe" % (code, len(models)))
         self.indexPrimaryIndicatorDao.bulkSave(models)
 
     def updateAll(self):
         indexes = self.indexDao.getIndexList()
         for code in indexes:
             self.updateAllByCode(code)
+            print(self.stockManager.stockPETTMNotFound)
+            self.stockManager.stockPETTMNotFound = {}
 
 
 if __name__ == "__main__":
     peManager = IndexPEPBGenerator()
     # models = peManager.calcEqualWeightedPE("000913", date(2018, 5, 10))
-    # peManager.updateAllByCode('000913')
-    peManager.updateAll()
+    peManager.updateAllByCode('000913')
+    # peManager.updateAll()
 
 
