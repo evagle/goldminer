@@ -12,8 +12,8 @@ from spider.v3.StockTradingDerivativeIndicatorSpider import StockTradingDerivati
 # '''
 # Download all index constituents
 # '''
-spider = IndexConstituentsSpider()
-spider.checkAndUpdateAllLatestConstituents()
+# spider = IndexConstituentsSpider()
+# spider.checkAndUpdateAllLatestConstituents()
 
 # '''
 # Download all index constituents
