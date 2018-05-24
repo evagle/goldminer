@@ -35,7 +35,7 @@ class IndexConstituentManager:
     # 否则尝试获取constituents
     # trade_date >= query_date && trade_date 最小
     def _getConstituents(self, code, date):
-        result = self.indexConstituentDao.getConstituents(code, date)
+        result = self.indexConstituentDao.getConstituents_1(code, date)
         if result is not None:
             return self.__formatConstituents(result)
         return None

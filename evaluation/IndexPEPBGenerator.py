@@ -56,9 +56,13 @@ class IndexPEPBGenerator:
                 constituents = self.indexConstituent.getConstituents(indexCode, d)
                 if constituents is not None:
                     stockPETTM = [self.stockManager.getStockPETTM(stock, d) for stock in constituents]
-                    pe = len(stockPETTM) / sum([1 / p if p > 0 else 0 for p in stockPETTM])
-                    model.equal_weight_pe = pe
-                    models.append(model)
+                    pesum = sum([1 / p if p > 0 else 0 for p in stockPETTM])
+                    if pesum == 0:
+                        print("ERROR empty stock pe", indexCode, d, constituents)
+                    if pesum > 0:
+                        pe = len(stockPETTM) / pesum
+                        model.equal_weight_pe = pe
+                        models.append(model)
                 else:
                     print("error", indexCode, d)
             d = d + timedelta(days=1)
