@@ -42,6 +42,25 @@ class IndexConstituentDao(BaseDao):
             .first()
         return result
 
+    '''
+    1. Find first record with trade_date <= date
+    2. If date < all trade_date, return first one
+    '''
+    def getConstituents_1(self, code, tradeDate) -> IndexConstituent:
+        result = self.session.query(IndexConstituent) \
+                             .filter(IndexConstituent.code == code, IndexConstituent.trade_date <= tradeDate) \
+                             .order_by(IndexConstituent.trade_date.desc()) \
+                             .first()
+        if result is not None:
+            return result
+
+        result = self.session.query(IndexConstituent) \
+            .filter(IndexConstituent.code == code, IndexConstituent.trade_date > tradeDate) \
+            .order_by(IndexConstituent.trade_date.asc()) \
+            .first()
+        return result
+
+
 
 if __name__ == "__main__":
     constituentDao = IndexConstituentDao()
