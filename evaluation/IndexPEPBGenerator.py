@@ -69,7 +69,7 @@ class IndexPEPBGenerator:
 
         return models
 
-    def updateAllByCode(self, code):
+    def updatePEByCode(self, code):
         now = datetime.now().date().strftime("%Y-%m-%d")
         d = self.indexPrimaryIndicatorDao.getLatestDate(code, "equal_weight_pe")
         if d is None:
@@ -80,10 +80,10 @@ class IndexPEPBGenerator:
         print("[%s] Save %d equal weight pe" % (code, len(models)))
         self.indexPrimaryIndicatorDao.bulkSave(models)
 
-    def updateAll(self):
+    def updateAllPE(self):
         indexes = self.indexDao.getIndexList()
         for code in indexes:
-            self.updateAllByCode(code)
+            self.updatePEByCode(code)
             print(self.stockManager.stockPETTMNotFound)
             self.stockManager.stockPETTMNotFound = {}
 
@@ -91,7 +91,7 @@ class IndexPEPBGenerator:
 if __name__ == "__main__":
     peManager = IndexPEPBGenerator()
     # models = peManager.calcEqualWeightedPE("000913", date(2018, 5, 10))
-    peManager.updateAllByCode('000913')
+    peManager.updatePEByCode('000913')
     # peManager.updateAll()
 
 
