@@ -59,8 +59,10 @@ class FundManager:
             startdate = self.getFundBarLastDate(code)
             self.downloadFundData(code, startdate)
 
-# fund = FundManager()
-# fund.updateAllFund()
+
+if __name__ == "__main__":
+    fund = FundManager()
+    fund.updateAllFund()
 
     
 
