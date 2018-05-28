@@ -64,7 +64,7 @@ class IndexPEPBGenerator:
                         model.equal_weight_pe = pe
                         models.append(model)
                 else:
-                    print("error", indexCode, d)
+                    print("No constituent", indexCode, d)
             d = d + timedelta(days=1)
 
         return models
