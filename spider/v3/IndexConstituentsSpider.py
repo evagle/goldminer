@@ -21,7 +21,6 @@ class IndexConstituentsSpider(GMBaseSpiderV3):
         model = self._rawDataToModel(code, constituent, IndexConstituent)
         model.constituents = json.dumps(model.constituents)
         model.code = code
-        model.no_weight = 0
         return model
 
     def downloadConstituents(self, code):
@@ -60,7 +59,6 @@ class IndexConstituentsSpider(GMBaseSpiderV3):
             model.code = code
             model.constituents = json.dump(dic)
             model.trade_date = today
-            model.no_weight = 0
             self.constituentsDao.add(model)
         else:
             print("[%s] constituent is up to date." % code)
