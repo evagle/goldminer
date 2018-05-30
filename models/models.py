@@ -761,7 +761,18 @@ class IndexConstituent(Base):
     code = Column(String(16), nullable=False)
     trade_date = Column(Date, nullable=False)
     constituents = Column(Text, nullable=False)
-    no_weight = Column(Integer, nullable=False, server_default=text("'0'"))
+
+
+class IndexWeight(Base):
+    __tablename__ = 'IndexWeight'
+    __table_args__ = (
+        Index('code', 'code', 'trade_date', unique=True),
+    )
+
+    id = Column(Integer, primary_key=True)
+    code = Column(String(16), nullable=False)
+    trade_date = Column(Date, nullable=False)
+    constituents = Column(Text, nullable=False)
 
 
 class IndexPrimaryIndicator(Base):
