@@ -25,28 +25,10 @@ class IndexWeightDao(BaseDao):
         return date(2001, 1, 1) if result is None else result[0]
 
     '''
-    1. Find first record with trade_date >= date
-    2. If date > all record, return latest one
-    '''
-    def getConstituents(self, code, tradeDate) -> IndexWeight:
-        result = self.session.query(IndexWeight) \
-                             .filter(IndexWeight.code == code, IndexWeight.trade_date >= tradeDate) \
-                             .order_by(IndexWeight.trade_date.asc()) \
-                             .first()
-        if result is not None:
-            return result
-
-        result = self.session.query(IndexWeight) \
-            .filter(IndexWeight.code == code, IndexWeight.trade_date < tradeDate) \
-            .order_by(IndexWeight.trade_date.desc()) \
-            .first()
-        return result
-
-    '''
     1. Find first record with trade_date <= date
     2. If date < all trade_date, return first one
     '''
-    def getConstituents_1(self, code, tradeDate) -> IndexWeight:
+    def getConstituents(self, code, tradeDate) -> IndexWeight:
         result = self.session.query(IndexWeight) \
                              .filter(IndexWeight.code == code, IndexWeight.trade_date <= tradeDate) \
                              .order_by(IndexWeight.trade_date.desc()) \
