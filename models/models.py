@@ -12,7 +12,7 @@ def to_dict(self, ignoreNone = True):
     attributes = Utils.getPropertiesOfClazz(self)
     dic = {}
     for attr in attributes:
-        if attr == "metadata" or attr == "toDict":
+        if attr in ["metadata", "to_dict", "to_str"]:
             continue
         val = getattr(self, attr)
         if val is not None or ignoreNone is False:
@@ -22,12 +22,12 @@ def to_dict(self, ignoreNone = True):
 
 def to_str(self):
     attributes = Utils.getPropertiesOfClazz(self)
-    str = "[%s] " % self.__name__
+    str = "[%s] " % self.__tablename__
     for attr in attributes:
-        if attr == "metadata" or attr == "toDict":
+        if attr in ["metadata", "to_dict", "to_str"]:
             continue
         val = getattr(self, attr)
-        str = str + ("%s=%s" % (attr, val))
+        str = str + ("%s=%s,\t" % (attr, val))
     return str
 
 
