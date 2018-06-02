@@ -54,10 +54,10 @@ class IndexConstituentsSpider(GMBaseSpiderV3):
                 print("[%s] has no constituent found")
             else:
                 print(code, last, dict)
-        elif not Utils.isConstituentsEqual(dic, json.loads(last.constituents)):
+        elif not Utils.isDictEqual(dic, json.loads(last.constituents)):
             model = IndexConstituent()
             model.code = code
-            model.constituents = json.dump(dic)
+            model.constituents = json.dumps(dic)
             model.trade_date = today
             self.constituentsDao.add(model)
         else:
