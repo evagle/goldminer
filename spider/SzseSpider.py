@@ -42,13 +42,15 @@ class SzseSpider:
                 return [tradeDate, cols]
 
     def checkAndUpdateLatestConstituents(self, code):
+        if code[0:2] != "39":
+            print("[%s] not szse index" % code)
+            return
+
         result = self.fetchConstituentByCode(code)
         if result is None:
             print("[%s] no new constituent found")
             return
-        if code[0:3] != "399":
-            print("[%s] not szse index" % code)
-            return
+
         tradeDate = result[0]
         newConstituents = result[1]
 
