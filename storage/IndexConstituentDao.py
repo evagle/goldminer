@@ -24,6 +24,11 @@ class IndexConstituentDao(BaseDao):
             .first()
         return date(2001, 1, 1) if result is None else result[0]
 
+    def getByDate(self, code: str, tradeDate) -> IndexConstituent:
+        return self.session.query(IndexConstituent) \
+            .filter(IndexConstituent.code == code, IndexConstituent.trade_date == tradeDate) \
+            .first()
+
     '''
     1. Find first record with trade_date <= date
     2. If date < all trade_date, return first one
