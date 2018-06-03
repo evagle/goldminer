@@ -42,7 +42,7 @@ class CSIndexSpider:
 
     def checkAndUpdateLatestConstituents(self, code):
         if code[0:2] != "00":
-            print("[%s] not szse index" % code)
+            print("[%s] not CSIndex index" % code)
             return
 
         result = self.fetchConstituentByCode(code)
