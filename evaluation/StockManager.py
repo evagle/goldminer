@@ -87,9 +87,13 @@ class StockManager:
             .filter(IndexDailyBar.code == '000001')
         for d in dates:
             self.__tradeDatesCache.append(d[0])
+        self.__tradeDatesCache.sort()
 
     def getTradeDates(self):
         return self.__tradeDatesCache
+
+    def getLastTradeDate(self):
+        return self.__tradeDatesCache[-1:]
 
     def isTradeDate(self, d: date):
         return d in self.__tradeDatesCache
@@ -105,3 +109,6 @@ class StockManager:
         return suspensionDates
 
 
+if __name__ == "__main__":
+    manager = StockManager()
+    print(manager.getLastTradeDate())

@@ -8,6 +8,7 @@ from urllib.error import HTTPError
 import xlrd
 
 from common.Utils import Utils
+from evaluation.StockManager import StockManager
 from models.models import IndexConstituent
 from storage.IndexConstituentDao import IndexConstituentDao
 from storage.IndexesDao import IndexesDao
@@ -19,6 +20,7 @@ class SzseSpider:
     def __init__(self):
         self.constituentsDao = IndexConstituentDao()
         self.indexesDao = IndexesDao()
+        self.stockManager = StockManager()
 
     def fetchConstituentByCode(self, code):
         url = self.SZSE_CONSTITUENT_URL % code
@@ -62,10 +64,9 @@ class SzseSpider:
             model = IndexConstituent()
             model.code = code
             model.constituents = json.dumps(newConstituents)
-            model.trade_date = today
+            model.trade_date = self.stockManager.getLastTradeDate()
             # self.constituentsDao.add(model)
             print("[%s] new constituents date = %s" % (code, model.trade_date))
-
         else:
             print("[%s] constituent is up to date." % code)
 
