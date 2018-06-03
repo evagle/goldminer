@@ -30,3 +30,32 @@ class Utils:
                 if k not in listB:
                     return False
         return True
+
+    @staticmethod
+    def getMedian(lst: list):
+        n = len(lst)
+        m = int(math.floor((n-1)/2))
+        if lst is None or n == 0:
+            return None
+        elif n % 2 == 1:
+            return lst[m]
+        else:
+            return (lst[m] + lst[m+1])/2
+
+
+if __name__ == "__main__":
+    lst = []
+    print(Utils.getMedian(lst))
+
+    lst = [1]
+    print(Utils.getMedian(lst))
+
+    lst = [1,2]
+    print(Utils.getMedian(lst))
+
+    lst = [1,2,3]
+    print(Utils.getMedian(lst))
+
+    lst = [1,2,3,4]
+    print(Utils.getMedian(lst))
+
