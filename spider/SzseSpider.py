@@ -75,8 +75,9 @@ class SzseSpider:
     def checkAndUpdateAllLatestConstituents(self):
         indexes = self.indexesDao.getIndexList()
         for code in indexes:
-            self.checkAndUpdateLatestConstituents(code)
-            time.sleep(0.5)
+            if code[0:2] == "39":
+                self.checkAndUpdateLatestConstituents(code)
+                time.sleep(0.5)
 
 
 if __name__ == "__main__":

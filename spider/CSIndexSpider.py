@@ -74,8 +74,9 @@ class CSIndexSpider:
     def checkAndUpdateAllLatestConstituents(self):
         indexes = self.indexesDao.getIndexList()
         for code in indexes:
-            self.checkAndUpdateLatestConstituents(code)
-            time.sleep(0.5)
+            if code[0:2] == "00":
+                self.checkAndUpdateLatestConstituents(code)
+                time.sleep(0.5)
 
 
 if __name__ == "__main__":
