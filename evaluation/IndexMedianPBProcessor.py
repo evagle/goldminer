@@ -38,8 +38,6 @@ class IndexMedianPBProcessor(IndexPEPBBaseProcessor):
                         print("ERROR empty stock pb", indexCode, d, constituents)
                     else:
                         pb = Utils.getMedian(pbs)
-                        print(pbs)
-                        print(pb)
                         model.median_pb = pb
                         models.append(model)
                 else:
