@@ -13,15 +13,15 @@ from storage.IndexConstituentDao import IndexConstituentDao
 from storage.IndexesDao import IndexesDao
 
 
-class CSIndexSpider:
-    CSINDEX_CONSTITUENT_URL = "http://www.csindex.cn/uploads/file/autofile/cons/%scons.xls"
+class SzseSpider:
+    SZSE_CONSTITUENT_URL = "http://www.szse.cn/szseWeb/ShowReport.szse?SHOWTYPE=xlsx&CATALOGID=1747&ZSDM=%s&tab1PAGENO=1&ENCODE=1&TABKEY=tab1"
 
     def __init__(self):
         self.constituentsDao = IndexConstituentDao()
         self.indexesDao = IndexesDao()
 
     def fetchConstituentByCode(self, code):
-        url = self.CSINDEX_CONSTITUENT_URL % code
+        url = self.SZSE_CONSTITUENT_URL % code
         try:
             response = urllib.request.urlopen(url)
             content = response.read()
@@ -35,9 +35,10 @@ class CSIndexSpider:
                 workbook = xlrd.open_workbook(file_contents = content)
                 # sheet_names = workbook
                 sheet = workbook.sheet_by_index(0)
-                cols = sheet.col_values(4)
-                cols.remove('成分券代码Constituent Code')
+                cols = sheet.col_values(0)
+                cols.remove('证券代码')
                 tradeDate = sheet.col_values(0)[1]
+                print(cols)
                 return [tradeDate, cols]
 
     def checkAndUpdateLatestConstituents(self, code):
@@ -45,7 +46,7 @@ class CSIndexSpider:
         if result is None:
             print("[%s] no new constituent found")
             return
-        if code[0:3] != "000":
+        if code[0:3] != "399":
             print("[%s] not szse index" % code)
             return
         tradeDate = result[0]
@@ -63,7 +64,7 @@ class CSIndexSpider:
             model.code = code
             model.constituents = json.dumps(newConstituents)
             model.trade_date = tradeDate
-            self.constituentsDao.add(model)
+            # self.constituentsDao.add(model)
             print("[%s] new constituents date = %s" % (code, model.trade_date))
 
         else:
@@ -77,5 +78,5 @@ class CSIndexSpider:
 
 
 if __name__ == "__main__":
-    spider = CSIndexSpider()
-    spider.checkAndUpdateLatestConstituents('000001')
+    spider = SzseSpider()
+    spider.checkAndUpdateLatestConstituents('399001')

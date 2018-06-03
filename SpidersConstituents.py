@@ -1,11 +1,10 @@
 # coding: utf-8
 from spider.CSIndexSpider import CSIndexSpider
+from spider.SzseSpider import SzseSpider
 
-
-'''
-Download all index constituents
-'''
 spider = CSIndexSpider()
 spider.checkAndUpdateAllLatestConstituents()
 
+spider = SzseSpider()
+spider.checkAndUpdateAllLatestConstituents()
 
