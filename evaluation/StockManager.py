@@ -13,40 +13,73 @@ class StockManager:
         self.fundamentalsDao = StockFundamentalsDao()
         self.stockDao = StockDao()
 
-        self.__stockPETTMCache = {}
+        '''
+        {
+            '000001' : 
+            {
+                "pe" : 
+                {
+                     "date1" : v1, 
+                     ...
+                }, 
+                "pb" : 
+                {
+                     "date2" : v2
+                     ...      
+                }
+            }
+        }
+        '''
+        self.__stockCache = {}
+        # self.__stockPETTMCache = {}
+        # self.__stockPBCache = {}
         self.__tradeDatesCache = []
 
         # load trade dates when initiate
         self.__loadTradeDates()
-        self.stockPETTMNotFound = {}
 
-    def __loadStockPETTM(self, stockCode):
-        if stockCode in self.__stockPETTMCache:
+    def getFieldByName(self, field):
+        if field == "PETTM":
+            return TradingDerivativeIndicator.PETTM
+        elif field == "PB":
+            return TradingDerivativeIndicator.PB
+
+    def __loadStockField(self, stockCode, field):
+        if stockCode in self.__stockCache and field in self.__stockCache[stockCode][field]:
             return
 
+        if stockCode not in self.__stockCache:
+            self.__stockCache[stockCode] = {}
+
         session = self.fundamentalsDao.getSession()
-        result = session.query(TradingDerivativeIndicator.end_date, TradingDerivativeIndicator.PETTM) \
+        fieldColumn = self.getFieldByName(field)
+        result = session.query(TradingDerivativeIndicator.end_date, fieldColumn) \
             .filter(TradingDerivativeIndicator.code == stockCode)
 
-        pe = {}
+        data = {}
         for row in result:
-            pe[row[0].strftime("%Y-%m-%d")] = row[1]
-        self.__stockPETTMCache[stockCode] = pe
-        print("[%s] Load %d PETTM successfully" % (stockCode, len(pe)))
+            data[row[0].strftime("%Y-%m-%d")] = row[1]
+        self.__stockCache[stockCode][field] = data
+        print("[%s] Load %d %s successfully" % (stockCode, len(data), field))
 
-    def getStockPETTM(self, stockCode, d: date):
-        if stockCode not in self.__stockPETTMCache:
-            self.__loadStockPETTM(stockCode)
+    def getStockFieldByDate(self, stockCode, field, d: date):
+        if stockCode not in self.__stockCache or field not in self.__stockCache[stockCode]:
+            self.__loadStockField(stockCode, field)
 
         datestr = d.strftime("%Y-%m-%d")
-        if datestr in self.__stockPETTMCache[stockCode]:
-            return self.__stockPETTMCache[stockCode][datestr]
+        data = self.__stockCache[stockCode][field]
+        if datestr in data:
+            return data[datestr]
         else:
-            if stockCode in self.stockPETTMNotFound:
-                self.stockPETTMNotFound[stockCode] += 1
-            else:
-                self.stockPETTMNotFound[stockCode] = 1
             return 0
+
+    def getStockPETTM(self, stockCode, d: date):
+        field = "PETTM"
+        return self.getStockFieldByDate(stockCode, field, d)
+
+    def getStockPB(self, stockCode, d: date):
+        field = "PB"
+        return self.getStockFieldByDate(stockCode, field, d)
 
     def __loadTradeDates(self):
         session = self.fundamentalsDao.getSession()
