@@ -37,9 +37,7 @@ class SzseSpider:
                 sheet = workbook.sheet_by_index(0)
                 cols = sheet.col_values(0)
                 cols.remove('证券代码')
-                tradeDate = sheet.col_values(0)[1]
-                print(cols)
-                return [tradeDate, cols]
+                return cols
 
     def checkAndUpdateLatestConstituents(self, code):
         if code[0:2] != "39":
@@ -51,8 +49,7 @@ class SzseSpider:
             print("[%s] no new constituent found")
             return
 
-        tradeDate = result[0]
-        newConstituents = result[1]
+        newConstituents = result
 
         today = datetime.now().date()
         last = self.constituentsDao.getConstituents(code, today)
@@ -65,7 +62,7 @@ class SzseSpider:
             model = IndexConstituent()
             model.code = code
             model.constituents = json.dumps(newConstituents)
-            model.trade_date = tradeDate
+            model.trade_date = today
             # self.constituentsDao.add(model)
             print("[%s] new constituents date = %s" % (code, model.trade_date))
 
