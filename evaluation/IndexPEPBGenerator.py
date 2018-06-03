@@ -2,7 +2,9 @@
 from datetime import datetime, timedelta, date
 
 from evaluation.IndexConstituentManager import IndexConstituentManager
+from evaluation.IndexEqualWeightPBProcessor import IndexEqualWeightPBProcessor
 from evaluation.IndexEqualWeightPEProcessor import IndexEqualWeightPEProcessor
+from evaluation.IndexMedianPBProcessor import IndexMedianPBProcessor
 from evaluation.IndexMedianPEProcessor import IndexMedianPEProcessor
 from evaluation.StockManager import StockManager
 from models.models import IndexPrimaryIndicator
@@ -18,18 +20,20 @@ class IndexPEPBGenerator:
 
         self.equalWeightPEProcessor = IndexEqualWeightPEProcessor()
         self.medianPEProcessor = IndexMedianPEProcessor()
+        self.equalWeightPBProcessor = IndexEqualWeightPBProcessor()
+        self.medianPBProcessor = IndexMedianPBProcessor()
 
     def updateAll(self):
         indexes = self.indexDao.getIndexList()
         for code in indexes:
             self.equalWeightPEProcessor.process(code)
             self.medianPEProcessor.process(code)
+            self.equalWeightPBProcessor.process(code)
+            self.medianPBProcessor.process(code)
 
 
 if __name__ == "__main__":
     peManager = IndexPEPBGenerator()
-    # models = peManager.calcEqualWeightedPE("000913", date(2018, 5, 10))
     peManager.updatePEByCode('000913')
-    # peManager.updateAll()
 
 

@@ -1,5 +1,5 @@
 # coding: utf-8
-from spider.CSIndexSpider import CSIndexSpider
+# from spider.CSIndexSpider import CSIndexSpider
 from spider.v3.IndexBarSpider import IndexBarSpider
 from spider.v3.IndexConstituentsSpider import IndexConstituentsSpider
 from spider.v3.StockBalanceSheetSpider import StockBalanceSheetSpider
@@ -13,8 +13,8 @@ from spider.v3.StockTradingDerivativeIndicatorSpider import StockTradingDerivati
 '''
 Download all index weights
 '''
-spider = IndexConstituentsSpider()
-spider.checkAndUpdateAllLatestConstituents()
+# spider = IndexConstituentsSpider()
+# spider.checkAndUpdateAllLatestConstituents()
 
 # '''
 # Download all index constituents

@@ -42,7 +42,7 @@ class IndexEqualWeightPBProcessor(IndexPEPBBaseProcessor):
             d = d + timedelta(days=1)
 
         print("[%s] Save %d equal weight pb" % (indexCode, len(models)))
-        # self.indexPrimaryIndicatorDao.bulkSave(models)
+        self.indexPrimaryIndicatorDao.bulkSave(models)
 
         return models
 
