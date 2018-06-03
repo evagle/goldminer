@@ -2,6 +2,7 @@
 from datetime import datetime, date
 import json
 
+from common.Utils import Utils
 from storage.IndexConstituentDao import IndexConstituentDao
 from models.models import IndexConstituent
 
@@ -22,7 +23,11 @@ class RiceQuantImport:
                 constituents.append(i[0:6])
             print(tradeDate, code)
             old = self.indexConstituentDao.getByDate(code, tradeDate)
-            if old is None:
+            last = self.indexConstituentDao.getConstituents(code, tradeDate)
+            if old is None and (
+                    last is None or
+                    not Utils.isListEqual(constituents, json.loads(last.constituents))
+            ):
                 model = IndexConstituent()
                 model.code = code
                 model.trade_date = tradeDate

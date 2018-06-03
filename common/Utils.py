@@ -22,7 +22,7 @@ class Utils:
         return True
 
     @staticmethod
-    def isListEqual(listA: dict, listB: dict):
+    def isListEqual(listA: list, listB: list):
         if len(listA) != len(listB):
             return False
         else:
