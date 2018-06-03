@@ -3,5 +3,5 @@ from evaluation.IndexPEPBGenerator import IndexPEPBGenerator
 
 
 pepbGenerator = IndexPEPBGenerator()
-pepbGenerator.updateAllPE()
+pepbGenerator.updateAll()
 
