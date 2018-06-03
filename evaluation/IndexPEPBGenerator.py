@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, date
 from evaluation.IndexConstituentManager import IndexConstituentManager
 from evaluation.StockManager import StockManager
 from models.models import IndexPrimaryIndicator
+from storage.IndexConstituentDao import IndexConstituentDao
 from storage.IndexPrimaryIndicatorDao import IndexPrimaryIndicatorDao
 from storage.IndexesDao import IndexesDao
 from storage.StockDao import StockDao
@@ -11,10 +12,11 @@ from storage.StockDao import StockDao
 
 class IndexPEPBGenerator:
     def __init__(self):
-        self.indexConstituent = IndexConstituentManager()
+        self.indexConstituentManager = IndexConstituentManager()
         self.stockManager = StockManager()
         self.indexPrimaryIndicatorDao = IndexPrimaryIndicatorDao()
         self.indexDao = IndexesDao()
+        self.indexConstituentDao = IndexConstituentDao()
 
     def getProfitAt(self, indexCode, date):
         sql = "SELECT code, pub_date, end_date, NETPROFIT FROM income_statement WHERE code = '%s' and pub_date <= '%s' ORDER BY pub_date LIMIT 1"
@@ -44,7 +46,7 @@ class IndexPEPBGenerator:
         now = datetime.now().date()
 
         models = []
-        print(d, now)
+        print("[%s] calcEqualWeightedPE from %s to %s " % (indexCode, d, now))
         while d <= now:
             if self.stockManager.isTradeDate(d):
                 model = self.indexPrimaryIndicatorDao.getByDate(indexCode, d)
@@ -53,7 +55,7 @@ class IndexPEPBGenerator:
                     model.code = indexCode
                     model.trade_date = d
 
-                constituents = self.indexConstituent.getConstituents(indexCode, d)
+                constituents = self.indexConstituentManager.getConstituents(indexCode, d)
                 if constituents is not None:
                     stockPETTM = [self.stockManager.getStockPETTM(stock, d) for stock in constituents]
                     pesum = sum([1 / p if p > 0 else 0 for p in stockPETTM])
@@ -69,13 +71,18 @@ class IndexPEPBGenerator:
 
         return models
 
+    # recalculate all pe from last constituent date
     def updatePEByCode(self, code):
         now = datetime.now().date().strftime("%Y-%m-%d")
         d = self.indexPrimaryIndicatorDao.getLatestDate(code, "equal_weight_pe")
         if d is None:
             d = self.indexDao.getIndexPublishDate(code)
 
-        print("[%s] (%s ~ %s) equal weight pe" % (code, d, now))
+        latestDate = self.indexConstituentDao.getLatestDate(code)
+        if latestDate is not None and latestDate < d:
+            d = latestDate
+
+        print("[%s] updatePEByCode from %s to %s" % (code, d, now))
         models = self.calcEqualWeightedPE(code, d)
         print("[%s] Save %d equal weight pe" % (code, len(models)))
         self.indexPrimaryIndicatorDao.bulkSave(models)
