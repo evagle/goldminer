@@ -84,7 +84,7 @@ class SzseSpider:
         for code in indexes:
             if code[0:2] == "39":
                 self.checkAndUpdateLatestConstituents(code)
-                time.sleep(0.5)
+                time.sleep(1)
 
 
 if __name__ == "__main__":
