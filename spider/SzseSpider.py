@@ -57,7 +57,7 @@ class SzseSpider:
         last = self.constituentsDao.getConstituents(code, today)
         if last is None:
             if len(newConstituents) == 0:
-                print("[%s] has no constituent found")
+                print("[%s] has no constituent found" % code)
             else:
                 model = IndexConstituent()
                 model.code = code
@@ -67,10 +67,13 @@ class SzseSpider:
                 print("[%s] not last found. Add first one, %s" % (code, model))
 
         elif not Utils.isListEqual(newConstituents, json.loads(last.constituents)):
-            model = IndexConstituent()
+            tradeDate = self.stockManager.getLastTradeDate()
+            model = self.constituentsDao.getByDate(code, tradeDate)
+            if model is None:
+                model = IndexConstituent()
             model.code = code
             model.constituents = json.dumps(newConstituents)
-            model.trade_date = self.stockManager.getLastTradeDate()
+            model.trade_date = tradeDate
             self.constituentsDao.add(model)
             print("[%s] new constituents date = %s" % (code, model.trade_date))
         else:
