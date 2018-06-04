@@ -1,20 +1,17 @@
 # coding=utf-8
-import json
-import sys
-import urllib
 
-sys.path.append('../')
-from storage.DB import *
+import json
+import time
+import urllib.request
 
 ## EastMoney's fund api:
 # history: http://fund.eastmoney.com/pingzhongdata/512580.js
 # lastday: http://fundgz.1234567.com.cn/js/512580.js
 
-class EastMoney:
-    def __init__(self):
-        self.db = DB()
 
-    def fundHistory(self, code):
+class EastMoney:
+
+    def fetchFund(self, code):
         data = {}
         response = urllib.request.urlopen("http://fund.eastmoney.com/pingzhongdata/"+code+".js") 
         html = response.read()

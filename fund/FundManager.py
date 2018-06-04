@@ -40,7 +40,7 @@ class FundManager:
     
     def downloadFundData(self, code, startdate):
         eastmoney = EastMoney()
-        data = eastmoney.fundHistory(code)
+        data = eastmoney.fetchFund(code)
         count = 0
         for item in data:
             tradetime = datetime.strptime(item["trade_date"], "%Y-%m-%d")

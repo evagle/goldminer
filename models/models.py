@@ -847,8 +847,8 @@ class SalaryFund(Base):
     net_value = Column(Float(asdecimal=True), nullable=False)
 
 
-class SalaryFundOperation(Base):
-    __tablename__ = 'SalaryFundOperations'
+class SalaryFundDeal(Base):
+    __tablename__ = 'SalaryFundDeal'
 
     id = Column(Integer, primary_key=True)
     trade_date = Column(Date, nullable=False)

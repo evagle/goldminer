@@ -25,6 +25,3 @@ class IndexesDao(BaseDao):
         if result is not None:
             return result[0]
         return None
-
-dao = IndexesDao()
-dao.getIndexList()
