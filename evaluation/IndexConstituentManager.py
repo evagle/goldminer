@@ -15,7 +15,7 @@ class IndexConstituentManager:
         self.indexWeightDao = IndexWeightDao()
 
     def getWeights(self, code, date):
-        model = self.indexWeightDao.getConstituents(code, date)
+        model = self.indexWeightDao.getByDate(code, date)
         if model is None:
             return None
 
@@ -59,4 +59,3 @@ class IndexConstituentManager:
 
 if __name__ == "__main__":
     manager = IndexConstituentManager()
-    manager.getWeights('000001', date(2017, 1, 4))
