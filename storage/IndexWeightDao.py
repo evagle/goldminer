@@ -28,7 +28,7 @@ class IndexWeightDao(BaseDao):
     1. Find first record with trade_date <= date
     2. If date < all trade_date, return first one
     '''
-    def getConstituents(self, code, tradeDate) -> IndexWeight:
+    def getByDate(self, code, tradeDate) -> IndexWeight:
         result = self.session.query(IndexWeight) \
                              .filter(IndexWeight.code == code, IndexWeight.trade_date <= tradeDate) \
                              .order_by(IndexWeight.trade_date.desc()) \
@@ -43,7 +43,6 @@ class IndexWeightDao(BaseDao):
         return result
 
 
-
 if __name__ == "__main__":
     constituentDao = IndexWeightDao()
-    print(constituentDao.getConstituents('000001', date(2005, 1, 1)))
+    print(constituentDao.getByDate('000001', date(2005, 1, 1)))
