@@ -1,7 +1,7 @@
 # coding: utf-8
 # from spider.CSIndexSpider import CSIndexSpider
 from spider.v3.IndexBarSpider import IndexBarSpider
-from spider.v3.IndexConstituentsSpider import IndexConstituentsSpider
+from spider.v3.IndexWeightsSpider import IndexWeightsSpider
 from spider.v3.StockBalanceSheetSpider import StockBalanceSheetSpider
 from spider.v3.StockDailyBarAdjustNoneSpider import StockDailyBarAdjustNoneSpider
 from spider.v3.StockDailyBarAdjustPrevSpider import StockDailyBarAdjustPrevSpider
@@ -13,14 +13,8 @@ from spider.v3.StockTradingDerivativeIndicatorSpider import StockTradingDerivati
 '''
 Download all index weights
 '''
-# spider = IndexConstituentsSpider()
-# spider.checkAndUpdateAllLatestConstituents()
-
-# '''
-# Download all index constituents
-# '''
-# spider = CSIndexSpider()
-# spider.checkAndUpdateAllLatestConstituents()
+spider = IndexWeightsSpider()
+spider.downloadAllIndexConstituents()
 
 
 '''
