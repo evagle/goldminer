@@ -15,7 +15,7 @@ class FundDailyBarDao(BaseDao):
         self.session.add(bar)
         self.session.commit()
 
-    def getByDate(self, code, tradeDate: date):
+    def getByDate(self, code, tradeDate: date) -> FundDailyBar:
         return self.session.query(FundDailyBar) \
             .filter(FundDailyBar.code == code) \
             .filter(FundDailyBar.trade_date == tradeDate) \

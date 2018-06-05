@@ -10,7 +10,7 @@ from storage.FundDailyBarDao import FundDailyBarDao
 from storage.SalaryFundDealDao import SalaryFundDealDao
 
 
-class FundManager:
+class FundSpider:
     def __init__(self):
         self.fundDailyBarDao = FundDailyBarDao()
         self.dealDao = SalaryFundDealDao()
@@ -50,8 +50,8 @@ class FundManager:
 
 
 if __name__ == "__main__":
-    fund = FundManager()
-    fund.updateAllFund()
+    spider = FundSpider()
+    spider.updateAllFund()
     # fund.downloadFundData('000478', date(2018, 5, 4))
 
     

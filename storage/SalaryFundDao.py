@@ -15,8 +15,13 @@ class SalaryFundDao(BaseDao):
         self.session.add(model)
         self.session.commit()
 
-    def getByDate(self, code, tradeDate: date):
+    def getByDate(self, tradeDate: date):
         return self.session.query(SalaryFund) \
-            .filter(SalaryFund.code == code) \
             .filter(SalaryFund.trade_date == tradeDate) \
             .first()
+
+    def getLatestDate(self):
+        result = self.session.query(SalaryFund.trade_date) \
+            .order_by(SalaryFund.trade_date.desc()) \
+            .first()
+        return None if result is None else result[0]

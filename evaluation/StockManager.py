@@ -98,6 +98,14 @@ class StockManager:
     def isTradeDate(self, d: date):
         return d in self.__tradeDatesCache
 
+    def getPreviousTradeDate(self, d):
+        pos = self.__tradeDatesCache.index(d)
+        if pos > 0:
+            pos = pos - 1
+        else:
+            raise Exception("No previous trade date found.")
+        return self.__tradeDatesCache[pos]
+
     def getSuspensionDates(self, code):
         stockBarDao = StockDailyBarAdjustNoneDao()
         tradeDates = stockBarDao.getAllTradeDatesByCode(code)

@@ -17,11 +17,10 @@ class SalaryFundDealDao(BaseDao):
         self.session.add(model)
         self.session.commit()
 
-    def getByDate(self, code, tradeDate: date):
+    def getByDate(self, tradeDate: date) -> List[SalaryFundDeal]:
         return self.session.query(SalaryFundDeal) \
-            .filter(SalaryFundDeal.code == code) \
             .filter(SalaryFundDeal.trade_date == tradeDate) \
-            .first()
+            .all()
 
     def getAllFundCodes(self):
         results = self.session.query(distinct(SalaryFundDeal.code)).all()
@@ -30,6 +29,11 @@ class SalaryFundDealDao(BaseDao):
             codes.append(item[0])
         return codes
 
+    def getDealsBeforeDate(self, tradeDate: date) -> List[SalaryFundDeal]:
+        return self.session.query(SalaryFundDeal) \
+            .filter(SalaryFundDeal.trade_date <= tradeDate) \
+            .order_by(SalaryFundDeal.trade_date.asc()) \
+            .all()
 
 
 if __name__ == "__main__":
