@@ -65,15 +65,12 @@ class IndexWeightsSpider(GMBaseSpiderV3):
             print("[%s] index weight is up to date." % code)
 
     def downloadAllIndexConstituents(self):
+        if datetime.now().day < 25:
+            print("NO UPDATE: Index Weights from gm are published at the end of each month")
+            return
         indexes = self.indexesDao.getIndexList()
         for code in indexes:
             self.downloadConstituents(code)
-            time.sleep(0.1)
-
-    def checkAndUpdateAllLatestConstituents(self):
-        indexes = self.indexesDao.getIndexList()
-        for code in indexes:
-            self.checkAndUpdateLatestConstituents(code)
             time.sleep(0.1)
 
 if __name__ == "__main__":
