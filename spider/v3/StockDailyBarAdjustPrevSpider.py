@@ -29,6 +29,10 @@ class StockDailyBarAdjustPrevSpider(GMBaseSpiderV3):
         startDate = self.stockBarDao.getLatestDate(code) + timedelta(days=1)
         endDate = datetime.now() + timedelta(days=1)
 
+        if startDate >= datetime.now().date():
+            print("[%s] is up to date" % code)
+            return
+
         symbol = self.codeToStockSymbol(code)
         print("[Download Stock Bars][%s] From %s to %s" % (symbol, startDate, endDate))
         bars = self.getHistory(symbol, "1d", startDate, endDate, adjust=GMConsts.ADJUST_PREV)
@@ -55,8 +59,8 @@ class StockDailyBarAdjustPrevSpider(GMBaseSpiderV3):
     def downloadAll(self):
         stocks = self.stockDao.getStockList()
         for i in stocks:
-            self.downloadBars(i)
-            time.sleep(0.1)
+            if self.downloadBars(i) is not None:
+                time.sleep(0.1)
 
 
 if __name__ == "__main__":

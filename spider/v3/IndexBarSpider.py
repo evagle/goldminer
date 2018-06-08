@@ -28,6 +28,10 @@ class IndexBarSpider(GMBaseSpiderV3):
         startDate = self.indexBarDao.getLatestDate(code) + timedelta(days=1)
         endDate = datetime.now() + timedelta(days=1)
 
+        if startDate >= datetime.now().date():
+            print("[%s] is up to date" % code)
+            return None
+
         symbol = self.getIndexSymbol(code) + "." + code
         print("[Download Index Bars] start=", startDate, "end=", endDate, "code=", symbol)
         bars = self.getHistory(symbol, "1d", startDate, endDate)
@@ -39,8 +43,8 @@ class IndexBarSpider(GMBaseSpiderV3):
     def downloadAllIndexBars(self):
         indexes = self.indexesDao.getIndexList()
         for i in indexes:
-            self.downloadBars(i)
-            time.sleep(0.1)
+            if self.downloadBars(i) is not None:
+                time.sleep(0.1)
 
 
 if __name__ == "__main__":
