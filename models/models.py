@@ -845,6 +845,12 @@ class SalaryFund(Base):
     cash = Column(Float(asdecimal=True), nullable=False)
     share = Column(Float(asdecimal=True), nullable=False)
     net_value = Column(Float(asdecimal=True), nullable=False)
+    principal_money = Column(Float(asdecimal=True), nullable=False)
+    interest = Column(Float(asdecimal=True), nullable=False)
+    hold_return = Column(Float(asdecimal=True), nullable=False)
+    total_return = Column(Float(asdecimal=True), nullable=False)
+    hold_return_rate = Column(Float(asdecimal=True), nullable=False)
+    total_return_rate = Column(Float(asdecimal=True), nullable=False)
 
 
 class SalaryFundDeal(Base):
@@ -857,10 +863,12 @@ class SalaryFundDeal(Base):
     name = Column(String(64), nullable=False)
     security_type = Column(Integer, nullable=False)
     money = Column(Float(asdecimal=True), nullable=False)
+    money_source = Column(String(32), nullable=False)
     share = Column(Float(asdecimal=True), nullable=False)
+    share_left = Column(Float(asdecimal=True), nullable=False)
     share_net_value = Column(Float(asdecimal=True), nullable=False)
     commission = Column(Float(asdecimal=True), nullable=False)
-    total_money = Column(Float(asdecimal=True), nullable=False)
+    trade_money = Column(Float(asdecimal=True), nullable=False)
 
 
 class SecurityType(Base):

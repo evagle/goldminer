@@ -35,6 +35,12 @@ class SalaryFundDealDao(BaseDao):
             .order_by(SalaryFundDeal.trade_date.asc()) \
             .all()
 
+    def getByCode(self, code) ->  List[SalaryFundDeal]:
+        return self.session.query(SalaryFundDeal) \
+                        .filter(SalaryFundDeal.code == code) \
+                        .order_by(SalaryFundDeal.trade_date.asc()) \
+                        .all()
+
 
 if __name__ == "__main__":
     dao = SalaryFundDealDao()

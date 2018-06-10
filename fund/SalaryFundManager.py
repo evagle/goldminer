@@ -13,12 +13,12 @@ class SalaryFundManager:
     def __init__(self):
         self.fundDailyBarDao = FundDailyBarDao()
         self.dealDao = SalaryFundDealDao()
-        self.salaryFundDao = SalaryFundDao()
+        self.myFundDao = SalaryFundDao()
         self.stockManager = StockManager()
 
     # 获取指定日期的fund信息, 如果是周一，则上一个交易日的
     def getFundByDate(self, date) -> SalaryFund:
-        model = self.salaryFundDao.getByDate(date)
+        model = self.myFundDao.getByDate(date)
         if model is None:
             raise Exception("Failed to get salary fund equal or before date : %s" % date)
         return model
@@ -46,12 +46,14 @@ class SalaryFundManager:
             if deal.trade_type == "buy":
                 net_value = self.getFundValueByDate(deal.code, date)
                 total_value += deal.share * net_value
+                print(deal.code, date, net_value, deal.share, total_value)
             elif deal.trade_type == "sell":
                 net_value = self.getFundValueByDate(deal.code, date)
                 total_value -= deal.share * net_value
         return total_value
 
-    # 购买基金，注入现金，取出现金会导致份额变化
+    # 用新加入资金购买基金，注入现金，取出现金会导致份额增加
+    # cashout即赎回卖出份额
     # 在前一天的净值和份额的基础上，加上当天的操作带来的这些份额变化
     def calcShares(self, date):
         prev_date = self.stockManager.getPreviousTradeDate(date)
@@ -61,10 +63,14 @@ class SalaryFundManager:
         share = prev_share
         deals = self.dealDao.getByDate(date)
         for deal in deals:
-            if deal.trade_type == "cashout" and deal.total_money > 0:
-                deal.total_money = -deal.total_money
-            if deal.trade_type in ["buy", "cashin", "cashout"]:
-                share += deal.total_money / prev_net_value
+            # 用新加入的资金买入份额
+            if deal.trade_type == "buy" and deal.money_source == "added":
+                share += deal.trade_money / prev_net_value
+            # cashout卖出份额
+            if deal.trade_type == "cashout" and deal.trade_money > 0:
+                deal.trade_money = -deal.trade_money
+            if deal.trade_type in ["cashin", "cashout"]:
+                share += deal.trade_money / prev_net_value
         return share
 
     # 计算指定日期的cash剩余
@@ -76,15 +82,53 @@ class SalaryFundManager:
         cash = prev_cash
         deals = self.dealDao.getByDate(date)
         for deal in deals:
-            if deal.trade_type == "cashout" and deal.total_money > 0:
-                deal.total_money = -deal.total_money
+            if deal.trade_type == "cashout" and deal.trade_money > 0:
+                deal.trade_money = -deal.trade_money
             if deal.trade_type in ["sell", "cashin", "cashout"]:
-                cash += deal.total_money
+                cash += deal.trade_money
         return cash
 
+    # 计算本金余额，本金即持有本金，不算现金，只计算购买的部分
+    # 基金买入，增加买入金额到本金
+    # 基金卖出，先计算该部分基金份额的买入本金是多少，总是卖出最早的份额，减少本金
+    def calcPrincipalMoney(self, date):
+        prev_date = self.stockManager.getPreviousTradeDate(date)
+        prev_fund = self.getFundByDate(prev_date)
+        principal_money = prev_fund.principal_money
+
+        deals = self.dealDao.getByDate(date)
+        for deal in deals:
+            if deal.trade_type == "buy":
+                principal_money += deal.trade_money
+            elif deal.trade_type == "sell":
+                dealsOfCode = self.dealDao.getByCode(deal.code)
+                for d in dealsOfCode:
+                    if d.trade_type == "buy" and deal.share > 0 and d.share_left > 0:
+                        share = min(deal.share, d.share_left)
+                        deal.share -= share
+                        principal_money += (share / d.share) * d.trade_money
+
+        return principal_money
+
+    # 持有收益(率)
+    # 持有收益 = 持有资产的总价值-持有本金
+    # 持有收益率 = 持有收益/持有本金*100%
+    def calcHoldReturns(self, fund: SalaryFund):
+        fund.hold_return = fund.security_assets - fund.principal_money
+        fund.hold_return_rate = fund.hold_return / fund.principal_money
+        return fund
+
+    # 总收益(率)
+    # 总收益 = 持有资产的总价值+现金-持有本金
+    # 总收益率 = 总收益/(持有本金+现金)*100%
+    def calcTotalReturns(self, fund: SalaryFund):
+        fund.total_return = fund.security_assets + fund.cash - fund.principal_money
+        fund.total_return_rate = fund.total_return / (fund.principal_money + fund.cash)
+        return fund
 
     # 计算指定日期的基金份额
     # 在前一天的份额和净值的基础上，分三种情况更新份额：
+    # - day1 初始化基金 初始净值为1，其余为0
     # - day2 买入一只基金，总共花去4000，手续费5元，当天的操作都不会计算到前一天净值里，等明天算今天的净值才要考虑
     # - day3 先按照day1净值买入4000基金，计算获得多少份额
     # - day3 计算day2的证券部分的价值
@@ -99,29 +143,34 @@ class SalaryFundManager:
     # * day9 按照day7的净值计算现金y的份额，加上份额，加上现金y
     # * day9 计算day8的证券部分的价值
     # * day9 (证券价值+现金)/总份额 = day8净值
-    def updateFundByDate(self, date):
-        if not self.stockManager.isTradeDate(date):
-            raise Exception("Date %s is a invalid trade date" % date.strftime("%Y-%m-%d"))
-        share = self.calcShares(date)
-        security_assets = self.calcSecurityValue(date)
-        cash = self.calcCash(date)
+    def updateFundByDate(self, d):
+        if not self.stockManager.isTradeDate(d):
+            raise Exception("Date %s is a invalid trade date" % d.strftime("%Y-%m-%d"))
+        share = self.calcShares(d)
+        security_assets = self.calcSecurityValue(d)
+        cash = self.calcCash(d)
         total_money = security_assets + cash
         net_value = total_money / share
 
         fund = SalaryFund()
-        fund.trade_date = date
+        fund.trade_date = d
         fund.total_assets = total_money
         fund.security_assets = security_assets
         fund.cash = cash
         fund.share = share
         fund.net_value = net_value
-        self.salaryFundDao.add(fund)
-
+        fund.principal_money = self.calcPrincipalMoney(d)
+        fund.interest = fund.security_assets - fund.principal_money
+        fund = self.calcHoldReturns(fund)
+        fund = self.calcTotalReturns(fund)
         print(fund)
+        self.myFundDao.add(fund)
+
+
 
     # 更新salary fund，计算所有未计算的数据并插入数据库
     def updateAllFund(self):
-        date = self.salaryFundDao.getLatestDate() + timedelta(days=1)
+        date = self.myFundDao.getLatestDate() + timedelta(days=1)
         end = datetime.now().date()
         print("Update salary fund from %s to %s" % (date, end))
         while date < end:
