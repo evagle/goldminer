@@ -5,3 +5,5 @@ __pycache__/
 .iml
 .idea
 UnitTestResult.html
+log
+*.pyc
