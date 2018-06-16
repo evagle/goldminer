@@ -8,6 +8,7 @@ from common.GMConsts import ADJUST_NONE
 
 class GMBaseSpiderV3:
     def __init__(self):
+        set_serv_addr("140.143.64.121:7001")
         set_token('a0998908534d317105b2184afbe436a4104dc51b')
 
     def currentTick(self, symbols, fields=''):
