@@ -1,7 +1,8 @@
 # coding=utf-8
 import time
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
 
+from evaluation.StockManager import StockManager
 from models.models import IndexConstituent, IndexDailyBar
 from spider.v3.GMBaseSpiderV3 import GMBaseSpiderV3
 from storage.IndexDailyBarDao import IndexDailyBarDao
@@ -27,6 +28,9 @@ class IndexBarSpider(GMBaseSpiderV3):
     def downloadBars(self, code):
         startDate = self.indexBarDao.getLatestDate(code) + timedelta(days=1)
         endDate = datetime.now() + timedelta(days=1)
+        return self.downloadBarsByDateRange(code, startDate, endDate.date())
+
+    def downloadBarsByDateRange(self, code, startDate: date, endDate: date):
 
         if startDate >= datetime.now().date():
             print("[%s] is up to date" % code)
@@ -46,9 +50,21 @@ class IndexBarSpider(GMBaseSpiderV3):
             if self.downloadBars(i) is not None:
                 time.sleep(0.1)
 
+    '''
+    检查每个index，如果有漏掉的bar就重新补齐
+    '''
+    def checkAllIndexBars(self):
+        stockManager = StockManager()
+        tradeDates = stockManager.getTradeDates()
+
+        indexes = self.indexesDao.getIndexList()
+        for code in indexes:
+            for d in tradeDates:
+                bar = self.indexBarDao.getByDate(code, d)
+                if bar is None:
+                    self.downloadBarsByDateRange(code, d, d)
 
 if __name__ == "__main__":
     spider = IndexBarSpider()
     # spider.downloadBars('000001')
-    code = '000802'
-    spider.getHistory(spider.getIndexSymbol(code)+"."+code, "1d", "2017-10-10", "2017-10-15")
+    spider.checkAllIndexBars()
