@@ -43,7 +43,7 @@ class IndexPEHeightTenYearProcessor(IndexPEPBBaseProcessor):
             changed.append(current)
 
             print("[%s] %s %s pe=%f, less=%d, total=%d, height=%f" % (indexCode, self.fieldName, current.trade_date,
-                                current.equal_weight_pb, smallerCount, totalCount, current.pb_height_ten_year))
+                                current.equal_weight_pb, smallerCount, totalCount, current.pe_height_ten_year))
 
         if len(changed) > 0:
             self.indexPrimaryIndicatorDao.bulkSave(changed)
