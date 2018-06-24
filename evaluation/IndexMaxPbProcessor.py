@@ -26,8 +26,8 @@ class IndexMaxPBProcessor(IndexPEPBBaseProcessor):
         changed = []
         for indicator in indicators:
             maxPb = max(maxPb, indicator.equal_weight_pb)
-            print("maxPb", maxPb, indicator.trade_date)
             if not indicator.max_pb:
+                print("[%s] %s date=%s, pb=%f" % (indexCode, self.fieldName, indicator.trade_date, maxPb))
                 indicator.max_pb = maxPb
                 changed.append(indicator)
                 # self.indexPrimaryIndicatorDao.add(indicator)
