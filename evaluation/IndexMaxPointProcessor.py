@@ -26,6 +26,8 @@ class IndexMaxPointProcessor(IndexPEPBBaseProcessor):
         changed = []
         for indicator in indicators:
             bar = self.indexDailyBarDao.getByDate(indexCode, indicator.trade_date)
+            if bar is None:
+                continue
             maxPoint = max(maxPoint, bar.close)
 
             print("maxPoint", maxPoint, indicator.trade_date)

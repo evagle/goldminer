@@ -28,9 +28,12 @@ class StockDailyBarAdjustNoneSpider(GMBaseSpiderV3):
         startDate = self.stockBarDao.getLatestDate(code) + timedelta(days=1)
         endDate = datetime.now() + timedelta(days=1)
 
+        return self.downloadBarsByDateRange(code, startDate, endDate)
+
+    def downloadBarsByDateRange(self, code, startDate, endDate):
         if startDate >= datetime.now().date():
             print("[%s] is up to date" % code)
-            return
+            return None
 
         symbol = self.codeToStockSymbol(code)
         print("[Download Stock Bars][%s] From %s to %s" % (symbol, startDate, endDate))
