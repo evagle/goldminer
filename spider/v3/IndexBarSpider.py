@@ -59,7 +59,10 @@ class IndexBarSpider(GMBaseSpiderV3):
 
         indexes = self.indexesDao.getIndexList()
         for code in indexes:
+            pubDate = self.indexesDao.getIndexPublishDate(code)
             for d in tradeDates:
+                if d < pubDate:
+                    continue
                 bar = self.indexBarDao.getByDate(code, d)
                 if bar is None:
                     self.downloadBarsByDateRange(code, d, d)
