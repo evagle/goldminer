@@ -10,6 +10,12 @@ from storage.BaseDao import BaseDao
 
 class IndexPrimaryIndicatorDao(BaseDao):
 
+    def getByCode(self, code: str) -> List[IndexPrimaryIndicator]:
+        return self.session.query(IndexPrimaryIndicator) \
+                            .filter(IndexPrimaryIndicator.code == code) \
+                            .order_by(IndexPrimaryIndicator.trade_date.asc())\
+                            .all()
+
     def getLatestDate(self, code: str, columnName):
         result = self.session.query(IndexPrimaryIndicator.trade_date)\
                              .filter(IndexPrimaryIndicator.code == code)\
@@ -24,6 +30,13 @@ class IndexPrimaryIndicatorDao(BaseDao):
                             .filter(IndexPrimaryIndicator.code == code)\
                             .filter(IndexPrimaryIndicator.trade_date == tradeDate)\
                             .first()
+
+    def getAfterDate(self, code, tradeDate: date) -> List[IndexPrimaryIndicator]:
+        return self.session.query(IndexPrimaryIndicator)\
+                            .filter(IndexPrimaryIndicator.code == code)\
+                            .filter(IndexPrimaryIndicator.trade_date >= tradeDate) \
+                            .order_by(IndexPrimaryIndicator.trade_date.asc())\
+                            .all()
 
     def bulkUpdateMappings(self, clazz, mappings: List [dict]):
         self.session.bulk_update_mappings(clazz, mappings)

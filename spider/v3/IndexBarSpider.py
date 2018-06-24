@@ -49,4 +49,6 @@ class IndexBarSpider(GMBaseSpiderV3):
 
 if __name__ == "__main__":
     spider = IndexBarSpider()
-    spider.downloadBars('000001')
+    # spider.downloadBars('000001')
+    code = '000802'
+    spider.getHistory(spider.getIndexSymbol(code)+"."+code, "1d", "2017-10-10", "2017-10-15")
