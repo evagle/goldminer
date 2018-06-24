@@ -3,11 +3,10 @@ from datetime import datetime, timedelta, date
 
 from evaluation.IndexConstituentManager import IndexConstituentManager
 from evaluation.StockManager import StockManager
-from models.models import IndexPrimaryIndicator
 from storage.IndexConstituentDao import IndexConstituentDao
+from storage.IndexDailyBarDao import IndexDailyBarDao
 from storage.IndexPrimaryIndicatorDao import IndexPrimaryIndicatorDao
 from storage.IndexesDao import IndexesDao
-from storage.StockDao import StockDao
 
 
 class IndexPEPBBaseProcessor:
@@ -17,6 +16,7 @@ class IndexPEPBBaseProcessor:
         self.indexPrimaryIndicatorDao = IndexPrimaryIndicatorDao()
         self.indexDao = IndexesDao()
         self.indexConstituentDao = IndexConstituentDao()
+        self.indexDailyBarDao = IndexDailyBarDao()
         self.fieldName = None
 
     def getStartDate(self, code):
@@ -33,7 +33,7 @@ class IndexPEPBBaseProcessor:
 
         # stock data starts from 2005-01-04
         if d < date(2005, 1, 4):
-            d = date(2015, 1, 4)
+            d = date(2005, 1, 4)
 
         return d
 

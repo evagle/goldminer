@@ -791,7 +791,13 @@ class IndexPrimaryIndicator(Base):
     equal_weight_pb = Column(Float(asdecimal=True))
     weighted_pb = Column(Float(asdecimal=True))
     median_pb = Column(Float(asdecimal=True))
-
+    max_pe = Column(Float(asdecimal=True))
+    max_pb = Column(Float(asdecimal=True))
+    max_point = Column(Float(asdecimal=True))
+    pe_height_ten_year = Column(Float(asdecimal=True))
+    pb_height_ten_year = Column(Float(asdecimal=True))
+    pe_grade_ten_year = Column(String(128))
+    pb_grade_ten_year = Column(String(128))
 
 class Indexes(Base):
     __tablename__ = 'Indexes'
