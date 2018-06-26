@@ -22,8 +22,8 @@ class StockDailyBarAdjustPrevSpider(GMBaseSpiderV3):
         model.trade_date = rawBar['eob'].date()
         for key in ['pre_close', 'amount', 'open', 'close', 'high', 'low']:
             if getattr(model, key) is None or \
-                    getattr(model, key) is float("inf") or \
-                    getattr(model, key) is float("nan"):
+                    str(getattr(model, key)) == "inf" or \
+                    str(getattr(model, key)) == "nan":
                 setattr(model, key, 0)
         return model
 
