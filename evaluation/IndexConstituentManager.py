@@ -13,6 +13,10 @@ class IndexConstituentManager:
     def __init__(self):
         self.indexConstituentDao = IndexConstituentDao()
         self.indexWeightDao = IndexWeightDao()
+        self.__updateDates = None
+        self.__lastQueryIndexCode = None
+        self.__lastConstituents = None
+        self.__lastQueryDate = None
 
     def getWeights(self, code, date):
         model = self.indexWeightDao.getByDate(code, date)
@@ -33,10 +37,24 @@ class IndexConstituentManager:
     # 获取指数成份股，如果能获取到weights则直接返回
     # 否则尝试获取constituents
     # trade_date >= query_date && trade_date 最小
-    def _getConstituents(self, code, date):
-        result = self.indexConstituentDao.getConstituents(code, date)
+    def _getConstituents(self, code, d: date):
+        # 如果查找的是上次查找的index code，并且日期并没有到达下一个constituent的日期，那就直接返回上一个
+        if code == self.__lastQueryIndexCode:
+            canUseCache = True
+            for idate in self.__updateDates:
+                if idate[0] == d and idate != self.__lastQueryDate:
+                    canUseCache = False
+            if canUseCache:
+                return self.__lastConstituents
+
+        result = self.indexConstituentDao.getConstituents(code, d)
         if result is not None:
-            return self.__formatConstituents(result)
+            constituents = self.__formatConstituents(result)
+            self.__lastQueryDate = d
+            self.__lastConstituents = constituents
+            self.__updateDates = self.indexConstituentDao.getConstituentUpdateDates(code)
+            self.__lastQueryIndexCode = code
+            return constituents
         return None
 
     def _getConstituentsForTest(self, code, date):
