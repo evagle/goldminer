@@ -11,6 +11,7 @@ from evaluation.IndexPBGradeTenYearProcessor import IndexPBGradeTenYearProcessor
 from evaluation.IndexPBHeightTenYearProcessor import IndexPBHeightTenYearProcessor
 from evaluation.IndexPEGradeTenYearProcessor import IndexPEGradeTenYearProcessor
 from evaluation.IndexPEHeightTenYearProcessor import IndexPEHeightTenYearProcessor
+from evaluation.IndexWeightedPBProcessor import IndexWeightedPBProcessor
 from evaluation.IndexWeightedPEProcessor import IndexWeightedPEProcessor
 from storage.IndexesDao import IndexesDao
 
@@ -23,7 +24,7 @@ class IndexPEPBGenerator:
         self.weightedPEProcessor = IndexWeightedPEProcessor()
         self.medianPEProcessor = IndexMedianPEProcessor()
         self.equalWeightPBProcessor = IndexEqualWeightPBProcessor()
-
+        self.weightedPBProcessor = IndexWeightedPBProcessor()
         self.medianPBProcessor = IndexMedianPBProcessor()
         self.maxPEProcessor = IndexMaxPEProcessor()
         self.maxPBProcessor = IndexMaxPBProcessor()
@@ -40,6 +41,7 @@ class IndexPEPBGenerator:
             self.weightedPEProcessor.process(code)
             self.medianPEProcessor.process(code)
             self.equalWeightPBProcessor.process(code)
+            self.weightedPBProcessor.process(code)
             self.medianPBProcessor.process(code)
             self.maxPEProcessor.process(code)
             self.maxPBProcessor.process(code)
