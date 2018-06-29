@@ -29,6 +29,12 @@ class IndexConstituentDao(BaseDao):
             .filter(IndexConstituent.code == code, IndexConstituent.trade_date == tradeDate) \
             .first()
 
+    def getConstituentUpdateDates(self, code):
+        return self.session.query(IndexConstituent.trade_date) \
+            .filter(IndexConstituent.code == code) \
+            .order_by(IndexConstituent.trade_date.asc())\
+            .all()
+
     '''
     1. Find first record with trade_date <= date
     2. If date < all trade_date, return first one
