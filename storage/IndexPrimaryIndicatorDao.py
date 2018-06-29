@@ -1,5 +1,5 @@
 # coding: utf-8
-from datetime import date
+from datetime import date, timedelta
 from typing import List
 
 from sqlalchemy import Column
@@ -9,6 +9,9 @@ from storage.BaseDao import BaseDao
 
 
 class IndexPrimaryIndicatorDao(BaseDao):
+
+    def __init__(self):
+        super(IndexPrimaryIndicatorDao, self).__init__()
 
     def getByCode(self, code: str) -> List[IndexPrimaryIndicator]:
         return self.session.query(IndexPrimaryIndicator) \
@@ -26,10 +29,19 @@ class IndexPrimaryIndicatorDao(BaseDao):
         return date(2005, 1, 4) if result is None else result[0]
 
     def getByDate(self, code, tradeDate: date):
-        return self.session.query(IndexPrimaryIndicator)\
-                            .filter(IndexPrimaryIndicator.code == code)\
-                            .filter(IndexPrimaryIndicator.trade_date == tradeDate)\
-                            .first()
+        clazzName = IndexPrimaryIndicator.__name__
+        val = self.getFromCache(code, tradeDate, clazzName)
+        if val is not None:
+            return val
+        self.deleteCache(clazzName)
+
+        results = self.session.query(IndexPrimaryIndicator)\
+                              .filter(IndexPrimaryIndicator.code == code)\
+                              .filter(IndexPrimaryIndicator.trade_date >= tradeDate, IndexPrimaryIndicator.trade_date <= tradeDate + timedelta(days=20))\
+                              .all()
+
+        self.addToCache(code, clazzName, results)
+        return self.getFromCache(code, tradeDate, clazzName)
 
     def getAfterDate(self, code, tradeDate: date) -> List[IndexPrimaryIndicator]:
         return self.session.query(IndexPrimaryIndicator)\

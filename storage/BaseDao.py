@@ -6,6 +6,7 @@ from storage.DBHelper import DBHelper
 class BaseDao:
     def __init__(self):
         self.session = DBHelper.getSession()
+        self.__cache = {}
 
     def add(self, instance):
         self.session.add(instance)
@@ -32,3 +33,22 @@ class BaseDao:
 
     def getSession(self):
         return self.session
+
+    def getCacheKey(self, code, tradeDate):
+        return code + tradeDate.strftime("%Y-%m-%d")
+
+    def getFromCache(self, code, tradeDate, clazzName):
+        key = self.getCacheKey(code, tradeDate)
+        if clazzName in self.__cache and key in self.__cache[clazzName]:
+            return self.__cache[clazzName][key]
+        return None
+
+    def addToCache(self, code, clazzName, models):
+        for model in models:
+            key = self.getCacheKey(code, model.trade_date)
+            if clazzName not in self.__cache:
+                self.__cache[clazzName] = {}
+            self.__cache[clazzName][key] = model
+
+    def deleteCache(self, clazzName):
+        self.__cache[clazzName] = {}
