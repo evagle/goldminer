@@ -1,5 +1,5 @@
 # coding: utf-8
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 
 from common.Utils import Utils
 from evaluation.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
