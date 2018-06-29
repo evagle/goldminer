@@ -9,7 +9,7 @@ class IndexPBHeightTenYearProcessor(IndexPEPBBaseProcessor):
 
     def __init__(self):
         super(IndexPBHeightTenYearProcessor, self).__init__()
-        self.fieldName = "pb_height_ten_year"
+        self.fieldName = "ew_pb_height_ten_year"
 
     def process(self, indexCode):
         d = self.getStartDate(indexCode)
@@ -26,7 +26,7 @@ class IndexPBHeightTenYearProcessor(IndexPEPBBaseProcessor):
 
         changed = []
         for current in indicators:
-            if current.pb_height_ten_year is not None:
+            if current.ew_pb_height_ten_year is not None:
                 continue
             tenYearBefore = current.trade_date - timedelta(days=3650)
             totalCount = 0
@@ -39,9 +39,9 @@ class IndexPBHeightTenYearProcessor(IndexPEPBBaseProcessor):
             if totalCount == 0:
                 continue
             percent = smallerCount * 100 / totalCount
-            current.pb_height_ten_year = float(Decimal(percent).quantize(Decimal('0.0')))
+            current.ew_pb_height_ten_year = float(Decimal(percent).quantize(Decimal('0.0')))
             print("[%s] %s %s pb=%f, less=%d, total=%d, height=%f" % (indexCode, self.fieldName, current.trade_date, current.equal_weight_pb, smallerCount,
-                  totalCount, current.pb_height_ten_year))
+                  totalCount, current.ew_pb_height_ten_year))
 
             changed.append(current)
 

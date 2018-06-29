@@ -10,7 +10,7 @@ class IndexPEGradeTenYearProcessor(IndexPEPBBaseProcessor):
 
     def __init__(self):
         super(IndexPEGradeTenYearProcessor, self).__init__()
-        self.fieldName = "pe_grade_ten_year"
+        self.fieldName = "ew_pe_grade_ten_year"
 
     def process(self, indexCode):
         indicators = self.indexPrimaryIndicatorDao.getByCode(indexCode)
@@ -20,7 +20,7 @@ class IndexPEGradeTenYearProcessor(IndexPEPBBaseProcessor):
 
         changed = []
         for current in indicators:
-            if current.pe_grade_ten_year is not None:
+            if current.ew_pe_grade_ten_year is not None:
                 continue
             tenYearBefore = current.trade_date - timedelta(days=3650)
             pes = []
@@ -37,8 +37,8 @@ class IndexPEGradeTenYearProcessor(IndexPEPBBaseProcessor):
 
             grades = [int(math.floor(pes[min(int(n*p), n-1)])) for p in [0.1, 0.3]]
             grades.extend([int(math.ceil(pes[min(int(n*p), n-1)])) for p in [0.8, 1]])
-            current.pe_grade_ten_year = json.dumps(grades)
-            print("[%s] %s trade_date = %s, grades = %s"% (indexCode, self.fieldName, current.trade_date, current.pe_grade_ten_year))
+            current.ew_pe_grade_ten_year = json.dumps(grades)
+            print("[%s] %s trade_date = %s, grades = %s"% (indexCode, self.fieldName, current.trade_date, current.ew_pe_grade_ten_year))
             changed.append(current)
 
         if len(changed) > 0:

@@ -9,7 +9,7 @@ class IndexPEHeightTenYearProcessor(IndexPEPBBaseProcessor):
 
     def __init__(self):
         super(IndexPEHeightTenYearProcessor, self).__init__()
-        self.fieldName = "pe_height_ten_year"
+        self.fieldName = "ew_pe_height_ten_year"
 
     def process(self, indexCode):
         d = self.getStartDate(indexCode)
@@ -26,7 +26,7 @@ class IndexPEHeightTenYearProcessor(IndexPEPBBaseProcessor):
 
         changed = []
         for current in indicators:
-            if current.pe_height_ten_year is not None:
+            if current.ew_pe_height_ten_year is not None:
                 continue
             tenYearBefore = current.trade_date - timedelta(days=3650)
             totalCount = 0
@@ -39,11 +39,11 @@ class IndexPEHeightTenYearProcessor(IndexPEPBBaseProcessor):
             if totalCount == 0:
                 continue
             percent = smallerCount * 100 / totalCount
-            current.pe_height_ten_year = float(Decimal(percent).quantize(Decimal('0.0')))
+            current.ew_pe_height_ten_year = float(Decimal(percent).quantize(Decimal('0.0')))
             changed.append(current)
 
             print("[%s] %s %s pe=%f, less=%d, total=%d, height=%f" % (indexCode, self.fieldName, current.trade_date,
-                                current.equal_weight_pb, smallerCount, totalCount, current.pe_height_ten_year))
+                                current.equal_weight_pb, smallerCount, totalCount, current.ew_pe_height_ten_year))
 
         if len(changed) > 0:
             self.indexPrimaryIndicatorDao.bulkSave(changed)
