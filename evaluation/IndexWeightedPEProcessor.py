@@ -1,16 +1,10 @@
 # coding: utf-8
 import math
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from decimal import Decimal
 
-from evaluation.IndexConstituentManager import IndexConstituentManager
 from evaluation.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
-from evaluation.StockManager import StockManager
-from models.models import IndexPrimaryIndicator, TradingDerivativeIndicator
-from storage.IndexConstituentDao import IndexConstituentDao
-from storage.IndexPrimaryIndicatorDao import IndexPrimaryIndicatorDao
-from storage.IndexesDao import IndexesDao
-from storage.StockDao import StockDao
+from models.models import IndexPrimaryIndicator
 
 
 class IndexWeightedPEProcessor(IndexPEPBBaseProcessor):
