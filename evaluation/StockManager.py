@@ -31,8 +31,6 @@ class StockManager:
         }
         '''
         self.__stockCache = {}
-        # self.__stockPETTMCache = {}
-        # self.__stockPBCache = {}
         self.__tradeDatesCache = []
 
         # load trade dates when initiate
@@ -43,9 +41,11 @@ class StockManager:
             return TradingDerivativeIndicator.PETTM
         elif field == "PB":
             return TradingDerivativeIndicator.PB
+        elif field == "TotalMarketValue":
+            return TradingDerivativeIndicator.TOTMKTCAP
 
     def __loadStockField(self, stockCode, field):
-        if stockCode in self.__stockCache and field in self.__stockCache[stockCode][field]:
+        if stockCode in self.__stockCache and field in self.__stockCache[stockCode]:
             return
 
         if stockCode not in self.__stockCache:
@@ -79,6 +79,10 @@ class StockManager:
 
     def getStockPB(self, stockCode, d: date):
         field = "PB"
+        return self.getStockFieldByDate(stockCode, field, d)
+
+    def getStockTotalMarketValue(self, stockCode, d: date):
+        field = "TotalMarketValue"
         return self.getStockFieldByDate(stockCode, field, d)
 
     def __loadTradeDates(self):
