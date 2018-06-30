@@ -62,6 +62,6 @@ class IndexWeightedPBProcessor(IndexPEPBBaseProcessor):
 
 if __name__ == "__main__":
     peManager = IndexWeightedPBProcessor()
-    peManager.process('000001')
+    peManager.process('000009')
 
 
