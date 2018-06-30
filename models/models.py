@@ -798,6 +798,10 @@ class IndexPrimaryIndicator(Base):
     ew_pb_height_ten_year = Column(Float(asdecimal=True))
     ew_pe_grade_ten_year = Column(String(128))
     ew_pb_grade_ten_year = Column(String(128))
+    w_pe_height_ten_year = Column(Float(asdecimal=True))
+    w_pb_height_ten_year = Column(Float(asdecimal=True))
+    w_pe_grade_ten_year = Column(String(128))
+    w_pb_grade_ten_year = Column(String(128))
 
 class Indexes(Base):
     __tablename__ = 'Indexes'

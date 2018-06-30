@@ -10,7 +10,7 @@ from evaluation.IndexMedianPEProcessor import IndexMedianPEProcessor
 from evaluation.IndexPBGradeTenYearProcessor import IndexPBGradeTenYearProcessor
 from evaluation.IndexPBHeightTenYearProcessor import IndexPBHeightTenYearProcessor
 from evaluation.IndexPEGradeTenYearProcessor import IndexPEGradeTenYearProcessor
-from evaluation.IndexPEHeightTenYearProcessor import IndexPEHeightTenYearProcessor
+from evaluation.IndexPEPBHeightProcessor import IndexPEHeightTenYearProcessor, IndexPEPBHeightProcessor
 from evaluation.IndexWeightedPBProcessor import IndexWeightedPBProcessor
 from evaluation.IndexWeightedPEProcessor import IndexWeightedPEProcessor
 from storage.IndexesDao import IndexesDao
@@ -29,8 +29,7 @@ class IndexPEPBGenerator:
         self.maxPEProcessor = IndexMaxPEProcessor()
         self.maxPBProcessor = IndexMaxPBProcessor()
         self.maxPointProcessor = IndexMaxPointProcessor()
-        self.peHeightProcessor = IndexPEHeightTenYearProcessor()
-        self.pbHeightProcessor = IndexPBHeightTenYearProcessor()
+        self.heightProcessor = IndexPEPBHeightProcessor()
         self.peGradeProcessor = IndexPEGradeTenYearProcessor()
         self.pbGradeProcessor = IndexPBGradeTenYearProcessor()
 
@@ -46,8 +45,19 @@ class IndexPEPBGenerator:
             self.maxPEProcessor.process(code)
             self.maxPBProcessor.process(code)
             self.maxPointProcessor.process(code)
-            self.peHeightProcessor.process(code)
-            self.pbHeightProcessor.process(code)
+
+            self.heightProcessor.runEqualWeightPEHeight()
+            self.heightProcessor.process(code)
+
+            self.heightProcessor.runEqualWeightPBHeight()
+            self.heightProcessor.process(code)
+
+            self.heightProcessor.runWeightedPEHeight()
+            self.heightProcessor.process(code)
+
+            self.heightProcessor.runWeightedPBHeight()
+            self.heightProcessor.process(code)
+
             self.peGradeProcessor.process(code)
             self.pbGradeProcessor.process(code)
 
