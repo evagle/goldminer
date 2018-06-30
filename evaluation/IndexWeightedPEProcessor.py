@@ -13,8 +13,6 @@ class IndexWeightedPEProcessor(IndexPEPBBaseProcessor):
     def __init__(self):
         super(IndexWeightedPEProcessor, self).__init__()
         self.fieldName = "weighted_pe"
-        # self.__totalMarketValueCache = {}
-        # self.stockFundamentalsDao = StockFundamentalsDao()
 
     def process(self, indexCode):
         d = self.getStartDate(indexCode)
