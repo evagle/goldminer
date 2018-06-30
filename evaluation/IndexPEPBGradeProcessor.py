@@ -61,7 +61,7 @@ class IndexPEPBGradeProcessor(IndexPEPBBaseProcessor):
             changed.append(current)
 
         if len(changed) > 0:
-            # self.indexPrimaryIndicatorDao.bulkSave(changed)
+            self.indexPrimaryIndicatorDao.bulkSave(changed)
             print("[%s] %d %s updated" % (indexCode, len(changed), self.fieldName))
 
         return 0
