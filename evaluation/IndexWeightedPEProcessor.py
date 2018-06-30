@@ -3,6 +3,7 @@ import math
 from datetime import datetime, timedelta
 from decimal import Decimal
 
+from common.Utils import Utils
 from evaluation.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
 from models.models import IndexPrimaryIndicator
 
@@ -48,7 +49,7 @@ class IndexWeightedPEProcessor(IndexPEPBBaseProcessor):
                         totalMarketValueSum += value
 
                     if profitSum > 0:
-                        pe = float((totalMarketValueSum / profitSum).quantize(Decimal('0.00')))
+                        pe = Utils.formatFloat(totalMarketValueSum / profitSum, 6)
                         model.weighted_pe = pe
                         models.append(model)
                         print("new weighted pe", indexCode, d, pe, profitSum, totalMarketValueSum)

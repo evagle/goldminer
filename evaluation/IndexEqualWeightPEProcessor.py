@@ -2,6 +2,7 @@
 from datetime import datetime, timedelta, date
 from decimal import Decimal
 
+from common.Utils import Utils
 from evaluation.IndexConstituentManager import IndexConstituentManager
 from evaluation.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
 from evaluation.StockManager import StockManager
@@ -41,7 +42,7 @@ class IndexEqualWeightPEProcessor(IndexPEPBBaseProcessor):
                     if pesum == 0:
                         print("ERROR empty stock pe", indexCode, d, constituents)
                     if pesum > 0:
-                        pe = float(Decimal(len(stockPETTM) / pesum).quantize(Decimal('0.0000')))
+                        pe = Utils.formatFloat(len(stockPETTM) / pesum, 6)
                         model.equal_weight_pe = pe
                         models.append(model)
                 else:

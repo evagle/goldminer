@@ -1,5 +1,6 @@
 # coding: utf-8
 import math
+from decimal import Decimal
 
 
 class Utils:
@@ -41,6 +42,13 @@ class Utils:
             return lst[m]
         else:
             return (lst[m] + lst[m+1])/2
+
+    @staticmethod
+    def formatFloat(value: float, precision: int):
+        format = "0."
+        for i in range(precision):
+            format += "0"
+        return float(Decimal(value).quantize(Decimal(format)))
 
 
 if __name__ == "__main__":
