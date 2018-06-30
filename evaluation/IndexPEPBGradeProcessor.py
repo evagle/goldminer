@@ -71,18 +71,6 @@ if __name__ == "__main__":
     manager = IndexPEPBGradeProcessor()
     manager.runWeightedPEGrade()
     manager.process('000009')
-    # lines = open("/Users/abing/Downloads/a.txt").readlines()
-    # for line in lines:
-    #     args = line.rstrip().split("\t")
-    #     print(args)
-    #     code = args[0].zfill(6)
-    #     d = datetime.strptime(args[1], "%d/%m/%Y").date()
-    #     indexDao = IndexesDao()
-    #     model = indexDao.getByCode(code)
-    #     if model and model.pub_date != d:
-    #         print("=======", d, model.pub_date)
-    #         model.pub_date = d
-    #         indexDao.add(model)
-    #         print("=======", model)
+
 
 
