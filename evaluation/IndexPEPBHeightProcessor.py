@@ -64,7 +64,7 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
                                 getattr(current, self.peName), smallerCount, totalCount, height))
 
         if len(changed) > 0:
-            # self.indexPrimaryIndicatorDao.bulkSave(changed)
+            self.indexPrimaryIndicatorDao.bulkSave(changed)
             print("[%s] %d %s updated" % (indexCode, len(changed), self.fieldName))
 
         return 0
@@ -73,5 +73,5 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
 if __name__ == "__main__":
     manager = IndexPEPBHeightProcessor()
     manager.runWeightedPBHeight()
-    manager.process('000001')
+    manager.process('000009')
 
