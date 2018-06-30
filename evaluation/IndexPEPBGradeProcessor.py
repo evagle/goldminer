@@ -38,8 +38,8 @@ class IndexPEPBGradeProcessor(IndexPEPBBaseProcessor):
 
         changed = []
         for current in indicators:
-            # if getattr(current, self.fieldName) is not None:
-            #     continue
+            if getattr(current, self.fieldName) is not None:
+                continue
             tenYearBefore = current.trade_date - timedelta(days=3650)
             pes = []
             for i in indicators:
