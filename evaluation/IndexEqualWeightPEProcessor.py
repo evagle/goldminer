@@ -41,7 +41,7 @@ class IndexEqualWeightPEProcessor(IndexPEPBBaseProcessor):
                     if pesum == 0:
                         print("ERROR empty stock pe", indexCode, d, constituents)
                     if pesum > 0:
-                        pe = float(Decimal(len(stockPETTM) / pesum).quantize(Decimal('0.00')))
+                        pe = float(Decimal(len(stockPETTM) / pesum).quantize(Decimal('0.0000')))
                         model.equal_weight_pe = pe
                         models.append(model)
                 else:

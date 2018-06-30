@@ -35,7 +35,7 @@ class IndexEqualWeightPBProcessor(IndexPEPBBaseProcessor):
                     if pbsum == 0:
                         print("ERROR empty stock pb", indexCode, d, constituents)
                     if pbsum > 0:
-                        pb = float(Decimal(len(stockPB) / pbsum).quantize(Decimal('0.00')))
+                        pb = float(Decimal(len(stockPB) / pbsum).quantize(Decimal('0.0000')))
                         model.equal_weight_pb = pb
                         models.append(model)
                 else:
