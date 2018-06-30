@@ -11,6 +11,9 @@ class IndexesDao(BaseDao):
     def all(self) -> List[Indexes]:
         return self.session.query(Indexes).all()
 
+    def getByCode(self, code) -> Indexes:
+        return self.session.query(Indexes).filter(Indexes.code == code).first()
+
     def getIndexList(self) -> List[str]:
         excludeIndexTypes = ["债券指数", "基金指数"]
         result = self.session.query(Indexes.code).filter(Indexes.index_type.notin_(excludeIndexTypes)).all()
