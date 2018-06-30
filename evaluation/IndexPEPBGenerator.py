@@ -8,8 +8,7 @@ from evaluation.IndexMaxPointProcessor import IndexMaxPointProcessor
 from evaluation.IndexMedianPBProcessor import IndexMedianPBProcessor
 from evaluation.IndexMedianPEProcessor import IndexMedianPEProcessor
 from evaluation.IndexPBGradeTenYearProcessor import IndexPBGradeTenYearProcessor
-from evaluation.IndexPBHeightTenYearProcessor import IndexPBHeightTenYearProcessor
-from evaluation.IndexPEGradeTenYearProcessor import IndexPEGradeTenYearProcessor
+from evaluation.IndexPEPBGradeProcessor import IndexPEPBGradeProcessor
 from evaluation.IndexPEPBHeightProcessor import IndexPEPBHeightProcessor
 from evaluation.IndexWeightedPBProcessor import IndexWeightedPBProcessor
 from evaluation.IndexWeightedPEProcessor import IndexWeightedPEProcessor
@@ -30,8 +29,7 @@ class IndexPEPBGenerator:
         self.maxPBProcessor = IndexMaxPBProcessor()
         self.maxPointProcessor = IndexMaxPointProcessor()
         self.heightProcessor = IndexPEPBHeightProcessor()
-        self.peGradeProcessor = IndexPEGradeTenYearProcessor()
-        self.pbGradeProcessor = IndexPBGradeTenYearProcessor()
+        self.gradeProcessor = IndexPEPBGradeProcessor()
 
     def updateAll(self):
         indexes = self.indexDao.getIndexList()
@@ -58,8 +56,17 @@ class IndexPEPBGenerator:
             self.heightProcessor.runWeightedPBHeight()
             self.heightProcessor.process(code)
 
-            self.peGradeProcessor.process(code)
-            self.pbGradeProcessor.process(code)
+            self.gradeProcessor.runEqualWeightPEGrade()
+            self.gradeProcessor.process(code)
+
+            self.gradeProcessor.runEqualWeightPBGrade()
+            self.gradeProcessor.process(code)
+
+            self.gradeProcessor.runWeightedPEGrade()
+            self.gradeProcessor.process(code)
+
+            self.gradeProcessor.runWeightedPBGrade()
+            self.gradeProcessor.process(code)
 
 
 if __name__ == "__main__":
