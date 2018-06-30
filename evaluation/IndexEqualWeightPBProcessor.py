@@ -1,5 +1,6 @@
 # coding: utf-8
 from datetime import datetime, timedelta, date
+from decimal import Decimal
 
 from evaluation.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
 from models.models import IndexPrimaryIndicator
@@ -34,7 +35,7 @@ class IndexEqualWeightPBProcessor(IndexPEPBBaseProcessor):
                     if pbsum == 0:
                         print("ERROR empty stock pb", indexCode, d, constituents)
                     if pbsum > 0:
-                        pb = len(stockPB) / pbsum
+                        pb = float((len(stockPB) / pbsum).quantize(Decimal('0.00')))
                         model.equal_weight_pb = pb
                         models.append(model)
                 else:
