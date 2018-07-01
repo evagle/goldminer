@@ -37,7 +37,7 @@ class IndexPrimaryIndicatorDao(BaseDao):
 
         results = self.session.query(IndexPrimaryIndicator)\
                               .filter(IndexPrimaryIndicator.code == code)\
-                              .filter(IndexPrimaryIndicator.trade_date >= tradeDate, IndexPrimaryIndicator.trade_date <= tradeDate + timedelta(days=20))\
+                              .filter(IndexPrimaryIndicator.trade_date >= tradeDate, IndexPrimaryIndicator.trade_date <= tradeDate + timedelta(days=60))\
                               .all()
 
         self.addToCache(code, clazzName, results)
