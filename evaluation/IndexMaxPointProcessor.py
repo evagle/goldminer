@@ -34,7 +34,6 @@ class IndexMaxPointProcessor(IndexPEPBBaseProcessor):
             if maxPoint > 0 and not indicator.max_point:
                 indicator.max_point = maxPoint
                 changed.append(indicator)
-                # self.indexPrimaryIndicatorDao.add(indicator)
                 count += 1
 
         if count > 0:

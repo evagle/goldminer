@@ -30,7 +30,6 @@ class IndexMaxPEProcessor(IndexPEPBBaseProcessor):
                 print("[%s] %s date=%s, pe=%f" % (indexCode, self.fieldName, indicator.trade_date, maxPe))
                 indicator.max_pe = maxPe
                 changed.append(indicator)
-                # self.indexPrimaryIndicatorDao.add(indicator)
                 count += 1
 
         if count > 0:
