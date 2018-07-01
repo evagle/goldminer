@@ -22,21 +22,21 @@ class IndexMaxPEProcessor(IndexPEPBBaseProcessor):
             return
 
         maxPe = 0 if indicators[0].max_pe is None else indicators[0].max_pe
-        count = 0
         changed = []
         for indicator in indicators:
+            if indicator.equal_weight_pe is None:
+                continue
             maxPe = max(maxPe, indicator.equal_weight_pe)
             if not indicator.max_pe:
                 print("[%s] %s date=%s, pe=%f" % (indexCode, self.fieldName, indicator.trade_date, maxPe))
                 indicator.max_pe = maxPe
                 changed.append(indicator)
-                count += 1
 
-        if count > 0:
+        if len(changed) > 0:
             self.indexPrimaryIndicatorDao.bulkSave(changed)
-            print("[%s] %d max pe updated" % (indexCode, count))
+            print("[%s] %d max pe updated" % (indexCode, len(changed)))
 
-        return count
+        return len(changed)
 
 
 if __name__ == "__main__":
