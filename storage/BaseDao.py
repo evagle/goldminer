@@ -52,3 +52,7 @@ class BaseDao:
 
     def deleteCache(self, clazzName):
         self.__cache[clazzName] = {}
+
+    def bulkSave(self, models):
+        self.session.bulk_save_objects(models)
+        self.session.commit()

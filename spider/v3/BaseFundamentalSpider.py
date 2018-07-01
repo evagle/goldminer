@@ -56,7 +56,7 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
                                      limit=10000, fields=self.fields)
 
         items = [self.rawDataToModel(code, item) for item in results]
-        self.fundamentalsDao.addAll(items)
+        self.fundamentalsDao.bulkSave(items)
 
         print("[%s\t%s] count = %d\n" % (modelName, code, len(items)))
         return items

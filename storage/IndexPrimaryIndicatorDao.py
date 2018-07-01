@@ -53,7 +53,3 @@ class IndexPrimaryIndicatorDao(BaseDao):
     def bulkUpdateMappings(self, clazz, mappings: List [dict]):
         self.session.bulk_update_mappings(clazz, mappings)
         self.session.commit()
-
-    def bulkSave(self, models):
-        self.session.bulk_save_objects(models)
-        self.session.commit()
