@@ -33,24 +33,26 @@ class IndexWeightedPBProcessor(IndexPEPBBaseProcessor):
 
                 constituents = self.indexConstituentManager.getConstituents(indexCode, d)
                 if constituents is not None:
-                    profitSum = 0
+                    netAssetsSum = 0
                     totalMarketValueSum = 0
                     for stock in constituents:
                         pb = self.stockManager.getStockPB(stock, d)
                         value = self.stockManager.getStockTotalMarketValue(stock, d)
-                        ## TODO 没有pb和市值数据，跳过，是否有更好的策略
+
                         if value is None or value < 1 or math.fabs(pb) < 1e-6:
                             print("[ERROR] no pb, total market value for %s at date %s" % (stock, d))
                             continue
-                        profit = value / Decimal(pb)
-                        profitSum += profit
+                        netAsset = value / Decimal(pb)
+                        netAssetsSum += netAsset
                         totalMarketValueSum += value
 
-                    if profitSum > 0:
-                        pb = Utils.formatFloat(totalMarketValueSum / profitSum, 6)
+                    if netAssetsSum > 0:
+                        pb = Utils.formatFloat(totalMarketValueSum / netAssetsSum, 6)
                         model.weighted_pb = pb
                         models.append(model)
-                        print("new weighted pb", indexCode, d, pb, profitSum, totalMarketValueSum)
+                        print("new weighted pb", indexCode, d, pb, netAssetsSum, totalMarketValueSum)
+                    else:
+                        print("[ERROR] weighted pb with net assets < 0")
                 else:
                     print("No constituent", indexCode, d)
             d = d + timedelta(days=1)

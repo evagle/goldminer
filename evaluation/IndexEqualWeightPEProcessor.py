@@ -1,16 +1,9 @@
 # coding: utf-8
-from datetime import datetime, timedelta, date
-from decimal import Decimal
+from datetime import datetime, timedelta
 
 from common.Utils import Utils
-from evaluation.IndexConstituentManager import IndexConstituentManager
 from evaluation.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
-from evaluation.StockManager import StockManager
 from models.models import IndexPrimaryIndicator
-from storage.IndexConstituentDao import IndexConstituentDao
-from storage.IndexPrimaryIndicatorDao import IndexPrimaryIndicatorDao
-from storage.IndexesDao import IndexesDao
-from storage.StockDao import StockDao
 
 
 class IndexEqualWeightPEProcessor(IndexPEPBBaseProcessor):
@@ -38,11 +31,14 @@ class IndexEqualWeightPEProcessor(IndexPEPBBaseProcessor):
                 constituents = self.indexConstituentManager.getConstituents(indexCode, d)
                 if constituents is not None:
                     stockPETTM = [self.stockManager.getStockPETTM(stock, d) for stock in constituents]
-                    pesum = sum([1 / p if p > 0 else 0 for p in stockPETTM])
-                    if pesum == 0:
+                    stockCount = len(stockPETTM)
+                    stockPETTM = Utils.iqrFilter(stockPETTM)
+
+                    peSum = sum([1 / p if p > 0 else 0 for p in stockPETTM])
+                    if peSum == 0:
                         print("ERROR empty stock pe", indexCode, d, constituents)
-                    if pesum > 0:
-                        pe = Utils.formatFloat(len(stockPETTM) / pesum, 6)
+                    else:
+                        pe = Utils.formatFloat(stockCount / peSum, 6)
                         model.equal_weight_pe = pe
                         models.append(model)
                 else:

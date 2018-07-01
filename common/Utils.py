@@ -1,6 +1,9 @@
 # coding: utf-8
 import math
 from decimal import Decimal
+import numpy as np
+
+from common import GMConsts
 
 
 class Utils:
@@ -49,6 +52,17 @@ class Utils:
         for i in range(precision):
             format += "0"
         return float(Decimal(value).quantize(Decimal(format)))
+
+    # 四分法 interquartile range (IQR)
+    # https://en.wikipedia.org/wiki/Interquartile_range#Examples
+    @staticmethod
+    def iqrFilter(sourceList):
+        q25 = np.percentile(sourceList, 25)
+        q75 = np.percentile(sourceList, 75)
+        iqr = q75 - q25
+        lowerBound = q25 - GMConsts.IQR_FACTOR * iqr
+        upperBound = q75 + GMConsts.IQR_FACTOR * iqr
+        return [i for i in sourceList if lowerBound <=i <= upperBound]
 
 
 if __name__ == "__main__":
