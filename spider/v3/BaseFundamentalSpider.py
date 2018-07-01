@@ -2,6 +2,8 @@
 from datetime import timedelta, datetime
 import time
 
+from sqlalchemy.exc import IntegrityError
+
 from models.models import IndexDailyBar, BalanceSheet
 from spider.v3.GMBaseSpiderV3 import GMBaseSpiderV3
 from storage.StockDao import StockDao
@@ -56,7 +58,11 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
                                      limit=10000, fields=self.fields)
 
         items = [self.rawDataToModel(code, item) for item in results]
-        self.fundamentalsDao.bulkSave(items)
+        try:
+            self.fundamentalsDao.addAll(items)
+        except IntegrityError as e:
+            print("[ERROR] failed to save %s, error message = %s " % (modelName, e))
+            print("==data==", items)
 
         print("[%s\t%s] count = %d\n" % (modelName, code, len(items)))
         return items
