@@ -3,6 +3,7 @@ import json
 import math
 from datetime import timedelta, datetime
 
+from common.Utils import Utils
 from evaluation.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
 from storage.IndexesDao import IndexesDao
 
@@ -33,7 +34,7 @@ class IndexPEPBGradeProcessor(IndexPEPBBaseProcessor):
     def process(self, indexCode):
         indicators = self.indexPrimaryIndicatorDao.getByCode(indexCode)
         if len(indicators) == 0:
-            print("[%s] no data found." % indexCode)
+            print("[%s] PEPBGradeProcessor  no data found." % indexCode)
             return
 
         changed = []
@@ -53,8 +54,8 @@ class IndexPEPBGradeProcessor(IndexPEPBBaseProcessor):
             pes = sorted(pes)
             n = len(pes)
 
-            grades = [int(math.floor(pes[min(int(n*p), n-1)])) for p in [0.1, 0.3]]
-            grades.extend([int(math.ceil(pes[min(int(n*p), n-1)])) for p in [0.8, 1]])
+            grades = [pes[min(int(n*p), n-1)] for p in [0.1, 0.3, 0.8, 1]]
+            grades = [Utils.formatFloat(i, 1) for i in grades]
             gradesJson = json.dumps(grades)
             setattr(current, self.fieldName, gradesJson)
             print("[%s] %s trade_date = %s, grades = %s"% (indexCode, self.fieldName, current.trade_date, gradesJson))
@@ -69,7 +70,7 @@ class IndexPEPBGradeProcessor(IndexPEPBBaseProcessor):
 
 if __name__ == "__main__":
     manager = IndexPEPBGradeProcessor()
-    manager.runWeightedPEGrade()
+    manager.runWeightedPBGrade()
     manager.process('000009')
 
 
