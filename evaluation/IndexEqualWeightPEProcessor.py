@@ -1,6 +1,7 @@
 # coding: utf-8
 from datetime import datetime, timedelta
 
+from common import GMConsts
 from common.Utils import Utils
 from evaluation.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
 from models.models import IndexPrimaryIndicator
@@ -37,10 +38,12 @@ class IndexEqualWeightPEProcessor(IndexPEPBBaseProcessor):
                     peSum = sum([1 / p if p > 0 else 0 for p in stockPETTM])
                     if peSum == 0:
                         print("ERROR empty stock pe", indexCode, d, constituents)
+                        pe = GMConsts.ABNORMAL_MAX_PE
                     else:
                         pe = Utils.formatFloat(stockCount / peSum, 6)
-                        model.equal_weight_pe = pe
-                        models.append(model)
+
+                    model.equal_weight_pe = pe
+                    models.append(model)
                 else:
                     print("No constituent", indexCode, d)
             d = d + timedelta(days=1)
