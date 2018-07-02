@@ -23,9 +23,8 @@ class IndexPEPBBaseProcessor:
         if self.fieldName is None:
             raise Exception("Field name is not given.")
         d = self.indexPrimaryIndicatorDao.getLatestDate(code, self.fieldName)
-        pubDate = self.indexDao.getIndexPublishDate(code)
-        if d is None or d < pubDate:
-            d = pubDate
+        if d is None:
+            d = self.indexDao.getIndexPublishDate(code)
 
         # recalculate from last constituent date
         latestDate = self.indexConstituentDao.getLatestDate(code)
