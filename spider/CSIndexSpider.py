@@ -19,6 +19,7 @@ class CSIndexSpider:
     def __init__(self):
         self.constituentsDao = IndexConstituentDao()
         self.indexesDao = IndexesDao()
+        self.CSINDEX = ['399975']
 
     def fetchConstituentByCode(self, code):
         url = self.CSINDEX_CONSTITUENT_URL % code
@@ -41,7 +42,7 @@ class CSIndexSpider:
                 return [tradeDate, cols]
 
     def checkAndUpdateLatestConstituents(self, code):
-        if code[0:2] != "00":
+        if code[0:2] != "00" and code not in self.CSINDEX:
             print("[%s] not CSIndex index" % code)
             return
 
