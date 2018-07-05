@@ -2,9 +2,6 @@
 
 from evaluation.IndexEqualWeightPBProcessor import IndexEqualWeightPBProcessor
 from evaluation.IndexEqualWeightPEProcessor import IndexEqualWeightPEProcessor
-from evaluation.IndexMaxPbProcessor import IndexMaxPBProcessor
-from evaluation.IndexMaxPeProcessor import IndexMaxPEProcessor
-from evaluation.IndexMaxPointProcessor import IndexMaxPointProcessor
 from evaluation.IndexMedianPBProcessor import IndexMedianPBProcessor
 from evaluation.IndexMedianPEProcessor import IndexMedianPEProcessor
 from evaluation.IndexPEPBGradeProcessor import IndexPEPBGradeProcessor
@@ -24,9 +21,6 @@ class IndexPEPBGenerator:
         self.equalWeightPBProcessor = IndexEqualWeightPBProcessor()
         self.weightedPBProcessor = IndexWeightedPBProcessor()
         self.medianPBProcessor = IndexMedianPBProcessor()
-        # self.maxPEProcessor = IndexMaxPEProcessor()
-        # self.maxPBProcessor = IndexMaxPBProcessor()
-        # self.maxPointProcessor = IndexMaxPointProcessor()
         self.heightProcessor = IndexPEPBHeightProcessor()
         self.gradeProcessor = IndexPEPBGradeProcessor()
 
@@ -69,6 +63,7 @@ class IndexPEPBGenerator:
 
     def updateImportant(self):
         codes = [
+            "399006"
             "000925",
             "000016",
             "399550",
@@ -91,7 +86,6 @@ class IndexPEPBGenerator:
             "000932",
             "000990",
             "000912",
-            "000126",
             "000827",
             "399812",
             "000993",
