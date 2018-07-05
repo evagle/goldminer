@@ -63,7 +63,7 @@ class IndexPEPBGenerator:
 
     def updateImportant(self):
         codes = [
-            "399006"
+            "399006",
             "000925",
             "000016",
             "399550",
