@@ -42,10 +42,10 @@ class CSIndexSpider:
 
     def isCSIndex(self, code):
         model = self.indexesDao.getByCode(code)
-        return model.pub_organization == "中证指数有限公司"
+        return model.pub_organization == "中证指数有限公司" or code[0:2] == "00"
 
     def checkAndUpdateLatestConstituents(self, code):
-        if code[0:2] != "00" and not self.isCSIndex(code):
+        if not self.isCSIndex(code):
             print("[%s] not CSIndex index" % code)
             return
 
@@ -85,7 +85,7 @@ class CSIndexSpider:
     def checkAndUpdateAllLatestConstituents(self):
         indexes = self.indexesDao.getIndexList()
         for code in indexes:
-            if code[0:2] == "00":
+            if self.isCSIndex(code):
                 self.checkAndUpdateLatestConstituents(code)
                 time.sleep(1)
 
