@@ -41,12 +41,8 @@ class SzseSpider:
                 cols.remove('证券代码')
                 return cols
 
-    def isCSIndex(self, code):
-        model = self.indexesDao.getByCode(code)
-        return model.pub_organization == "中证指数有限公司" or code[0:2] == "00"
-
     def checkAndUpdateLatestConstituents(self, code):
-        if code[0:2] != "39" or self.isCSIndex(code):
+        if code[0:2] != "39":
             print("[%s] not szse index" % code)
             return
 

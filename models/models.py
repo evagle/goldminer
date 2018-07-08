@@ -761,6 +761,7 @@ class IndexConstituent(Base):
     code = Column(String(16), nullable=False)
     trade_date = Column(Date, nullable=False)
     constituents = Column(Text, nullable=False)
+    source = Column(String(32), nullable=True)
 
 
 class IndexWeight(Base):
@@ -811,6 +812,8 @@ class Indexes(Base):
     pub_date = Column(DateTime, nullable=False)
     pub_organization = Column(String(64), nullable=False)
     description = Column(Text, nullable=False)
+    analysis = Column(Text, nullable=True)
+    source = Column(String(32), nullable=True)
 
 
 class PrimaryFinanceIndicator(Base):

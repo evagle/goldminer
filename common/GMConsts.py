@@ -11,3 +11,6 @@ ABNORMAL_MIN_PE = -1000  # PE极端值，小于-1000时记录成-1000
 
 IQR_FACTOR = 1.5
 
+CS_INDEX = "csindex"
+CN_INDEX = "cnindex"
+
