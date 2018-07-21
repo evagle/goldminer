@@ -38,6 +38,6 @@ class RiceQuantImport:
             line2 = fin.readline()
 
 
-
-importer = RiceQuantImport()
-importer.importConstituents("/Users/abing/Downloads/index_components_all.csv")
+if __name__ == "__main__":
+    importer = RiceQuantImport()
+    importer.importConstituents("/Users/abing/Downloads/index_components_all.csv")
