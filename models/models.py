@@ -945,5 +945,7 @@ class Industry(Base):
 
     code = Column(String(16), primary_key=True)
     name = Column(String(64), nullable=False)
+    primary_code = Column(String(16), nullable=False)
+    primary_industry = Column(String(64), nullable=False)
 
 
