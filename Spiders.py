@@ -1,5 +1,4 @@
 # coding: utf-8
-# from spider.CSIndexSpider import CSIndexSpider
 from spider.v3.IndexBarSpider import IndexBarSpider
 from spider.v3.IndexWeightsSpider import IndexWeightsSpider
 from spider.v3.StockBalanceSheetSpider import StockBalanceSheetSpider
