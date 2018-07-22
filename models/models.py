@@ -938,3 +938,12 @@ class TradingDerivativeIndicator(Base):
     TURNRATE = Column(Float, nullable=False)
     TOTAL_SHARE = Column(Float(asdecimal=True), nullable=False)
     FLOW_SHARE = Column(Float(asdecimal=True), nullable=False)
+
+
+class Industry(Base):
+    __tablename__ = 'Industry'
+
+    code = Column(String(16), primary_key=True)
+    name = Column(String(64), nullable=False)
+
+
