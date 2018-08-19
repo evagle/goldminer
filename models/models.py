@@ -948,4 +948,13 @@ class Industry(Base):
     primary_code = Column(String(16), nullable=False)
     primary_industry = Column(String(64), nullable=False)
 
+class IndexCorrelation(Base):
+    __tablename__ = 'IndexCorrelation'
+
+    id = Column(String(32), primary_key=True)
+    codea = Column(String(32), nullable=False)
+    codeb = Column(String(32), nullable=False)
+    correlation = Column(Float(asdecimal=True), nullable=False)
+
+
 
