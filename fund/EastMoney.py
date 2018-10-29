@@ -19,10 +19,11 @@ class EastMoney:
             return {}
 
         html = html.decode('utf-8')
-        lines = html.split("\r\n")
+        lines = html.split(";")
         for line in lines:
-            if line.startswith("var Data_netWorthTrend = "):
-                history = line.replace("var Data_netWorthTrend = ", "").replace(";", "");
+            if line.find("var Data_netWorthTrend = ") > -1:
+                pos = line.find("var Data_netWorthTrend = ") + 25
+                history = line[pos:].replace(";", "")
                 history = json.loads(history)
                 for z in history:
                     record = {"code":code}
@@ -31,8 +32,10 @@ class EastMoney:
                     record['trade_date'] = date
                     record['net'] = z["y"]
                     data[code+date] = record
-            elif line.startswith("var Data_ACWorthTrend = "):
-                history = line.replace("var Data_ACWorthTrend = ", "").replace(";", "");
+                    print("=======", code, date, record)
+            elif line.find("var Data_ACWorthTrend = ") > -1:
+                pos = line.find("var Data_ACWorthTrend = ") + 24
+                history = line[pos:].replace(";", "")
                 history = json.loads(history)
                 for z in history:
                     t = time.localtime(z[0]/1000)
