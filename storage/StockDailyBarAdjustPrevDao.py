@@ -3,7 +3,7 @@ from datetime import date
 
 from models.models import StockDailyBarAdjustPrev
 from storage.BaseDao import BaseDao
-
+from typing import List
 
 class StockDailyBarAdjustPrevDao(BaseDao):
 
@@ -17,3 +17,10 @@ class StockDailyBarAdjustPrevDao(BaseDao):
                              .order_by(StockDailyBarAdjustPrev.trade_date.desc())\
                              .first()
         return date(2001, 1, 1) if result is None else result[0]
+
+    def getAll(self, code: str) -> List[StockDailyBarAdjustPrev]:
+        result = self.session.query(StockDailyBarAdjustPrev) \
+            .filter(StockDailyBarAdjustPrev.code == code) \
+            .order_by(StockDailyBarAdjustPrev.trade_date.asc()) \
+            .all()
+        return result
