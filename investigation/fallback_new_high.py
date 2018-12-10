@@ -423,7 +423,8 @@ if __name__ == "__main__":
 
     random.shuffle(stocks)
     training_data = None
-    for code in stocks[:2000]:
+    num = 2000
+    for code in stocks[:num]:
         print(code)
         try:
             df = analyzer.fallback_new_high_buy_points(code)
@@ -439,5 +440,6 @@ if __name__ == "__main__":
         else:
             training_data = pd.concat([training_data, df])
 
-    training_data.to_csv("~/buypoints.tsv", sep="\t", index=False)
+    output_filename = "fallback_new_high_%d_%s.tsv" % (num, datetime.now().strftime("%Y-%m-%d"))
+    training_data.to_csv(output_filename, sep="\t", index=False)
 
