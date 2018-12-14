@@ -55,7 +55,7 @@ class StockDailyBarAdjustPrevSpider(GMBaseSpiderV3):
                     bar.lower_limit = instrument['lower_limit']
 
         self.stockBarDao.addAll(bars)
-        print("[Download Stock Bars][%s] count = %d\n" % (symbol, len(bars)))
+        print("[Download Stock Bars][%s] count = %d\n" %(symbol, len(bars)))
         return bars
 
     def downloadAll(self):
@@ -63,20 +63,6 @@ class StockDailyBarAdjustPrevSpider(GMBaseSpiderV3):
         for i in stocks:
             if self.downloadBars(i) is not None:
                 time.sleep(0.1)
-
-    def checkBars(self, code):
-        '''
-        check if stock bar is with correct close price
-        :param code:
-        :return:
-        '''
-        bars = self.stockBarDao.getAll(code)
-        incorrect = []
-        for i in range(1, len(bars)):
-            if bars[i].close > bars[i - 1].close * 1.15 or bars[i].close < bars[i - 1].close * 0.88:
-                print("***", code, bars[i].close, bars[i-1].close)
-                incorrect.append([bars[i-1], bars[i]])
-        return incorrect
 
 
 if __name__ == "__main__":
