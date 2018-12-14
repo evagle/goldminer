@@ -240,6 +240,7 @@ class StockDailyBarAdjustPrev(Base):
     upper_limit = Column(Float)
     lower_limit = Column(Float)
     adj_factor = Column(Float(asdecimal=True))
+    fix_abnormal = Column(String(32), nullable=True)
 
 
 class CashflowStatement(Base):
