@@ -15,7 +15,6 @@ import numpy as np
 import pandas as pd
 
 
-
 class FallbackNewHigh:
     def __init__(self):
         self.stockBarDao = StockDailyBarAdjustPrevDao()
@@ -83,14 +82,14 @@ class FallbackNewHigh:
         for i in range(len(derivatives)):
             if derivatives[i].end_date >= start_date and derivatives[i].end_date <= end_date:
                 turn_rate += derivatives[i].TURNRATE
-                n+=1
-        return turn_rate/n if n > 0 else 0
+                n += 1
+        return turn_rate / n if n > 0 else 0
 
     # 从上市日起比当前价格低的天数
     def calculate_days_with_lower_price(self, bars, pos):
         close = bars[pos].close
         days = 0
-        for i in range(pos-1, 0, -1):
+        for i in range(pos - 1, 0, -1):
             if bars[i].close < close:
                 days += 1
         return days
@@ -110,7 +109,7 @@ class FallbackNewHigh:
         close = bars[pos].close
         minimal = bars[pos].close
         days = 0
-        for i in range(pos-1, 0, -1):
+        for i in range(pos - 1, 0, -1):
             if bars[i].close > close:
                 break
             if bars[i].close < minimal:
@@ -128,19 +127,19 @@ class FallbackNewHigh:
         return np.var(closes)
 
     def calculate_quarter_profit_growth(self, income_statements, trade_date):
-        for i in range(len(income_statements)-1, 0, -1):
+        for i in range(len(income_statements) - 1, 0, -1):
             if income_statements[i].pub_date < trade_date:
                 return income_statements[i].NETPROFIT / income_statements[i - 4].NETPROFIT - 1
         return 0
 
     def calculate_quarter_business_growth(self, income_statements, trade_date):
-        for i in range(len(income_statements)-1, 0, -1):
+        for i in range(len(income_statements) - 1, 0, -1):
             if income_statements[i].pub_date < trade_date:
                 return income_statements[i].BIZINCO / income_statements[i - 4].BIZINCO - 1
         return 0
 
     def calculate_eps_growth(self, primary_finance_indicators, trade_date):
-        for i in range(len(primary_finance_indicators)-1, 0, -1):
+        for i in range(len(primary_finance_indicators) - 1, 0, -1):
             if primary_finance_indicators[i].pub_date < trade_date:
                 if i >= 4 and primary_finance_indicators[i - 4].EPSBASIC > 0:
                     return primary_finance_indicators[i].EPSBASIC / primary_finance_indicators[i - 4].EPSBASIC - 1
@@ -155,7 +154,7 @@ class FallbackNewHigh:
         :return:
         '''
         lowest_bar = None
-        for i in range(pos-1, 0, -1):
+        for i in range(pos - 1, 0, -1):
             if bars[i].high > bars[pos].high:
                 break
             if not lowest_bar or lowest_bar.high > bars[i].high:
@@ -172,6 +171,8 @@ class FallbackNewHigh:
         income_statements = self.stockFundamentals.getAll(code, IncomeStatement)
 
         n = len(bars)
+        if n == 0:
+            return (-1, -1)
 
         closes = np.array([bar.close for bar in bars])
         if np.isnan(np.mean(closes)):
@@ -198,10 +199,10 @@ class FallbackNewHigh:
             bars[i].sma250 = sma250[i]
 
         for bar in bars:
-            bar.outer_amplitude = (bar.high - bar.low)/bar.low if bar.low > 0 else 0
+            bar.outer_amplitude = (bar.high - bar.low) / bar.low if bar.low > 0 else 0
 
         for bar in bars:
-            bar.inner_amplitude = math.fabs(bar.close - bar.open)/bar.open if bar.open > 0 else 0
+            bar.inner_amplitude = math.fabs(bar.close - bar.open) / bar.open if bar.open > 0 else 0
 
         # 记录之前出现过的买点，不重复计算
         win = 0
@@ -244,7 +245,8 @@ class FallbackNewHigh:
                     pb_height = self.calculate_pb_heigt_eight_year(bars[j].trade_date, derivatives)
 
                     # 平均换手率 < 3% (or avg)
-                    average_turn_rate = self.calculate_average_turn_rate(bars[i].trade_date, bars[j].trade_date, derivatives)
+                    average_turn_rate = self.calculate_average_turn_rate(bars[i].trade_date, bars[j].trade_date,
+                                                                         derivatives)
 
                     # 调整期内的方差
                     variance = self.calculate_variance(bars[i:j])
@@ -285,7 +287,8 @@ class FallbackNewHigh:
                     profit_growth = self.calculate_quarter_profit_growth(income_statements, bars[j].trade_date) * 100
 
                     # 同比营收增速
-                    business_growth = self.calculate_quarter_business_growth(income_statements, bars[j].trade_date) * 100
+                    business_growth = self.calculate_quarter_business_growth(income_statements,
+                                                                             bars[j].trade_date) * 100
 
                     # 同比EPS增速
                     eps_growth = self.calculate_eps_growth(primary_finance_indicators, bars[j].trade_date) * 100
@@ -298,19 +301,20 @@ class FallbackNewHigh:
 
                     # 10日日内振幅用来作为卖出指标判断
 
-                    finance_indicator = self.get_primary_finance_indicator_by_date(bars[j].trade_date, primary_finance_indicators)
+                    finance_indicator = self.get_primary_finance_indicator_by_date(bars[j].trade_date,
+                                                                                   primary_finance_indicators)
                     eps_basic = finance_indicator.EPSBASIC
 
                     roe = finance_indicator.ROEWEIGHTED
 
-                    #TODO 是否有跳空缺口
+                    # TODO 是否有跳空缺口
                     # up_break_through_gap =
 
-                    #TODO RPS股价强弱指标
-                    #rps =
+                    # TODO RPS股价强弱指标
+                    # rps =
 
-                    #TODO eps_rs, eps relative strength, 类似rps计算方式
-                    #eps_rs
+                    # TODO eps_rs, eps relative strength, 类似rps计算方式
+                    # eps_rs
 
                     # print("**debug", code, bars[j].trade_date, pe_height, pb_height, average_turn_rate, variance, new_high_days, \
                     #       sma50_120, sma120_250, sma10_20, sma10_250, volume_ratio, profit_growth)
@@ -333,10 +337,8 @@ class FallbackNewHigh:
                                 max_price_date = bars[k].trade_date
                                 days_to_max_price = k - j
 
-
                         gain = (max_price - bars[j].close) * 100.0 / bars[j].close
                         target = (gain >= 50)
-
 
                         derivative = self.get_derivatives_by_date(bars[j].trade_date, derivatives)
 
@@ -360,7 +362,7 @@ class FallbackNewHigh:
                         buy_point["increase_before_fallback"] = increase_before_fallback
                         buy_point["pe"] = derivative.PETTM
                         buy_point["pb"] = derivative.PB
-                        buy_point["mkt_cap"] = int(derivative.TOTMKTCAP/decimal.Decimal(1e8))
+                        buy_point["mkt_cap"] = int(derivative.TOTMKTCAP / decimal.Decimal(1e8))
                         buy_point["adjust_period"] = adjust_period
                         buy_point["sma50_120"] = sma50_120
                         buy_point["sma120_250"] = sma120_250
@@ -384,15 +386,13 @@ class FallbackNewHigh:
         return pd.DataFrame.from_records(buy_points)
 
 
-
 if __name__ == "__main__":
     analyzer = FallbackNewHigh()
     stockDao = StockDao()
     stocks = stockDao.getStockList()
 
-    df = analyzer.fallback_new_high_buy_points("601318")
+    df = analyzer.fallback_new_high_buy_points("000860")
     df.to_csv("~/buypoints.tsv", sep="\t", index=False)
-
 
     random.shuffle(stocks)
     training_data = None
@@ -415,4 +415,3 @@ if __name__ == "__main__":
 
     output_filename = "fallback_new_high_%d_%s.tsv" % (num, datetime.now().strftime("%Y-%m-%d"))
     training_data.to_csv(output_filename, sep="\t", index=False)
-
