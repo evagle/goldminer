@@ -173,19 +173,16 @@ class BuyPointInvestigation:
                 break
         return (bars[pos].close - lowest_bar.close) / lowest_bar.close if lowest_bar else 0
 
-
-    def strategy1(self, code):
+    '''
+    一年新高测试
+    '''
+    def strategy_test(self, code):
         bars = self.stockBarDao.getAll(code)
         derivatives = self.stockFundamentals.getAll(code, TradingDerivativeIndicator)
-        # if len(bars) != len(derivatives):
-            # print(len(bars), len(derivatives))
-            # print("!!![ERROR] bars != derivatives")
-            # return
 
         n = len(bars)
 
         closes = np.array([bar.close for bar in bars])
-        print(np.mean(closes))
         if np.isnan(np.mean(closes)):
             return (-1, -1)
 
@@ -209,8 +206,7 @@ class BuyPointInvestigation:
         for i in range(n):
             bars[i].sma250 = sma250[i]
 
-        # 记录之前出现过的买点，不重复计算
-        # 如果出现包含的买点，例如(a,b), (c,d), a<c<d<b, 则应该按照c,d计算
+
         win = 0
         total = 0
         win_ratio = []
@@ -218,16 +214,12 @@ class BuyPointInvestigation:
 
         buy_points = []
         for i in range(250, n):
-            # 左边10个K线小于当前点，右边30个K线小于当前点
-            left = right = True
-            for j in range(i - 7, i):
-                if bars[j].high > bars[i].high:
-                    left = False
-            for j in range(i + 1, min(i + 15, n)):
-                if bars[j].high > bars[i].high:
-                    left = False
-            if not left or not right:
-                continue
+            # i点没有一年新高，过滤掉
+            for j in range(i-250, i):
+                if bars[j].close > bars[i].close:
+                    continue
+
+
 
             # 寻找右边突破K线的点
             max_decrease = 0
@@ -246,7 +238,7 @@ class BuyPointInvestigation:
                     period_lt_250 = (j - i <= 250)
 
                     # 算PE，PB高度 < 70%
-                    pe_height = self.calcPEHeight(bars[j].trade_date, derivatives)
+                    pe_height = self.calculate_pe_heigt_eight_year(bars[j].trade_date, derivatives)
 
                     # 平均换手率 < 3% (or avg)
 
@@ -353,8 +345,6 @@ if __name__ == "__main__":
     stockDao = StockDao()
     stocks = stockDao.getStockList()
 
-    df = analyzer.strategy1("601318")
-    df.to_csv("~/buypoints.tsv", sep="\t", index=False)
     # analyzer.strategy1('000001')
     # analyzer.strategy1('000739')
     # analyzer.strategy1('600149')
