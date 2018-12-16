@@ -241,7 +241,9 @@ class StockDailyBarAdjustPrev(Base):
     lower_limit = Column(Float)
     adj_factor = Column(Float(asdecimal=True))
     fix_abnormal = Column(String(32), nullable=True)
-
+    gain50 = Column(Float, nullable=True)
+    gain120 = Column(Float, nullable=True)
+    gain250 = Column(Float, nullable=True)
 
 class CashflowStatement(Base):
     __tablename__ = 'CashflowStatement'
