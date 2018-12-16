@@ -87,7 +87,11 @@ class StockManager:
         return self.getStockFieldByDate(stockCode, field, d)
 
     def __loadTradeDates(self):
-        self.__tradeDatesCache = Utils.getAllTradeDates()
+        session = self.fundamentalsDao.getSession()
+        dates = session.query(IndexDailyBar.trade_date) \
+            .filter(IndexDailyBar.code == '000001')
+        for d in dates:
+            self.__tradeDatesCache.append(d[0])
         self.__tradeDatesCache.sort()
 
     def getTradeDates(self):
