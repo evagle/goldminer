@@ -8,7 +8,7 @@ Base = declarative_base()
 metadata = Base.metadata
 
 
-def to_dict(self, ignoreNone = True):
+def to_dict(self, ignoreNone=True):
     attributes = Utils.getPropertiesOfClazz(self)
     dic = {}
     for attr in attributes:
@@ -244,6 +244,7 @@ class StockDailyBarAdjustPrev(Base):
     gain50 = Column(Float, nullable=True)
     gain120 = Column(Float, nullable=True)
     gain250 = Column(Float, nullable=True)
+
 
 class CashflowStatement(Base):
     __tablename__ = 'CashflowStatement'
@@ -604,7 +605,7 @@ class IncomeStatement(Base):
         Index('code_pub_date_end_date', 'code', 'pub_date', 'end_date', unique=True),
     )
 
-    id = Column( Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     code = Column(String(16), nullable=False)
     pub_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
@@ -804,6 +805,7 @@ class IndexPrimaryIndicator(Base):
     w_pe_grade_ten_year = Column(String(128))
     w_pb_grade_ten_year = Column(String(128))
 
+
 class Indexes(Base):
     __tablename__ = 'Indexes'
 
@@ -951,6 +953,7 @@ class Industry(Base):
     primary_code = Column(String(16), nullable=False)
     primary_industry = Column(String(64), nullable=False)
 
+
 class IndexCorrelation(Base):
     __tablename__ = 'IndexCorrelation'
 
@@ -958,6 +961,3 @@ class IndexCorrelation(Base):
     codea = Column(String(32), nullable=False)
     codeb = Column(String(32), nullable=False)
     correlation = Column(Float(asdecimal=True), nullable=False)
-
-
-
