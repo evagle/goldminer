@@ -1,18 +1,17 @@
 # coding: utf-8
 import decimal
+import math
 import random
 from datetime import datetime
 
-import talib
-
-from goldminer.models import TradingDerivativeIndicator, IncomeStatement, PrimaryFinanceIndicator
-from goldminer.storage import StockDailyBarAdjustPrevDao
-import math
-
-from goldminer.storage import StockDao
-from goldminer.storage import StockFundamentalsDao
 import numpy as np
 import pandas as pd
+import talib
+
+from goldminer.models.models import TradingDerivativeIndicator, IncomeStatement, PrimaryFinanceIndicator
+from goldminer.storage.StockDailyBarAdjustPrevDao import StockDailyBarAdjustPrevDao
+from goldminer.storage.StockDao import StockDao
+from goldminer.storage.StockFundamentalsDao import StockFundamentalsDao
 
 
 class FallbackNewHigh:
@@ -397,8 +396,9 @@ if __name__ == "__main__":
     random.shuffle(stocks)
     training_data = None
     num = 2000
-    for code in stocks[:num]:
-        print(code)
+    for i in range(num):
+        code = stocks[i]
+        print("processing", i, code)
         try:
             df = analyzer.fallback_new_high_buy_points(code)
             if type(df) == tuple:
