@@ -1,7 +1,7 @@
 # coding: utf-8
 from datetime import timedelta
 
-from goldminer.evaluation.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
+from goldminer.indicators.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
 
 
 class IndexMaxPEProcessor(IndexPEPBBaseProcessor):

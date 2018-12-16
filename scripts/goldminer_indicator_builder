@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # coding: utf-8
 
-from goldminer.evaluation.IndexPEPBGenerator import IndexPEPBGenerator
+from goldminer.indicators.IndexPEPBGenerator import IndexPEPBGenerator
 
 
 pepbGenerator = IndexPEPBGenerator()

@@ -1,8 +1,8 @@
 # coding: utf-8
 from datetime import date
 
-from goldminer.evaluation.IndexConstituentManager import IndexConstituentManager
-from goldminer.evaluation.StockManager import StockManager
+from goldminer.indicators.IndexConstituentManager import IndexConstituentManager
+from goldminer.indicators.StockManager import StockManager
 from goldminer.storage.IndexConstituentDao import IndexConstituentDao
 from goldminer.storage.IndexDailyBarDao import IndexDailyBarDao
 from goldminer.storage.IndexPrimaryIndicatorDao import IndexPrimaryIndicatorDao

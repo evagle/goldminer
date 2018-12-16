@@ -2,14 +2,14 @@
 from datetime import datetime, timedelta
 
 from goldminer.common.Utils import Utils
-from goldminer.evaluation.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
+from goldminer.indicators.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
 from goldminer.models.models import IndexPrimaryIndicator
 
 
-class IndexEqualWeightPBProcessor(IndexPEPBBaseProcessor):
+class IndexMedianPEProcessor(IndexPEPBBaseProcessor):
     def __init__(self):
-        super(IndexEqualWeightPBProcessor, self).__init__()
-        self.fieldName = "equal_weight_pb"
+        super(IndexMedianPEProcessor, self).__init__()
+        self.fieldName = "median_pe"
 
     def process(self, indexCode):
         d = self.getStartDate(indexCode)
@@ -19,7 +19,7 @@ class IndexEqualWeightPBProcessor(IndexPEPBBaseProcessor):
 
         now = datetime.now().date()
         models = []
-        print("[%s] calcEqualWeightedPB from %s to %s " % (indexCode, d, now))
+        print("[%s] calc Median PE from %s to %s " % (indexCode, d, now))
         while d <= now:
             if self.stockManager.isTradeDate(d):
                 model = self.indexPrimaryIndicatorDao.getByDate(indexCode, d)
@@ -30,26 +30,27 @@ class IndexEqualWeightPBProcessor(IndexPEPBBaseProcessor):
 
                 constituents = self.indexConstituentManager.getConstituents(indexCode, d)
                 if constituents is not None:
-                    stockPB = [self.stockManager.getStockPB(stock, d) for stock in constituents]
-                    pbsum = sum([1 / p if p > 0 else 0 for p in stockPB])
-                    if pbsum == 0:
-                        print("ERROR empty stock pb", indexCode, d, constituents)
-                    if pbsum > 0:
-                        pb = Utils.formatFloat(len(stockPB) / pbsum, 6)
-                        model.equal_weight_pb = pb
+                    stockPETTM = [self.stockManager.getStockPETTM(stock, d) for stock in constituents]
+                    pes = [p for p in stockPETTM if p > 0]
+                    pes.sort()
+                    if len(pes) == 0:
+                        print("ERROR empty stock pe", indexCode, d, constituents)
+                    else:
+                        pe = Utils.getMedian(pes)
+                        model.median_pe = pe
                         models.append(model)
                 else:
                     print("No constituent", indexCode, d)
             d = d + timedelta(days=1)
 
-        print("[%s] Save %d equal weight pb" % (indexCode, len(models)))
+        print("[%s] Save %d median weight pe" % (indexCode, len(models)))
         self.indexPrimaryIndicatorDao.bulkSave(models)
 
         return models
 
 
 if __name__ == "__main__":
-    manager = IndexEqualWeightPBProcessor()
-    manager.process('000913')
+    peManager = IndexMedianPEProcessor()
+    peManager.process('000001')
 
 

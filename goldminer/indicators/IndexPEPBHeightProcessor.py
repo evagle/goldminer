@@ -2,7 +2,7 @@
 from datetime import timedelta, datetime
 from decimal import Decimal
 
-from goldminer.evaluation.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
+from goldminer.indicators.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
 
 
 class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):

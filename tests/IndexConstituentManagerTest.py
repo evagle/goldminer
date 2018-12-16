@@ -2,7 +2,7 @@
 import unittest
 from datetime import date
 
-from goldminer.evaluation.IndexConstituentManager import IndexConstituentManager
+from goldminer.indicators.IndexConstituentManager import IndexConstituentManager
 
 
 class IndexConstituentManagerTest(unittest.TestCase):

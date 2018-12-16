@@ -8,7 +8,7 @@ from urllib.error import HTTPError
 import xlrd
 
 from goldminer.common.Utils import Utils
-from goldminer.evaluation.StockManager import StockManager
+from goldminer.indicators.StockManager import StockManager
 from goldminer.models.models import IndexConstituent
 from goldminer.storage.IndexConstituentDao import IndexConstituentDao
 from goldminer.storage.IndexesDao import IndexesDao

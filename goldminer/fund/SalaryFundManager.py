@@ -1,7 +1,7 @@
 # coding: utf-8
 from datetime import timedelta, datetime
 
-from goldminer.evaluation.StockManager import StockManager
+from goldminer.indicators.StockManager import StockManager
 from goldminer.fund.FundSpider import FundSpider
 from goldminer.models.models import SalaryFund
 from goldminer.storage.FundDailyBarDao import FundDailyBarDao

@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from goldminer.common import GMConsts
 from goldminer.common.Utils import Utils
-from goldminer.evaluation.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
+from goldminer.indicators.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
 from goldminer.models.models import IndexPrimaryIndicator
 
 
