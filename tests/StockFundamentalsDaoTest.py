@@ -1,9 +1,8 @@
 import unittest
 from datetime import date
 
-from models.models import BalanceSheet, TradingDerivativeIndicator, PrimaryFinanceIndicator, IncomeStatement, \
-    CashflowStatement, DerivativeFinanceIndicator
-from storage.StockFundamentalsDao import StockFundamentalsDao
+from goldminer.models.models import BalanceSheet, TradingDerivativeIndicator, PrimaryFinanceIndicator, IncomeStatement
+from goldminer.storage.StockFundamentalsDao import StockFundamentalsDao
 
 
 class StockFundamentalsDaoTest(unittest.TestCase):

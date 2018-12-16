@@ -1,8 +1,8 @@
 import unittest
 from datetime import date
 
-from models.models import Indexes
-from storage.IndexesDao import IndexesDao
+from goldminer.models.models import Indexes
+from goldminer.storage.IndexesDao import IndexesDao
 
 
 class IndexesDaoTest(unittest.TestCase):

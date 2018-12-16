@@ -1,18 +1,14 @@
 # coding: utf-8
-import decimal
-import random
 from datetime import datetime
 
 import talib
 
-from models.models import TradingDerivativeIndicator, IncomeStatement, PrimaryFinanceIndicator
-from storage.StockDailyBarAdjustPrevDao import StockDailyBarAdjustPrevDao
-import math
+from goldminer.models import TradingDerivativeIndicator
+from goldminer.storage import StockDailyBarAdjustPrevDao
 
-from storage.StockDao import StockDao
-from storage.StockFundamentalsDao import StockFundamentalsDao
+from goldminer.storage import StockDao
+from goldminer.storage import StockFundamentalsDao
 import numpy as np
-import pandas as pd
 
 
 class SellStrategies:

@@ -2,7 +2,7 @@
 import unittest
 from datetime import date
 
-from storage.StockDailyBarAdjustNoneDao import StockDailyBarAdjustNoneDao
+from goldminer.storage.StockDailyBarAdjustNoneDao import StockDailyBarAdjustNoneDao
 
 
 class StockDailyBarAdjustNoneDaoTest(unittest.TestCase):

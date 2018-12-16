@@ -2,8 +2,8 @@
 import unittest
 from datetime import date
 
-from models.models import Stock
-from storage.StockDao import StockDao
+from goldminer.models.models import Stock
+from goldminer.storage.StockDao import StockDao
 
 
 class StockDaoTest(unittest.TestCase):

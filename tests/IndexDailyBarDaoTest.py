@@ -1,7 +1,7 @@
 import unittest
 from datetime import date
 
-from storage.IndexDailyBarDao import IndexDailyBarDao
+from goldminer.storage.IndexDailyBarDao import IndexDailyBarDao
 
 
 class IndexDailyBarDaoTest(unittest.TestCase):

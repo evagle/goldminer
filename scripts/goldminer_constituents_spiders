@@ -1,0 +1,11 @@
+#!/usr/bin/python
+# coding: utf-8
+from goldminer.spider.CSIndexSpider import CSIndexSpider
+from goldminer.spider.CnIndexSpider import CnIndexSpider
+
+spider = CSIndexSpider()
+spider.checkAndUpdateAllLatestConstituents()
+
+spider = CnIndexSpider()
+spider.checkAndUpdateAllLatestConstituents()
+

@@ -5,12 +5,12 @@ from datetime import datetime
 
 import talib
 
-from models.models import TradingDerivativeIndicator, IncomeStatement, PrimaryFinanceIndicator
-from storage.StockDailyBarAdjustPrevDao import StockDailyBarAdjustPrevDao
+from goldminer.models import TradingDerivativeIndicator, IncomeStatement, PrimaryFinanceIndicator
+from goldminer.storage import StockDailyBarAdjustPrevDao
 import math
 
-from storage.StockDao import StockDao
-from storage.StockFundamentalsDao import StockFundamentalsDao
+from goldminer.storage import StockDao
+from goldminer.storage import StockFundamentalsDao
 import numpy as np
 import pandas as pd
 

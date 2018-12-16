@@ -4,7 +4,7 @@ import io
 import sys
 import unittest
 
-from lib.HTMLTestRunner import HTMLTestRunner
+from tests.HTMLTestRunner import HTMLTestRunner
 # ------------------------------------------------------------------------
 # This is the main test on HTMLTestRunner
 from tests.IndexConstituentDaoTest import IndexConstituentDaoTest

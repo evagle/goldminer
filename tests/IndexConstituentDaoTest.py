@@ -1,7 +1,7 @@
 import unittest
 from datetime import date
 
-from storage.IndexConstituentDao import IndexConstituentDao
+from goldminer.storage.IndexConstituentDao import IndexConstituentDao
 
 
 class IndexConstituentDaoTest(unittest.TestCase):

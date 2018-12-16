@@ -1,0 +1,10 @@
+#!/usr/bin/python
+# coding: utf-8
+from goldminer.fund.SalaryFundManager import SalaryFundManager
+from goldminer.fund.FundSpider import FundSpider
+
+spider = FundSpider()
+spider.updateAllFund()
+
+manager = SalaryFundManager()
+manager.updateAllFund()
