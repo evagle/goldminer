@@ -3,10 +3,11 @@ import time
 from datetime import timedelta, datetime
 
 from goldminer.common import GMConsts
-from goldminer.models import StockDailyBarAdjustPrev
+from goldminer.indicators.NDayGainsProcessor import NDayGainsProcessor
+from goldminer.models.models import StockDailyBarAdjustPrev
 from goldminer.spider.v3.GMBaseSpiderV3 import GMBaseSpiderV3
-from goldminer.storage import StockDailyBarAdjustPrevDao
-from goldminer.storage import StockDao
+from goldminer.storage.StockDailyBarAdjustPrevDao import StockDailyBarAdjustPrevDao
+from goldminer.storage.StockDao import StockDao
 
 
 class StockDailyBarAdjustPrevSpider(GMBaseSpiderV3):
@@ -60,8 +61,10 @@ class StockDailyBarAdjustPrevSpider(GMBaseSpiderV3):
 
     def downloadAll(self):
         stocks = self.stockDao.getStockList()
-        for i in stocks:
-            if self.downloadBars(i) is not None:
+        ndayGainsProcessor = NDayGainsProcessor()
+        for code in stocks:
+            if self.downloadBars(code) is not None:
+                ndayGainsProcessor.process(code, n=300)
                 time.sleep(0.1)
 
 
