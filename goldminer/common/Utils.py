@@ -5,6 +5,8 @@ from decimal import Decimal
 import numpy as np
 
 from goldminer.common import GMConsts
+from goldminer.models.models import IndexDailyBar
+from goldminer.storage.StockDao import StockDao
 
 
 class Utils:
@@ -65,6 +67,16 @@ class Utils:
         upperBound = q75 + GMConsts.IQR_FACTOR * iqr
         return [i for i in sourceList if lowerBound <= i <= upperBound]
 
+    @staticmethod
+    def getAllTradeDates():
+        stockDao = StockDao()
+        session = stockDao.getSession()
+        dates = session.query(IndexDailyBar.trade_date) \
+            .filter(IndexDailyBar.code == '000001')
+        trade_dates = []
+        for d in dates:
+            trade_dates.append(d[0])
+        return trade_dates
 
 if __name__ == "__main__":
     lst = []

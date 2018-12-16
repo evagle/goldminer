@@ -1,6 +1,7 @@
 # coding: utf-8
 from datetime import date
 
+from goldminer.common.Utils import Utils
 from goldminer.models.models import IndexDailyBar, TradingDerivativeIndicator
 from goldminer.storage.StockDailyBarAdjustNoneDao import StockDailyBarAdjustNoneDao
 from goldminer.storage.StockDao import StockDao
@@ -86,11 +87,7 @@ class StockManager:
         return self.getStockFieldByDate(stockCode, field, d)
 
     def __loadTradeDates(self):
-        session = self.fundamentalsDao.getSession()
-        dates = session.query(IndexDailyBar.trade_date) \
-            .filter(IndexDailyBar.code == '000001')
-        for d in dates:
-            self.__tradeDatesCache.append(d[0])
+        self.__tradeDatesCache = Utils.getAllTradeDates()
         self.__tradeDatesCache.sort()
 
     def getTradeDates(self):
