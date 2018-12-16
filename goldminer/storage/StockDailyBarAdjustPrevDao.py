@@ -19,8 +19,14 @@ class StockDailyBarAdjustPrevDao(BaseDao):
         return date(2001, 1, 1) if result is None else result[0]
 
     def getAll(self, code: str) -> List[StockDailyBarAdjustPrev]:
-        result = self.session.query(StockDailyBarAdjustPrev) \
+        return self.getN(code)
+
+    def getN(self, code: str, limit = None) -> List[StockDailyBarAdjustPrev]:
+        query = self.session.query(StockDailyBarAdjustPrev) \
             .filter(StockDailyBarAdjustPrev.code == code) \
-            .order_by(StockDailyBarAdjustPrev.trade_date.asc()) \
-            .all()
+            .order_by(StockDailyBarAdjustPrev.trade_date.asc())
+        if limit is None or limit <= 0:
+            result = query.all()
+        else:
+            result = query.limit(limit).all()
         return result
