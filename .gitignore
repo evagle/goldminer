@@ -7,3 +7,6 @@ __pycache__/
 UnitTestResult.html
 log
 *.pyc
+build/
+dist/
+*.egg-info
