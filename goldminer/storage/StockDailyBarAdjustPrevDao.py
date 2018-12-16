@@ -30,3 +30,10 @@ class StockDailyBarAdjustPrevDao(BaseDao):
         else:
             result = query.limit(limit).all()
         return result
+
+    def getByDate(self, trade_date: str) -> List[StockDailyBarAdjustPrev]:
+        result = self.session.query(StockDailyBarAdjustPrev) \
+            .filter(StockDailyBarAdjustPrev.trade_date == trade_date) \
+            .order_by(StockDailyBarAdjustPrev.code.asc()) \
+            .all()
+        return result
