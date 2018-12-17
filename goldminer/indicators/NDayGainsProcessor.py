@@ -1,4 +1,6 @@
 # coding: utf-8
+import math
+
 from goldminer.indicators.BaseIndicatorProcessor import BaseIndicatorProcessor
 from goldminer.storage.StockDailyBarAdjustPrevDao import StockDailyBarAdjustPrevDao
 from goldminer.storage.StockDao import StockDao
@@ -9,12 +11,23 @@ class NDayGainsProcessor(BaseIndicatorProcessor):
         self.stockBarPrevDao = StockDailyBarAdjustPrevDao()
 
     def process(self, code, **kwargs):
-        key_ndays = "n"
-        if key_ndays in kwargs and kwargs[key_ndays] > 50:
-            bars = self.stockBarPrevDao.getN(code, kwargs[key_ndays])
+        '''
+
+        :param code:
+        :param kwargs:
+                    n: int, n days
+                    refresh: bool, refresh all data
+        :return:
+        '''
+        n = self.get_args(kwargs, "n", 0)
+        refresh = self.get_args(kwargs, "refresh", False)
+
+        if n > 50:
+            bars = self.stockBarPrevDao.getN(code, n)
         else:
             bars = self.stockBarPrevDao.getAll(code)
 
+        changedBars = []
         for n in [50, 120, 250]:
             for i in range(n, len(bars)):
                 attr = "gain" + str(n)
@@ -29,9 +42,14 @@ class NDayGainsProcessor(BaseIndicatorProcessor):
                         print("Error bar close = 0", bars[i - n + j])
 
                 val = (bars[i].close - close) / close * 100 if close > 0 else 0
-                setattr(bars[i], attr, val)
 
-        self.stockBarPrevDao.bulkSave(bars)
+                oldval = getattr(bars[i], attr)
+                if refresh or oldval is None or math.fabs(oldval-val) > 1e-6:
+                    setattr(bars[i], attr, val)
+                    changedBars.append(bars[i])
+
+        print(len(changedBars), "bars updated")
+        self.stockBarPrevDao.bulkSave(changedBars)
 
 
 if __name__ == "__main__":
