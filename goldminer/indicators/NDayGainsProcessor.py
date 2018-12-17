@@ -18,9 +18,19 @@ class NDayGainsProcessor(BaseIndicatorProcessor):
         for n in [50, 120, 250]:
             for i in range(n, len(bars)):
                 attr = "gain" + str(n)
-                val = (bars[i].close - bars[i - n].close) / bars[i - n].close * 100
+
+                # close可能等于零，此时找后面的几个bar
+                close = 0
+                for j in range(10):
+                    close = bars[i - n + j].close
+                    if close > 0:
+                        break
+                    else:
+                        print("Error bar close = 0", bars[i - n + j])
+
+                val = (bars[i].close - close) / close * 100 if close > 0 else 0
                 setattr(bars[i], attr, val)
-                print(i)
+
         self.stockBarPrevDao.bulkSave(bars)
 
 
