@@ -244,6 +244,9 @@ class StockDailyBarAdjustPrev(Base):
     gain50 = Column(Float, nullable=True)
     gain120 = Column(Float, nullable=True)
     gain250 = Column(Float, nullable=True)
+    rps50 = Column(Float, nullable=True)
+    rps120 = Column(Float, nullable=True)
+    rps250 = Column(Float, nullable=True)
 
 
 class CashflowStatement(Base):
