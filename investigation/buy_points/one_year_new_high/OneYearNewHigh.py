@@ -388,7 +388,7 @@ class OneYearNewHigh:
                 buy_point["gain"] = gain
                 buy_point["target"] = 1 if target else 0
                 buy_points.append(buy_point)
-                print(buy_point)
+
 
         return pd.DataFrame.from_records(buy_points)
 
