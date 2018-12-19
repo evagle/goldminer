@@ -3,7 +3,7 @@ from datetime import date
 
 from gm.api import *
 
-from goldminer.common import ADJUST_NONE
+from goldminer.common.GMConsts import ADJUST_NONE
 
 
 class GMBaseSpiderV3:
