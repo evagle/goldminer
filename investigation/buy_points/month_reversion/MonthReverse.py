@@ -224,7 +224,7 @@ class MonthReverse(BuyPointBase):
                     new_high_50_counts > 0 and
                     3 < days_above_sma250 < 30 and
                     high_devide_high_120 > 0.9 and
-                    i - last_point >= 30
+                    i - last_point > 30
             ):
                 last_point = i
                 # 计算止损线为7%，能获得的最大收益
@@ -282,6 +282,10 @@ class MonthReverse(BuyPointBase):
                 buy_point["index_pe_height"] = index_pe_height
                 buy_point["index_pb_height"] = index_pb_height
 
+                buy_point["new_high_50_counts"] = new_high_50_counts
+                buy_point["days_above_sma250"] = days_above_sma250
+                buy_point["high_devide_high_120"] = high_devide_high_120
+
                 buy_point["gain"] = gain
                 buy_point["target"] = 1 if target else 0
                 buy_points.append(buy_point)
@@ -295,8 +299,8 @@ if __name__ == "__main__":
     stockDao = StockDao()
     stocks = stockDao.getStockList()
 
-    df = analyzer.month_reverse_buy_points("600548")
-    df.to_csv("~/buypoints.tsv", sep="\t", index=False)
+    # df = analyzer.month_reverse_buy_points("600548")
+    # df.to_csv("~/buypoints.tsv", sep="\t", index=False)
 
     training_data = None
     num = len(stocks)
