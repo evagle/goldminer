@@ -41,7 +41,11 @@ class CnIndexSpider:
                 # sheet_names = workbook
                 sheet = workbook.sheet_by_index(0)
                 cols = sheet.col_values(2)
-                cols.remove('证券代码')
+
+                if '证券代码' in cols:
+                    cols.remove('证券代码')
+                elif '样本股代码' in cols:
+                    cols.remove('样本股代码')
 
                 tradeDate = None
                 today = datetime.now().date()
