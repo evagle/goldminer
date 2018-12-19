@@ -28,7 +28,7 @@ class IndexPrimaryIndicatorDao(BaseDao):
 
         return date(2005, 1, 4) if result is None else result[0]
 
-    def getByDate(self, code, tradeDate: date):
+    def getByDate(self, code, tradeDate: date) -> IndexPrimaryIndicator:
         clazzName = IndexPrimaryIndicator.__name__
         val = self.getFromCache(code, tradeDate, clazzName)
         if val is not None:

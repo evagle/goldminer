@@ -9,6 +9,7 @@ import pandas as pd
 import talib
 
 from goldminer.models.models import TradingDerivativeIndicator, IncomeStatement, PrimaryFinanceIndicator
+from goldminer.storage.IndexPrimaryIndicatorDao import IndexPrimaryIndicatorDao
 from goldminer.storage.StockDailyBarAdjustPrevDao import StockDailyBarAdjustPrevDao
 from goldminer.storage.StockDao import StockDao
 from goldminer.storage.StockFundamentalsDao import StockFundamentalsDao
@@ -18,6 +19,7 @@ class FallbackNewHigh:
     def __init__(self):
         self.stockBarDao = StockDailyBarAdjustPrevDao()
         self.stockFundamentals = StockFundamentalsDao()
+        self.indexIndicatorDao = IndexPrimaryIndicatorDao()
 
     def calculate_pe_heigt_eight_year(self, tradeDate, derivatives):
         '''
@@ -306,9 +308,14 @@ class FallbackNewHigh:
 
                     roe = finance_indicator.ROEWEIGHTED
 
-                    rps50 = bars[i].rps50
-                    rps120 = bars[i].rps120
-                    rps250 = bars[i].rps250
+                    rps50 = bars[j].rps50
+                    rps120 = bars[j].rps120
+                    rps250 = bars[j].rps250
+
+                    # 大盘点位高度，用上证综指000001
+                    indexIndicator = self.indexIndicatorDao.getByDate("000001", bars[j].trade_date)
+                    index_pe_height = indexIndicator.w_pe_height_ten_year
+                    index_pb_height = indexIndicator.w_pb_height_ten_year
 
                     # TODO eps_rs, eps relative strength, 类似rps计算方式
                     # eps_rs
@@ -378,6 +385,9 @@ class FallbackNewHigh:
                         buy_point["rps50"] = rps50
                         buy_point["rps120"] = rps120
                         buy_point["rps250"] = rps250
+
+                        buy_point["index_pe_height"] = index_pe_height
+                        buy_point["index_pb_height"] = index_pb_height
 
                         buy_point["gain"] = gain
                         buy_point["target"] = 1 if target else 0
