@@ -1,6 +1,5 @@
 # coding: utf-8
-
-from goldminer.models import TradingDerivativeIndicator
+from goldminer.models.models import TradingDerivativeIndicator
 from goldminer.spider.v3.BaseFundamentalSpider import BaseFundamentalSpider
 
 

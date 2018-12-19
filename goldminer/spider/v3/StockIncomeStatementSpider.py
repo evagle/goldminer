@@ -1,6 +1,5 @@
 # coding: utf-8
-
-from goldminer.models import IncomeStatement
+from goldminer.models.models import IncomeStatement
 from goldminer.spider.v3.BaseFundamentalSpider import BaseFundamentalSpider
 
 

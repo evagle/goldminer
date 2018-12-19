@@ -1,6 +1,5 @@
 # coding: utf-8
-
-from goldminer.models import PrimaryFinanceIndicator
+from goldminer.models.models import PrimaryFinanceIndicator
 from goldminer.spider.v3.BaseFundamentalSpider import BaseFundamentalSpider
 
 

@@ -2,10 +2,10 @@
 import time
 from datetime import timedelta, datetime
 
-from goldminer.models import StockDailyBarAdjustNone
+from goldminer.models.models import StockDailyBarAdjustNone
 from goldminer.spider.v3.GMBaseSpiderV3 import GMBaseSpiderV3
-from goldminer.storage import StockDailyBarAdjustNoneDao
-from goldminer.storage import StockDao
+from goldminer.storage.StockDailyBarAdjustNoneDao import StockDailyBarAdjustNoneDao
+from goldminer.storage.StockDao import StockDao
 
 
 class StockDailyBarAdjustNoneSpider(GMBaseSpiderV3):

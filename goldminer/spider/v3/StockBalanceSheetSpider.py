@@ -1,6 +1,5 @@
 # coding: utf-8
-
-from goldminer.models import BalanceSheet
+from goldminer.models.models import BalanceSheet
 from goldminer.spider.v3.BaseFundamentalSpider import BaseFundamentalSpider
 
 

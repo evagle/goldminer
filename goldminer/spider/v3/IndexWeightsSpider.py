@@ -1,13 +1,13 @@
 # coding=utf-8
 import json
-from datetime import timedelta, datetime
 import time
+from datetime import timedelta, datetime
 
-from goldminer.common import Utils
-from goldminer.models import IndexWeight
+from goldminer.common.Utils import Utils
+from goldminer.models.models import IndexWeight
 from goldminer.spider.v3.GMBaseSpiderV3 import GMBaseSpiderV3
-from goldminer.storage import IndexWeightDao
-from goldminer.storage import IndexesDao
+from goldminer.storage.IndexWeightDao import IndexWeightDao
+from goldminer.storage.IndexesDao import IndexesDao
 
 
 class IndexWeightsSpider(GMBaseSpiderV3):

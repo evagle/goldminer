@@ -2,11 +2,11 @@
 import time
 from datetime import timedelta, datetime, date
 
-from goldminer.indicators import StockManager
-from goldminer.models import IndexDailyBar
+from goldminer.indicators.StockManager import StockManager
+from goldminer.models.models import IndexDailyBar
 from goldminer.spider.v3.GMBaseSpiderV3 import GMBaseSpiderV3
-from goldminer.storage import IndexDailyBarDao
-from goldminer.storage import IndexesDao
+from goldminer.storage.IndexDailyBarDao import IndexDailyBarDao
+from goldminer.storage.IndexesDao import IndexesDao
 
 
 class IndexBarSpider(GMBaseSpiderV3):
