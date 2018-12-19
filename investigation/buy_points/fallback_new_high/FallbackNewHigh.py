@@ -162,18 +162,6 @@ class FallbackNewHigh:
                 break
         return (bars[pos].close - lowest_bar.close) / lowest_bar.close if lowest_bar else 0
 
-    def has_break_through_gap(self, pos, bars):
-        '''
-        检查30日内是否有向上跳空缺口
-        :param pos:
-        :param bars:
-        :return:
-        '''
-        for i in range(pos - 30, pos):
-            if bars[i].low > bars[i-1].high:
-                return 1
-        return 0
-
     # 策略1 上涨后长期整理，然后突破形态
     def fallback_new_high_buy_points(self, code):
         bars = self.stockBarDao.getAll(code)
@@ -318,9 +306,6 @@ class FallbackNewHigh:
 
                     roe = finance_indicator.ROEWEIGHTED
 
-                    # TODO 是否有跳空缺口
-                    has_break_through_gap = self.has_break_through_gap(j, bars)
-
                     rps50 = bars[i].rps50
                     rps120 = bars[i].rps120
                     rps250 = bars[i].rps250
@@ -393,8 +378,6 @@ class FallbackNewHigh:
                         buy_point["rps50"] = rps50
                         buy_point["rps120"] = rps120
                         buy_point["rps250"] = rps250
-
-                        buy_point["has_break_through_gap"] = has_break_through_gap
 
                         buy_point["gain"] = gain
                         buy_point["target"] = 1 if target else 0
