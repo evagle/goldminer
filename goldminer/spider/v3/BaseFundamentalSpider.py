@@ -5,8 +5,8 @@ import time
 from sqlalchemy.exc import IntegrityError
 
 from goldminer.spider.v3.GMBaseSpiderV3 import GMBaseSpiderV3
-from goldminer.storage import StockDao
-from goldminer.storage import StockFundamentalsDao
+from goldminer.storage.StockDao import StockDao
+from goldminer.storage.StockFundamentalsDao import StockFundamentalsDao
 
 
 class BaseFundamentalSpider(GMBaseSpiderV3):
