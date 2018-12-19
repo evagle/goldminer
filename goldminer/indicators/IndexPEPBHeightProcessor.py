@@ -45,6 +45,8 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
         for current in indicators:
             if getattr(current, self.fieldName) is not None:
                 continue
+            if getattr(current, self.peName) is not None:
+                continue
             tenYearBefore = current.trade_date - timedelta(days=3650)
             totalCount = 0
             smallerCount = 0
