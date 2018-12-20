@@ -8,12 +8,9 @@ import numpy as np
 import pandas as pd
 import talib
 
+from goldminer.investigation.buy_points.BuyPointBase import BuyPointBase
 from goldminer.models.models import TradingDerivativeIndicator, IncomeStatement, PrimaryFinanceIndicator
-from goldminer.storage.IndexPrimaryIndicatorDao import IndexPrimaryIndicatorDao
-from goldminer.storage.StockDailyBarAdjustPrevDao import StockDailyBarAdjustPrevDao
 from goldminer.storage.StockDao import StockDao
-from goldminer.storage.StockFundamentalsDao import StockFundamentalsDao
-from investigation.buy_points.BuyPointBase import BuyPointBase
 
 
 class FallbackNewHigh(BuyPointBase):
