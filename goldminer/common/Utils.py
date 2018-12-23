@@ -1,10 +1,12 @@
 # coding: utf-8
+import datetime
 import math
 from decimal import Decimal
 
 import numpy as np
 
 from goldminer.common import GMConsts
+from goldminer.models.IndexWeeklyBar import IndexWeeklyBar
 
 
 class Utils:
@@ -65,6 +67,43 @@ class Utils:
         upperBound = q75 + GMConsts.IQR_FACTOR * iqr
         return [i for i in sourceList if lowerBound <= i <= upperBound]
 
+    @staticmethod
+    def date2Week(date):
+        week = date.isocalendar()
+        return "%d_%d" % (week[0], week[1])
+
+    @staticmethod
+    def dailyBar2WeeklyBar(code, dailyBars):
+        barsGroupByWeek = {}
+        for bar in dailyBars:
+            week = Utils.date2Week(bar.trade_date)
+
+            if week in barsGroupByWeek:
+                barsGroupByWeek[week].append(bar)
+            else:
+                barsGroupByWeek[week] = [bar]
+
+
+        weeklyBars = []
+        for week in barsGroupByWeek:
+            bar = IndexWeeklyBar()
+
+            bars = barsGroupByWeek[week]
+
+            bar.code = code
+            bar.start_date = bars[0].trade_date
+            bar.end_date = bars[-1].trade_date
+            bar.open = bars[0].open
+            bar.close = bars[-1].close
+            bar.high = max([b.high for b in bars])
+            bar.low = min([b.low for b in bars])
+            bar.amount = sum([b.amount for b in bars])
+            bar.volume = sum([b.volume for b in bars])
+
+            weeklyBars.append(bar)
+
+        return weeklyBars
+
 
 if __name__ == "__main__":
     lst = []
@@ -81,3 +120,4 @@ if __name__ == "__main__":
 
     lst = [1, 2, 3, 4]
     print(Utils.getMedian(lst))
+
