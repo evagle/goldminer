@@ -299,8 +299,8 @@ if __name__ == "__main__":
     stockDao = StockDao()
     stocks = stockDao.getStockList()
 
-    # df = analyzer.month_reverse_buy_points("600548")
-    # df.to_csv("~/buypoints.tsv", sep="\t", index=False)
+    df = analyzer.month_reverse_buy_points("300104")
+    df.to_csv("~/buypoints.tsv", sep="\t", index=False)
 
     training_data = None
     num = len(stocks)
