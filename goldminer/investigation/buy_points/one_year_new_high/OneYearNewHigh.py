@@ -82,7 +82,7 @@ class OneYearNewHigh(BuyPointBase):
         buy_points = []
         # 当天创新高，而且最近一个月内没创过新高的
         for i in range(250, n):
-            if not hasattr(bars[i], "new_high") or bars[i].new_high != 1 or bars[i].days_since_last < 30:
+            if not hasattr(bars[i], "new_high") or bars[i].new_high != 1 or bars[i].days_since_last <= 30:
                 continue
 
             # 一年内最低点
