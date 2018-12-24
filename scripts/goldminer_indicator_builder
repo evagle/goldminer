@@ -9,4 +9,4 @@ pepbGenerator.updateAll()
 
 
 rps = RPSProcessor()
-rps.build()
+rps.buildLastWeek()
