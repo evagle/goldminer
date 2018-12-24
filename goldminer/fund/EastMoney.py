@@ -13,7 +13,8 @@ class EastMoney:
 
     def fetchFund(self, code):
         data = {}
-        response = urllib.request.urlopen("http://fund.eastmoney.com/pingzhongdata/"+code+".js") 
+        response = urllib.request.urlopen("http://fund.eastmoney.com/pingzhongdata/"+code+".js")
+        print("http://fund.eastmoney.com/pingzhongdata/"+code+".js")
         html = response.read()
         if html is None or html == "":
             return {}
@@ -32,7 +33,6 @@ class EastMoney:
                     record['trade_date'] = date
                     record['net'] = z["y"]
                     data[code+date] = record
-                    print("=======", code, date, record)
             elif line.find("var Data_ACWorthTrend = ") > -1:
                 pos = line.find("var Data_ACWorthTrend = ") + 24
                 history = line[pos:].replace(";", "")

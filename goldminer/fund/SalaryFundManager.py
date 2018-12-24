@@ -30,10 +30,14 @@ class SalaryFundManager:
         else:
             raise Exception("Failed to get fund value, code = %s, date = %s" % (code, date))
 
+    def isQDII(self, code):
+        return code in ["000614"]
+
     # 计算账户中的证券部分的价值
-    # 将账户中下雨等于date的所有操作都计算进来，计算每一个基金的份额，乘以当前的基金净值，得到总的证券价值
+    # 将账户中所有等于date的所有操作都计算进来，计算每一个基金的份额，乘以当前的基金净值，得到总的证券价值
     # 正常当天的价值需要在第二天才能计算，因为ETF等基金净值通常要晚上8，9点之后才会更新
     # 计算证券价值只需考虑买入和卖出基金的操作，现金注入和取出不用考虑
+    # QDII基金有延迟
     def calcSecurityValue(self, date):
 
         # datestr = date.strftime("%Y-%m-%d")
@@ -43,13 +47,17 @@ class SalaryFundManager:
         ## (('512580', 5200.0, 'buy'), ('512000', 5800.0, 'sell'))
         total_value = 0
         for deal in deals:
-            if deal.trade_type == "buy":
+            if self.isQDII(deal.code):
+                net_value = self.getFundValueByDate(deal.code, date - timedelta(days=1))
+            else:
                 net_value = self.getFundValueByDate(deal.code, date)
+
+            if deal.trade_type == "buy":
                 total_value += deal.share * net_value
                 print(deal.code, date, net_value, deal.share, total_value)
             elif deal.trade_type == "sell":
-                net_value = self.getFundValueByDate(deal.code, date)
                 total_value -= deal.share * net_value
+
         return total_value
 
     # 用新加入资金购买基金，注入现金，取出现金会导致份额增加
@@ -64,8 +72,10 @@ class SalaryFundManager:
         deals = self.dealDao.getByDate(date)
         for deal in deals:
             # 用新加入的资金买入份额
+            # 用cash pool里的资金不算购买新份额，因为这部分资金已经算过份额了
             if deal.trade_type == "buy" and deal.money_source == "added":
                 share += deal.trade_money / prev_net_value
+
             # cashout卖出份额
             if deal.trade_type == "cashout" and deal.trade_money > 0:
                 deal.trade_money = -deal.trade_money
@@ -86,11 +96,14 @@ class SalaryFundManager:
                 deal.trade_money = -deal.trade_money
             if deal.trade_type in ["sell", "cashin", "cashout"]:
                 cash += deal.trade_money
+            if deal.trade_type == "buy" and deal.money_source == "cash_pool":
+                cash -= deal.trade_money
+
         return cash
 
     # 计算本金余额，本金即持有本金，不算现金，只计算购买的部分
     # 基金买入，增加买入金额到本金
-    # 基金卖出，先计算该部分基金份额的买入本金是多少，总是卖出最早的份额，减少本金
+    # 基金卖出，先计算该部分基金份额的买入本金是多少，卖出最早的份额，减少本金
     def calcPrincipalMoney(self, date):
         prev_date = self.stockManager.getPreviousTradeDate(date)
         prev_fund = self.getFundByDate(prev_date)
@@ -106,9 +119,25 @@ class SalaryFundManager:
                     if d.trade_type == "buy" and deal.share > 0 and d.share_left > 0:
                         share = min(deal.share, d.share_left)
                         deal.share -= share
-                        principal_money += (share / d.share) * d.trade_money
+                        principal_money -= (share / d.share) * d.trade_money
 
         return principal_money
+
+    # 已卖出部分收益
+    # 先进先出的方式计算
+    def calcSellReturns(self, date):
+        deals = self.dealDao.getByDate(date)
+        returns = 0
+        for deal in deals:
+            if deal.trade_type == "sell":
+                dealsOfCode = self.dealDao.getByCode(deal.code)
+                for d in dealsOfCode:
+                    if d.trade_type == "buy" and deal.share > 0 and d.share_left > 0:
+                        share = min(deal.share, d.share_left)
+                        deal.share -= share
+                        returns += share * (deal.trade_money - d.trade_money )
+
+        return returns
 
     # 持有收益(率)
     # 持有收益 = 持有资产的总价值-持有本金
@@ -116,13 +145,14 @@ class SalaryFundManager:
     def calcHoldReturns(self, fund: SalaryFund):
         fund.hold_return = fund.security_assets - fund.principal_money
         fund.hold_return_rate = fund.hold_return / fund.principal_money
+
         return fund
 
     # 总收益(率)
     # 总收益 = 持有资产的总价值+现金-持有本金
     # 总收益率 = 总收益/(持有本金+现金)*100%
     def calcTotalReturns(self, fund: SalaryFund):
-        fund.total_return = fund.security_assets + fund.cash - fund.principal_money
+        fund.total_return = fund.security_assets - fund.principal_money
         fund.total_return_rate = fund.total_return / (fund.principal_money + fund.cash)
         return fund
 
