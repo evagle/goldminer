@@ -2,8 +2,11 @@
 # coding: utf-8
 
 from goldminer.indicators.IndexPEPBGenerator import IndexPEPBGenerator
-
+from goldminer.indicators.RPSProcessor import RPSProcessor
 
 pepbGenerator = IndexPEPBGenerator()
 pepbGenerator.updateAll()
 
+
+rps = RPSProcessor()
+rps.build()

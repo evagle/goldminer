@@ -55,12 +55,15 @@ class RPSProcessor:
         print(len(bars), "updated")
         self.stockBarPrevDao.bulkSave(bars)
 
+    def build(self):
+        stockManager = StockManager()
+        trade_dates = stockManager.getTradeDates()
+        for d in trade_dates:
+            print("start", d)
+            self.process(d)
+            print("end", d)
+
 
 if __name__ == "__main__":
-    stockManager = StockManager()
-    trade_dates = stockManager.getTradeDates()
     processor = RPSProcessor()
-    for d in trade_dates:
-        print("start", d)
-        processor.process(d)
-        print("end", d)
+    processor.build()
