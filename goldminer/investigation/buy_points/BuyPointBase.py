@@ -1,8 +1,12 @@
 # coding: utf-8
+import math
 
 import numpy as np
+import talib
 
+from goldminer.spider.tushare.TSStockBarSpider import TSStockBarSpider
 from goldminer.storage.IndexPrimaryIndicatorDao import IndexPrimaryIndicatorDao
+from goldminer.storage.StockDailyBarAdjustNoneDao import StockDailyBarAdjustNoneDao
 from goldminer.storage.StockDailyBarAdjustPrevDao import StockDailyBarAdjustPrevDao
 from goldminer.storage.StockFundamentalsDao import StockFundamentalsDao
 
@@ -10,8 +14,35 @@ from goldminer.storage.StockFundamentalsDao import StockFundamentalsDao
 class BuyPointBase:
     def __init__(self):
         self.stockBarDao = StockDailyBarAdjustPrevDao()
+        self.stockBarNoAdjustDao = StockDailyBarAdjustNoneDao()
         self.stockFundamentals = StockFundamentalsDao()
         self.indexIndicatorDao = IndexPrimaryIndicatorDao()
+        self.tsStockBarSpider = TSStockBarSpider()
+
+    def get_closes(self, bars):
+        if len(bars) == 0:
+            return None
+        closes = np.array([bar.close for bar in bars])
+        if np.isnan(np.mean(closes)):
+            return None
+        return closes
+
+    def calculate_ma(self, bars, periods):
+        closes = self.get_closes(bars)
+        if closes is None:
+            return False
+        for period in periods:
+            sma = talib.SMA(closes, period)
+            for i in range(len(bars)):
+                setattr(bars[i], "sma" + str(period), sma[i])
+        return True
+
+    def calculate_amplitude(self, bars):
+        for bar in bars:
+            bar.outer_amplitude = (bar.high - bar.low) / bar.low if bar.low > 0 else 0
+
+        for bar in bars:
+            bar.inner_amplitude = math.fabs(bar.close - bar.open) / bar.open if bar.open > 0 else 0
 
     def calculate_pe_heigt_eight_year(self, tradeDate, derivatives):
         '''
