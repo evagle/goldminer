@@ -121,7 +121,7 @@ if __name__ == "__main__":
     stockDao = StockDao()
     stocks = stockDao.getStockList()
 
-    analyzer.ma_ten_weeks_buy_points('000001')
+    # analyzer.ma_ten_weeks_buy_points('000001')
     # exit(1)
     training_data = None
     num = len(stocks)
@@ -142,7 +142,7 @@ if __name__ == "__main__":
         else:
             training_data = pd.concat([training_data, df])
 
-        break
 
     output_filename = "ma_ten_week_%d_%s.tsv" % (num, datetime.now().strftime("%Y-%m-%d"))
     training_data.to_csv(output_filename, sep="\t", index=False)
+
