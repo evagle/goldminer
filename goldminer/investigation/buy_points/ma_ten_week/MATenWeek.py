@@ -110,6 +110,9 @@ class MATenWeek(BuyPointBase):
                 buy_point = {}
                 buy_point['code'] = code
                 buy_point['trade_date'] = bar.end_date
+                buy_point['close_sma50'] = bar.close / bar.sma50
+                buy_point['minimum_60d'] = minimum
+                buy_point['maximum_60d'] = maximum
 
                 buy_points.append(buy_point)
 
