@@ -38,23 +38,24 @@ class SalaryFundManager:
     # 正常当天的价值需要在第二天才能计算，因为ETF等基金净值通常要晚上8，9点之后才会更新
     # 计算证券价值只需考虑买入和卖出基金的操作，现金注入和取出不用考虑
     # QDII基金有延迟
-    def calcSecurityValue(self, date):
+    def calcSecurityValue(self, trade_date):
 
         # datestr = date.strftime("%Y-%m-%d")
         # sql = "SELECT code,share,trade_type from salary_fund_changes where trade_date <= '%s' order by trade_date" % datestr
         # result = self.db.executeSql(sql)
-        deals = self.dealDao.getDealsBeforeDate(date)
+        deals = self.dealDao.getDealsBeforeDate(trade_date)
         ## (('512580', 5200.0, 'buy'), ('512000', 5800.0, 'sell'))
         total_value = 0
         for deal in deals:
             if self.isQDII(deal.code):
-                net_value = self.getFundValueByDate(deal.code, date - timedelta(days=1))
+                previous_trade_date = self.stockManager.getPreviousTradeDate(trade_date)
+                net_value = self.getFundValueByDate(deal.code, previous_trade_date)
             else:
-                net_value = self.getFundValueByDate(deal.code, date)
+                net_value = self.getFundValueByDate(deal.code, trade_date)
 
             if deal.trade_type == "buy":
                 total_value += deal.share * net_value
-                print(deal.code, date, net_value, deal.share, total_value)
+                print(deal.code, trade_date, net_value, deal.share, total_value)
             elif deal.trade_type == "sell":
                 total_value -= deal.share * net_value
 
