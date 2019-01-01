@@ -3,8 +3,8 @@ from datetime import datetime
 
 import tushare as ts
 
-from goldminer.models import Stock
-from goldminer.storage import StockDao
+from goldminer.models.models import Stock
+from goldminer.storage.StockDao import StockDao
 
 
 class StockSpider():
