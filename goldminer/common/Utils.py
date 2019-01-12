@@ -99,6 +99,10 @@ class Utils:
             bar.low = min([b.low for b in bars])
             bar.amount = sum([b.amount for b in bars])
             bar.volume = sum([b.volume for b in bars])
+            for rps in ["rps50", "rps120", "rps250"]:
+                if hasattr(bars[-1], rps):
+                    val = getattr(bars[-1], rps)
+                    setattr(bar, rps, val)
 
             weeklyBars.append(bar)
 
