@@ -28,7 +28,7 @@ class OneYearNewHigh(BuyPointBase):
 
     # 一年新高图形
     def one_year_new_high_buy_points(self, code):
-        bars = self.stockBarDao.getAll(code)
+        bars = self.stockBarAdjustPrevDao.getAll(code)
         derivatives = self.stockFundamentals.getAll(code, TradingDerivativeIndicator)
         primary_finance_indicators = self.stockFundamentals.getAll(code, PrimaryFinanceIndicator)
         income_statements = self.stockFundamentals.getAll(code, IncomeStatement)

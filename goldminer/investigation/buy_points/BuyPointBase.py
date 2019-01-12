@@ -13,7 +13,7 @@ from goldminer.storage.StockFundamentalsDao import StockFundamentalsDao
 
 class BuyPointBase:
     def __init__(self):
-        self.stockBarDao = StockDailyBarAdjustPrevDao()
+        self.stockBarAdjustPrevDao = StockDailyBarAdjustPrevDao()
         self.stockBarNoAdjustDao = StockDailyBarAdjustNoneDao()
         self.stockFundamentals = StockFundamentalsDao()
         self.indexIndicatorDao = IndexPrimaryIndicatorDao()
