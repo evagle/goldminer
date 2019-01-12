@@ -11,7 +11,7 @@ class TSStockBarSpider(TushareBase):
 
     def getDailyBars(self, code, adj='qfq', start_date: datetime=None, end_date: datetime=None):
         if start_date is None:
-            start_date = datetime(2001, 1, 1).strftime("%Y%m%d")
+            start_date = datetime(2005, 1, 1).strftime("%Y%m%d")
         if end_date is None:
             end_date = datetime.now().strftime("%Y%m%d")
 
