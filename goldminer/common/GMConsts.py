@@ -14,3 +14,5 @@ IQR_FACTOR = 1.5
 CS_INDEX = "csindex"
 CN_INDEX = "cnindex"
 
+MIN_GAIN = -1e6
+

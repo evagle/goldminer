@@ -70,41 +70,42 @@ if __name__ == "__main__":
     indexSignal = MidtermIndexSignal()
     dates = indexSignal.find("000001").keys()
 
-    tmp = {}
+    signals = {}
     for d in dates:
-        tmp[d] = []
+        signals[d] = []
     for code in codes:
         result = indexSignal.find(code)
-        for d in tmp:
-            item = tmp[d]
+        for d in signals:
+            item = signals[d]
             if d in result:
                 item.append(result[d])
             else:
                 item.append(0)
 
     previous = ""
-    for d in tmp:
+    for d in signals:
         positive_in_6 = 0
-        for i in tmp[d][:6]:
+        for i in signals[d][:6]:
             if i > 0:
                 positive_in_6+=1
+
         positive_all = 0
-        for i in tmp[d]:
+        for i in signals[d]:
             if i > 0:
                 positive_all+=1
 
         if previous == "start" or previous == "continue":
             if positive_in_6 < 3 or positive_all < 9:
-                print("E**", d, tmp[d], "\n")
+                print("E**", d, signals[d], "\n")
                 previous = ""
                 continue
 
         if positive_in_6 >= 3 and positive_all >= 8:
             if previous != "start" and previous != "continue":
-                print("S**", d, tmp[d])
+                print("S**", d, signals[d])
                 previous = "start"
             else:
-                print("  C", d, tmp[d])
+                print("  C", d, signals[d])
                 previous = "continue"
         else:
             previous = ""

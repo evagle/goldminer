@@ -1,5 +1,5 @@
 # coding: utf-8
-
+from goldminer.common import GMConsts
 from goldminer.storage.IndexDailyBarDao import IndexDailyBarDao
 from goldminer.storage.IndexesDao import IndexesDao
 
@@ -46,15 +46,11 @@ class IndexRanker:
                 barsGroupByTradeDate[datestr].append(bar)
 
         for date in barsGroupByTradeDate:
-            MIN = -1e6
             bars = barsGroupByTradeDate[date]
-            attr = "gain50"
-            sortedBars = sorted(bars, key=lambda bar: getattr(bar, attr) if hasattr(bar, attr) else MIN, reverse=True)
-            barsGroupByTradeDate[date] = sortedBars
 
             for n in [30, 50, 120, 250]:
                 attr = "gain" + str(n)
-                sortedBars = sorted(bars, key=lambda bar: getattr(bar, attr) if hasattr(bar, attr) else MIN, reverse=True)
+                sortedBars = sorted(bars, key=lambda bar: getattr(bar, attr) if hasattr(bar, attr) else GMConsts.MIN_GAIN, reverse=True)
                 rankattr = "rank" + str(n)
                 for i in range(len(sortedBars)):
                     setattr(sortedBars[i], rankattr, i+1)
@@ -64,7 +60,7 @@ class IndexRanker:
 
 '''
 1. 排在第一的说明近期强度最高，在指数中期信号到来时买入最强指数总是一个不错的选择
-2. 第一名常客：中证消费，证券公司，中证军工，全脂医药等
+2. 第一名常客：中证消费，证券公司，中证军工，创业板指等
 3. 当第一名易主超过两天或者第一名，需要考虑换仓
 4. 衍生策略：买入第一的指数etf，当发生以下情况换仓
     a) 当前持仓跌破仓位，或者接近亏损
@@ -86,10 +82,11 @@ if __name__ == "__main__":
     for code in codes:
         indexes[code] = indexesDao.getByCode(code)
 
-    n = 30
+    n = 50
     attr = "gain" + str(n)
     for tradeDate, bars in barsGroup:
         s = tradeDate
+        bars = sorted(bars, key=lambda bar: getattr(bar, attr) if hasattr(bar, attr) else GMConsts.MIN_GAIN, reverse=True)
         for b in bars:
             if hasattr(b, attr):
                 # print(tradeDate, b.code, indexes[b.code].name, b.gain50)
