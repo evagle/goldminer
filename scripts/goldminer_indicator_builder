@@ -2,11 +2,14 @@
 # coding: utf-8
 
 from goldminer.indicators.IndexPEPBGenerator import IndexPEPBGenerator
+from goldminer.indicators.NDayGainsProcessor import NDayGainsProcessor
 from goldminer.indicators.RPSProcessor import RPSProcessor
 
 pepbGenerator = IndexPEPBGenerator()
 pepbGenerator.updateAll()
 
+processor = NDayGainsProcessor()
+processor.updateAll(7)
 
 rps = RPSProcessor()
 rps.buildLastWeek()

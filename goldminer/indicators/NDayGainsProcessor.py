@@ -9,6 +9,7 @@ from goldminer.storage.StockDao import StockDao
 class NDayGainsProcessor(BaseIndicatorProcessor):
     def __init__(self):
         self.stockBarPrevDao = StockDailyBarAdjustPrevDao()
+        self.stockDao = StockDao()
 
     def process(self, code, **kwargs):
         '''
@@ -51,6 +52,13 @@ class NDayGainsProcessor(BaseIndicatorProcessor):
         print(len(changedBars), "bars updated")
         self.stockBarPrevDao.bulkSave(changedBars)
 
+    def updateAll(self, nDays = 7):
+        stocks = self.stockDao.getStockList()
+        processor = NDayGainsProcessor()
+        for code in stocks:
+            print("start calculate n days gain for", code)
+            processor.process(code, n = nDays)
+            print("end", code)
 
 if __name__ == "__main__":
     stockDao = StockDao()
