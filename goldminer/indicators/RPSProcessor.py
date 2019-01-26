@@ -21,7 +21,7 @@ class RPSProcessor:
 
         has_rps = True
         for bar in bars:
-            if bar.rps50 is None or bar.rps50 is None or bar.rps50 is None:
+            if bar.rps50 is None or bar.gain50 is None or bar.rps120 is None or bar.rps250 is None:
                 has_rps = False
 
         if has_rps:
