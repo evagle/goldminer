@@ -3,6 +3,7 @@ import datetime
 import math
 from decimal import Decimal
 
+import talib
 import numpy as np
 
 from goldminer.common import GMConsts
@@ -120,6 +121,22 @@ class Utils:
 
         return bars
 
+    @staticmethod
+    def sma(bars, periods):
+        if len(bars) == 0 or len(periods) == 0:
+            return None
+
+        closes = np.array([bar.close for bar in bars])
+        if np.isnan(np.mean(closes)):
+            return None
+
+        for n in periods:
+            attr = 'sma' + str(n)
+            sman = talib.SMA(closes, n)
+            for i in range(len(closes)):
+                setattr(bars[i], attr, sman[i])
+
+        return bars
 
 if __name__ == "__main__":
     lst = []
