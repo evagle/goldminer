@@ -9,28 +9,28 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
 
     def __init__(self):
         super(IndexPEPBHeightProcessor, self).__init__()
-        self.fieldName = None
-        self.peName = None
+        self.heightFieldName = None
+        self.baseFieldName = None
 
     def runEqualWeightPEHeight(self):
-        self.fieldName = "ew_pe_height_ten_year"
-        self.peName = "equal_weight_pe"
+        self.heightFieldName = "ew_pe_height_ten_year"
+        self.baseFieldName = "equal_weight_pe"
 
     def runEqualWeightPBHeight(self):
-        self.fieldName = "ew_pb_height_ten_year"
-        self.peName = "equal_weight_pb"
+        self.heightFieldName = "ew_pb_height_ten_year"
+        self.baseFieldName = "equal_weight_pb"
 
     def runWeightedPEHeight(self):
-        self.fieldName = "w_pe_height_ten_year"
-        self.peName = "weighted_pe"
+        self.heightFieldName = "w_pe_height_ten_year"
+        self.baseFieldName = "weighted_pe"
 
     def runWeightedPBHeight(self):
-        self.fieldName = "w_pb_height_ten_year"
-        self.peName = "weighted_pb"
+        self.heightFieldName = "w_pb_height_ten_year"
+        self.baseFieldName = "weighted_pb"
 
     def process(self, indexCode):
         d = self.getStartDate(indexCode)
-        print("[%s] Update %s from %s" % (indexCode, self.fieldName, d))
+        print("[%s] Update %s from %s" % (indexCode, self.heightFieldName, d))
 
         if d is None:
             print("[Error] [%s] Invalid start date." % indexCode)
@@ -43,9 +43,9 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
 
         changed = []
         for current in indicators:
-            if getattr(current, self.fieldName) is not None:
+            if getattr(current, self.heightFieldName) is not None:
                 continue
-            if getattr(current, self.peName) is not None:
+            if getattr(current, self.baseFieldName) is None:
                 continue
             tenYearBefore = current.trade_date - timedelta(days=3650)
             totalCount = 0
@@ -53,21 +53,21 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
             for i in indicators:
                 if tenYearBefore <= i.trade_date < current.trade_date:
                     totalCount += 1
-                    if getattr(i, self.peName) <= getattr(current, self.peName):
+                    if getattr(i, self.baseFieldName) <= getattr(current, self.baseFieldName):
                         smallerCount += 1
             if totalCount == 0:
                 continue
             percent = smallerCount * 100 / totalCount
             height = float(Decimal(percent).quantize(Decimal('0.0')))
-            setattr(current, self.fieldName, height)
+            setattr(current, self.heightFieldName, height)
             changed.append(current)
 
-            print("[%s] %s %s pe=%f, less=%d, total=%d, height=%f" % (indexCode, self.fieldName, current.trade_date,
-                                getattr(current, self.peName), smallerCount, totalCount, height))
+            print("[%s] %s %s pe=%f, less=%d, total=%d, height=%f" % (indexCode, self.heightFieldName, current.trade_date,
+                                                                      getattr(current, self.baseFieldName), smallerCount, totalCount, height))
 
         if len(changed) > 0:
             self.indexPrimaryIndicatorDao.bulkSave(changed)
-            print("[%s] %d %s updated" % (indexCode, len(changed), self.fieldName))
+            print("[%s] %d %s updated" % (indexCode, len(changed), self.heightFieldName))
 
         return 0
 
@@ -75,5 +75,5 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
 if __name__ == "__main__":
     manager = IndexPEPBHeightProcessor()
     manager.runWeightedPBHeight()
-    manager.process('000009')
+    manager.process('000001')
 
