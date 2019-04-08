@@ -15,18 +15,22 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
     def runEqualWeightPEHeight(self):
         self.heightFieldName = "ew_pe_height_ten_year"
         self.baseFieldName = "equal_weight_pe"
+        self.fieldName = self.baseFieldName
 
     def runEqualWeightPBHeight(self):
         self.heightFieldName = "ew_pb_height_ten_year"
         self.baseFieldName = "equal_weight_pb"
+        self.fieldName = self.baseFieldName
 
     def runWeightedPEHeight(self):
         self.heightFieldName = "w_pe_height_ten_year"
         self.baseFieldName = "weighted_pe"
+        self.fieldName = self.baseFieldName
 
     def runWeightedPBHeight(self):
         self.heightFieldName = "w_pb_height_ten_year"
         self.baseFieldName = "weighted_pb"
+        self.fieldName = self.baseFieldName
 
     def process(self, indexCode):
         d = self.getStartDate(indexCode)
@@ -74,6 +78,6 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
 
 if __name__ == "__main__":
     manager = IndexPEPBHeightProcessor()
-    manager.runWeightedPBHeight()
+    manager.runWeightedPEHeight()
     manager.process('000001')
 
