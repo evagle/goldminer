@@ -1,5 +1,5 @@
 # coding: utf-8
-from datetime import date
+from datetime import date, datetime, timedelta
 
 from gm.api import *
 
@@ -68,8 +68,14 @@ class GMBaseSpiderV3:
         for key in raw:
             val = raw[key]
             if hasattr(model, key):
-                if key in ["trade_date", "pub_date", "end_date"] and type(val) == date:
-                    setattr(model, key, val.date())
+                if key in ["trade_date", "pub_date", "end_date"]:
+                    if type(val) == date:
+                        setattr(model, key, val.date())
+                    elif type(val) == datetime:
+                        val = val + timedelta(hours=8)
+                        setattr(model, key, val.date())
+                    else:
+                        raise Exception("GMBaseSpiderV3: Date format error. data="+dict)
                 else:
                     setattr(model, key, val)
         return model
