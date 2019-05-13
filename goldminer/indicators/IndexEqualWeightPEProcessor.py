@@ -38,7 +38,7 @@ class IndexEqualWeightPEProcessor(IndexPEPBBaseProcessor):
                     peSum = sum([1 / p if p > 0 else 0 for p in stockPETTM])
                     if peSum == 0:
                         print("ERROR empty stock pe", indexCode, d, constituents)
-                        pe = GMConsts.ABNORMAL_MAX_PE
+                        pe = None
                     else:
                         pe = Utils.formatFloat(stockCount / peSum, 6)
 
