@@ -54,7 +54,11 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
             tenYearBefore = current.trade_date - timedelta(days=3650)
             totalCount = 0
             smallerCount = 0
+
             for i in indicators:
+                if not hasattr(i, self.baseFieldName) or getattr(i, self.baseFieldName) is None:
+                    print("Error", i.trade_date)
+                    continue
                 if tenYearBefore <= i.trade_date < current.trade_date:
                     totalCount += 1
                     if getattr(i, self.baseFieldName) <= getattr(current, self.baseFieldName):
@@ -78,6 +82,6 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
 
 if __name__ == "__main__":
     manager = IndexPEPBHeightProcessor()
-    manager.runWeightedPEHeight()
-    manager.process('000001')
+    manager.runWeightedPBHeight()
+    manager.process('399102')
 

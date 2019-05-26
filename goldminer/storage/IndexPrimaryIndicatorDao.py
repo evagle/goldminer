@@ -26,7 +26,7 @@ class IndexPrimaryIndicatorDao(BaseDao):
                              .order_by(IndexPrimaryIndicator.trade_date.desc())\
                              .first()
 
-        return date(2005, 1, 4) if result is None else result[0]
+        return None if result is None else result[0]
 
     def getByDate(self, code, tradeDate: date) -> IndexPrimaryIndicator:
         clazzName = IndexPrimaryIndicator.__name__
