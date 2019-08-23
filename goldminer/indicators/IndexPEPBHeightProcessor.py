@@ -83,5 +83,5 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
 if __name__ == "__main__":
     manager = IndexPEPBHeightProcessor()
     manager.runWeightedPBHeight()
-    manager.process('399102')
+    manager.process('399108')
 
