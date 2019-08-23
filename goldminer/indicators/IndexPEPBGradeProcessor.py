@@ -38,6 +38,7 @@ class IndexPEPBGradeProcessor(IndexPEPBBaseProcessor):
 
         changed = []
         queue = []
+        date_queue = []
         for current in indicators:
             if getattr(current, self.fieldName) is not None:
                 continue
@@ -45,19 +46,13 @@ class IndexPEPBGradeProcessor(IndexPEPBBaseProcessor):
             val = getattr(current, self.sourceFieldName)
             if val is not None:
                 queue.append(val)
-                if len(queue) >= 2500:
+                date_queue.append(current.trade_date)
+                if (current.trade_date - date_queue[0]).days > 3650:
                     queue.pop(0)
+                    date_queue.pop(0)
 
-
-
-            # tenYearBefore = current.trade_date - timedelta(days=3650)
-            #
-            # pes = []
-            # for item in indicators:
-            #     val = getattr(item, self.sourceFieldName)
-            #     if val is not None and tenYearBefore <= item.trade_date < current.trade_date:
-            #         pes.append(val)
             pes = queue.copy()
+
             if len(pes) == 0:
                 continue
 
@@ -82,7 +77,7 @@ class IndexPEPBGradeProcessor(IndexPEPBBaseProcessor):
 if __name__ == "__main__":
     manager = IndexPEPBGradeProcessor()
     manager.runWeightedPBGrade()
-    manager.process('399108')
+    manager.process('399001')
 
 
 
