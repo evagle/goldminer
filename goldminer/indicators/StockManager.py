@@ -45,6 +45,28 @@ class StockManager:
         elif field == "TotalMarketValue":
             return TradingDerivativeIndicator.TOTMKTCAP
 
+    def __preLoadTradingDerivative(self):
+        if len(self.__stockCache) > 0:
+            print("Cache for TradingDerivativeIndicator already loaded.")
+            return
+
+        session = self.fundamentalsDao.getSession()
+        result = session.query(TradingDerivativeIndicator.code,
+                               TradingDerivativeIndicator.end_date,
+                               TradingDerivativeIndicator.PETTM,
+                               TradingDerivativeIndicator.PB,
+                               TradingDerivativeIndicator.TOTMKTCAP)
+        data = {}
+        for row in result:
+            # cache[code][trade_date] = {fields}
+            self.__stockCache[row[0]][row[1]] = {
+                "PETTM" : row[2],
+                "PB": row[3],
+                "TotalMarketValue": row[4],
+            }
+
+        print("Load %d TradingDerivativeIndicator PE,PB,TOTMKTCAP successfully" % len(data))
+
     def __loadStockField(self, stockCode, field):
         if stockCode in self.__stockCache and field in self.__stockCache[stockCode]:
             return
@@ -64,13 +86,11 @@ class StockManager:
         print("[%s] Load %d %s successfully" % (stockCode, len(data), field))
 
     def getStockFieldByDate(self, stockCode, field, d: date):
-        if stockCode not in self.__stockCache or field not in self.__stockCache[stockCode]:
-            self.__loadStockField(stockCode, field)
+        if stockCode not in self.__stockCache:
+            self.__preLoadTradingDerivative()
 
-        datestr = d.strftime("%Y-%m-%d")
-        data = self.__stockCache[stockCode][field]
-        if datestr in data:
-            return data[datestr]
+        if d in self.__stockCache[stockCode] and field in self.__stockCache[stockCode][d]:
+            return self.__stockCache[stockCode][d][field]
         else:
             return 0
 
