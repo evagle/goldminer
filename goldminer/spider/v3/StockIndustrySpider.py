@@ -44,7 +44,7 @@ class StockIndustrySpider(GMBaseSpiderV3):
             if code not in stocksDict:
                 continue
             stock = stocksDict[code]
-            stock.industry = stockIndustryMap[code]
+            stock.industry = ",".join(stockIndustryMap[code])
             updatedStock.append(stock)
             logger.info("[StockIndustrySpider] Add industry {} for stock {}.".format(stock.industry, stock))
 
