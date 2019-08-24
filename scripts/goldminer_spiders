@@ -7,8 +7,25 @@ from goldminer.spider.v3.StockBalanceSheetSpider import StockBalanceSheetSpider
 from goldminer.spider.v3.StockDailyBarAdjustNoneSpider import StockDailyBarAdjustNoneSpider
 from goldminer.spider.v3.StockDailyBarAdjustPrevSpider import StockDailyBarAdjustPrevSpider
 from goldminer.spider.v3.StockIncomeStatementSpider import StockIncomeStatementSpider
+from goldminer.spider.v3.StockIndustrySpider import StockIndustrySpider
 from goldminer.spider.v3.StockPrimaryFinanceIndicatorSpider import StockPrimaryFinanceIndicatorSpider
+from goldminer.spider.v3.StockSpider import StockSpider
 from goldminer.spider.v3.StockTradingDerivativeIndicatorSpider import StockTradingDerivativeIndicatorSpider
+
+
+'''
+Download newest stock list
+'''
+spider = StockSpider()
+spider.getStockFromTuShare()
+
+
+'''
+Update stock industry from goldminer
+'''
+
+spider = StockIndustrySpider()
+spider.updateIndustry()
 
 
 '''
