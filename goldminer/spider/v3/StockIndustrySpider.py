@@ -24,31 +24,33 @@ class StockIndustrySpider(GMBaseSpiderV3):
         industries = self.industryDao.all()
         logger.info("[StockIndustrySpider] Get {} industries.".format(len(industries)))
 
-        stocksExistsDB = self.stockDao.all()
-        stocksDict = {}
-        for stock in stocksExistsDB:
-            stocksDict[stock.code] = stock
-
+        stockIndustryMap = {}
         for industry in industries:
             stocks = self.getIndustry(industry.code)
             logger.info("[StockIndustrySpider] Stocks in industry {} are {}.".format(industry.name, stocks))
             for code in stocks:
                 code = code[5:]
-                if code not in stocksDict:
-                    continue
+                if code not in stockIndustryMap:
+                    stockIndustryMap[code] = []
+                stockIndustryMap[code].append(industry.code)
 
-                stock = stocksDict[code]
-                if stock.industry is None or stock.industry == "":
-                    stock.industry = []
-                else:
-                    stock.industry = json.loads(stock.industry)
+        stocksExistsDB = self.stockDao.all()
+        stocksDict = {}
+        for stock in stocksExistsDB:
+            stocksDict[stock.code] = stock
 
-                if industry.code not in stock.industry:
-                    stock.industry.append(industry.code)
-                    stock.industry = json.dumps(stock.industry)
-                    self.stockDao.add(stock)
-                    logger.info("[StockIndustrySpider] Add industry {} for stock {}.".format(industry, stock))
+        updatedStock = []
+        for code in stockIndustryMap:
+            if code not in stocksDict:
+                continue
+            stock = stocksDict[code]
+            stock.industry = stockIndustryMap[code]
+            updatedStock.append(stock)
+            logger.info("[StockIndustrySpider] Add industry {} for stock {}.".format(stock.industry, stock))
 
+        if len(updatedStock) > 0:
+            self.stockDao.bulkSave(updatedStock)
+            logger.info("[StockIndustrySpider] Update industry for {} stocks.".format(len(updatedStock)))
 
 if __name__ == "__main__":
     spider = StockIndustrySpider()
