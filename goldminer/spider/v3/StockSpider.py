@@ -3,8 +3,11 @@ from datetime import datetime
 
 import tushare as ts
 
+from goldminer.common.logger import get_logger
 from goldminer.models.models import Stock
 from goldminer.storage.StockDao import StockDao
+
+logger = get_logger(__name__)
 
 
 class StockSpider():
@@ -16,12 +19,19 @@ class StockSpider():
     从tushare下载所有股票列表，更新stock数据库
     '''
     def getStockFromTuShare(self):
+        logger.info("[StockSpider] Start to update stock list")
         data = ts.get_stock_basics()
+        logger.info("[StockSpider] Get {} stocks from tushare.".format(data.shape[0]))
+
+        stocksExistsDB = self.stockDao.all()
+        stocksDict = {}
+        for stock in stocksExistsDB:
+            stocksDict[stock.code] = stock
+        logger.info("[StockSpider] Get {} stocks from db.".format(len(stocksExistsDB)))
+
+        newStocks = []
         for code, row in data.iterrows():
-            print(code)
-            # print(row)
-            stock = self.stockDao.getByCode(code)
-            if not stock and not row["name"].startswith("N") and row.timeToMarket > 0:
+            if code not in stocksDict and not row["name"].startswith("N") and row.timeToMarket > 0:
                 stock = Stock()
                 stock.code = code
                 stock.name = row["name"]
@@ -34,8 +44,11 @@ class StockSpider():
                     stock.exchange = 2
                 stock.total_stock = row.totals*1e8
                 stock.circulation_stock = row.outstanding*1e8
-                self.stockDao.add(stock)
-                print(stock)
+                newStocks.append(stock)
+                logger.info("[StockSpider] New stock {}".format(stock))
+
+        self.stockDao.bulkSave(newStocks)
+        logger.info("[StockSpider] Save {} new stocks to db.".format(len(newStocks)))
 
     '''
     从上交所下载股票列表然后导入
