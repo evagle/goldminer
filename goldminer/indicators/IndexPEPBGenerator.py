@@ -63,6 +63,7 @@ class IndexPEPBGenerator:
 
     def updateImportant(self):
         codes = [
+            "399102",
             "399006",
             "000925",
             "000016",
@@ -98,6 +99,6 @@ class IndexPEPBGenerator:
 
 if __name__ == "__main__":
     peManager = IndexPEPBGenerator()
-    peManager.updateImportant()
-
+    # peManager.updateImportant()
+    peManager.execOneIndex('399102')
 

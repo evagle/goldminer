@@ -66,7 +66,7 @@ class RPSProcessor:
     def buildLastWeek(self):
         stockManager = StockManager()
         trade_dates = stockManager.getTradeDates()
-        for d in trade_dates[-7:]:
+        for d in trade_dates[-50:]:
             print("start", d)
             self.process(d)
             print("end", d)
