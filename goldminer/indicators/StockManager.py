@@ -61,7 +61,12 @@ class StockManager:
                                TradingDerivativeIndicator.TOTMKTCAP)
         for row in result:
             # cache[code][trade_date] = {fields}
-            self.__stockCache[row[0]][row[1]] = {
+            code = row[0]
+            date = row[1]
+            if code not in self.__stockCache:
+                self.__stockCache[code] = {}
+
+            self.__stockCache[code][date] = {
                 "PETTM" : row[2],
                 "PB": row[3],
                 "TotalMarketValue": row[4],
