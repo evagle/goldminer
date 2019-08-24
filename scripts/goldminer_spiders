@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # coding: utf-8
-
+from goldminer.spider.tushare.StockSpider import StockSpider
 from goldminer.spider.v3.IndexBarSpider import IndexBarSpider
 from goldminer.spider.v3.IndexWeightsSpider import IndexWeightsSpider
 from goldminer.spider.v3.StockBalanceSheetSpider import StockBalanceSheetSpider
@@ -9,7 +9,6 @@ from goldminer.spider.v3.StockDailyBarAdjustPrevSpider import StockDailyBarAdjus
 from goldminer.spider.v3.StockIncomeStatementSpider import StockIncomeStatementSpider
 from goldminer.spider.v3.StockIndustrySpider import StockIndustrySpider
 from goldminer.spider.v3.StockPrimaryFinanceIndicatorSpider import StockPrimaryFinanceIndicatorSpider
-from goldminer.spider.v3.StockSpider import StockSpider
 from goldminer.spider.v3.StockTradingDerivativeIndicatorSpider import StockTradingDerivativeIndicatorSpider
 
 
