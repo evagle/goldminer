@@ -1,4 +1,5 @@
 # coding: utf-8
+import time
 from datetime import date
 
 from goldminer.common.Utils import Utils
@@ -50,13 +51,14 @@ class StockManager:
             print("Cache for TradingDerivativeIndicator already loaded.")
             return
 
+        start = time.clock()
+
         session = self.fundamentalsDao.getSession()
         result = session.query(TradingDerivativeIndicator.code,
                                TradingDerivativeIndicator.end_date,
                                TradingDerivativeIndicator.PETTM,
                                TradingDerivativeIndicator.PB,
                                TradingDerivativeIndicator.TOTMKTCAP)
-        data = {}
         for row in result:
             # cache[code][trade_date] = {fields}
             self.__stockCache[row[0]][row[1]] = {
@@ -64,8 +66,8 @@ class StockManager:
                 "PB": row[3],
                 "TotalMarketValue": row[4],
             }
-
-        print("Load %d TradingDerivativeIndicator PE,PB,TOTMKTCAP successfully" % len(data))
+        end = time.clock()
+        print("Load {} TradingDerivativeIndicator PE,PB,TOTMKTCAP successfully, time = {}".format(len(self.__stockCache), end))
 
     def __loadStockField(self, stockCode, field):
         if stockCode in self.__stockCache and field in self.__stockCache[stockCode]:
