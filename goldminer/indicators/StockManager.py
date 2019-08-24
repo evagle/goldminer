@@ -67,12 +67,14 @@ class StockManager:
                 self.__stockCache[code] = {}
 
             self.__stockCache[code][date] = {
-                "PETTM" : row[2],
+                "PETTM": row[2],
                 "PB": row[3],
                 "TotalMarketValue": row[4],
             }
         end = time.clock()
-        print("Load {} TradingDerivativeIndicator PE,PB,TOTMKTCAP successfully, time = {}".format(len(self.__stockCache), end-start))
+        print(
+            "Load {} TradingDerivativeIndicator PE,PB,TOTMKTCAP successfully, time = {}".format(len(self.__stockCache),
+                                                                                                end - start))
 
     def __loadStockField(self, stockCode, field):
         if stockCode in self.__stockCache and field in self.__stockCache[stockCode]:
@@ -92,12 +94,12 @@ class StockManager:
         self.__stockCache[stockCode][field] = data
         print("[%s] Load %d %s successfully" % (stockCode, len(data), field))
 
-    def getStockFieldByDate(self, stockCode, field, d: date):
-        if stockCode not in self.__stockCache:
+    def getStockFieldByDate(self, code, field, d: date):
+        if code not in self.__stockCache:
             self.__preLoadTradingDerivative()
 
-        if d in self.__stockCache[stockCode] and field in self.__stockCache[stockCode][d]:
-            return self.__stockCache[stockCode][d][field]
+        if code in self.__stockCache and d in self.__stockCache[code] and field in self.__stockCache[code][d]:
+            return self.__stockCache[code][d][field]
         else:
             return 0
 
@@ -145,7 +147,7 @@ class StockManager:
         startDate = self.stockDao.getStockPublishDate(code)
         suspensionDates = [d for d in candidates if d >= startDate]
         suspensionDates.sort()
-        print("[%s] %d suspension dates" % (code,  len(suspensionDates)))
+        print("[%s] %d suspension dates" % (code, len(suspensionDates)))
         return suspensionDates
 
 
