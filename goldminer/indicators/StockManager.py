@@ -67,7 +67,7 @@ class StockManager:
                 "TotalMarketValue": row[4],
             }
         end = time.clock()
-        print("Load {} TradingDerivativeIndicator PE,PB,TOTMKTCAP successfully, time = {}".format(len(self.__stockCache), end))
+        print("Load {} TradingDerivativeIndicator PE,PB,TOTMKTCAP successfully, time = {}".format(len(self.__stockCache), end-start))
 
     def __loadStockField(self, stockCode, field):
         if stockCode in self.__stockCache and field in self.__stockCache[stockCode]:
