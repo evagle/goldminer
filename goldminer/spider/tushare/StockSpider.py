@@ -49,7 +49,7 @@ class StockSpider(TushareBase):
         for _, row in data.iterrows():
             code = row["symbol"]
             name = row["name"]
-            list_date = datetime.strptime(row["list_date"], "%Y%m%d")
+            list_date = datetime.strptime(row["list_date"], "%Y%m%d").date()
             if name.startswith("N") or list_date is None:
                 continue
             stock = Stock()
@@ -58,7 +58,7 @@ class StockSpider(TushareBase):
             stock.pub_date = list_date
             delist_date = row["delist_date"]
             if delist_date is not None:
-                stock.end_date = datetime.strptime(delist_date, "%Y%m%d")
+                stock.end_date = datetime.strptime(delist_date, "%Y%m%d").date()
             # industry用掘金的数据
             if code in stocksDict:
                 stock.industry = stocksDict[code].industry
