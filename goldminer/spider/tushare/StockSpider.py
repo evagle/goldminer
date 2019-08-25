@@ -2,6 +2,7 @@
 from datetime import datetime
 
 import tushare as ts
+from goldminer.spider.tushare.TushareBase import TushareBase
 
 from goldminer.common.logger import get_logger
 from goldminer.models.models import Stock
@@ -10,42 +11,68 @@ from goldminer.storage.StockDao import StockDao
 logger = get_logger(__name__)
 
 
-class StockSpider():
+class StockSpider(TushareBase):
     def __init__(self):
         super(StockSpider, self).__init__()
         self.stockDao = StockDao()
+        self.exchangeMap = {"SSE": 1, "SZSE": 2}
+
+    def _diff(self, stockA, stockB):
+        fields = ["code", 'pub_date', 'end_date', 'exchange', 'status']
+        changed = False
+        for field in fields:
+            if getattr(stockA, field) != getattr(stockB, field):
+                changed = True
+                break
+        if changed:
+            for field in fields:
+                setattr(stockA, field, getattr(stockB, field))
+            return stockA
+        else:
+            return None
 
     '''
     从tushare下载所有股票列表，更新stock数据库
     '''
     def getStockFromTuShare(self):
         logger.info("[StockSpider] Start to update stock list")
-        data = ts.get_stock_basics()
+        data = self.ts_pro_api.stock_basic(fields='ts_code,symbol,name,area,industry,list_date,delist_date,list_status,exchange')
         logger.info("[StockSpider] Get {} stocks from tushare.".format(data.shape[0]))
 
-        stocksExistsDB = self.stockDao.all()
+        stocksInDB = self.stockDao.all()
         stocksDict = {}
-        for stock in stocksExistsDB:
+        for stock in stocksInDB:
             stocksDict[stock.code] = stock
-        logger.info("[StockSpider] Get {} stocks from db.".format(len(stocksExistsDB)))
+        logger.info("[StockSpider] Get {} stocks from db.".format(len(stocksInDB)))
 
         newStocks = []
-        for code, row in data.iterrows():
-            if code not in stocksDict and not row["name"].startswith("N") and row.timeToMarket > 0:
-                stock = Stock()
-                stock.code = code
-                stock.name = row["name"]
-                stock.pub_date = datetime.strptime(str(row.timeToMarket), "%Y%m%d")
-                stock.end_date = None
-                stock.industry = ""
-                if code[0:1] == "6":
-                    stock.exchange = 1
-                else:
-                    stock.exchange = 2
-                stock.total_stock = row.totals*1e8
-                stock.circulation_stock = row.outstanding*1e8
+        for _, row in data.iterrows():
+            code = row["symbol"]
+            name = row["name"]
+            list_date = datetime.strptime(row["list_date"], "%Y%m%d")
+            if name.startswith("N") or list_date is None:
+                continue
+            stock = Stock()
+            stock.code = code
+            stock.name = name
+            stock.pub_date = list_date
+            delist_date = row["delist_date"]
+            if delist_date is not None:
+                stock.end_date = datetime.strptime(delist_date, "%Y%m%d")
+            # industry用掘金的数据
+            if code in stocksDict:
+                stock.industry = stocksDict[code].industry
+            stock.exchange = self.exchangeMap[row["exchange"]]
+            stock.status = row["list_status"]
+
+            if code not in stocksDict:
                 newStocks.append(stock)
                 logger.info("[StockSpider] New stock {}".format(stock))
+            else:
+                updatedStock = self._diff(stocksDict[code], stock)
+                if updatedStock:
+                    newStocks.append(updatedStock)
+                    logger.info("[StockSpider] Update stock {}".format(updatedStock))
 
         self.stockDao.bulkSave(newStocks)
         logger.info("[StockSpider] Save {} new stocks to db.".format(len(newStocks)))
