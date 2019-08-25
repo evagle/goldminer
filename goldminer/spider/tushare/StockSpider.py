@@ -31,10 +31,10 @@ class StockSpider(TushareBase):
         else:
             return None
 
-    '''
-    从tushare下载所有股票列表，更新stock数据库
-    '''
     def getStockFromTuShare(self):
+        """
+        从tushare下载所有股票列表，更新stock数据库
+        """
         logger.info("[StockSpider] Start to update stock list")
         data = self.ts_pro_api.stock_basic(fields='ts_code,symbol,name,area,industry,list_date,delist_date,list_status,exchange')
         logger.info("[StockSpider] Get {} stocks from tushare.".format(data.shape[0]))
