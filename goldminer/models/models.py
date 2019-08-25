@@ -905,9 +905,8 @@ class Stock(Base):
     exchange = Column(Integer, nullable=False)
     pub_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=True)
-    industry = Column(String(64), nullable=False)
-    total_stock = Column(Float(asdecimal=True), nullable=False)
-    circulation_stock = Column(Float(asdecimal=True), nullable=False)
+    industry = Column(String(64), nullable=True)
+    status = Column(String(64), nullable=True)
 
 
 class TradingDerivativeIndicator(Base):
