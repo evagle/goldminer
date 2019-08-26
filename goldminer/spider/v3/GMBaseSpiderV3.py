@@ -67,9 +67,7 @@ class GMBaseSpiderV3:
         model = modelClass()
         for key in raw:
             val = raw[key]
-            if key == 'symbol':
-                setattr(model, key, self.symbolToCode(val))
-            elif hasattr(model, key):
+            if hasattr(model, key):
                 if key in ["trade_date", "pub_date", "end_date"]:
                     if type(val) == date:
                         setattr(model, key, val.date())

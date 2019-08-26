@@ -31,6 +31,10 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
     '''
     def rawDataToModel(self, rawBar):
         model = self._rawDataToModel(rawBar, self.modelClass)
+        symbol = 'symbol'
+        if symbol in rawBar:
+            model.code = self.symbolToCode(rawBar[symbol])
+
         model = self.fillWithZero(model)
         return model
 
@@ -78,7 +82,7 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
 
         models = [self.rawDataToModel(item) for item in results]
         try:
-            models = self.removeExists(models)
+            models = self.removeExists(codes, models)
             self.fundamentalsDao.addAll(models)
         except IntegrityError as e:
             print("[ERROR] failed to save %s, error message = %s " % (modelName, e))

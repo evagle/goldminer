@@ -18,7 +18,7 @@ class StockDailyBarAdjustPrevSpider(GMBaseSpiderV3):
         self.stockDao = StockDao()
 
     def rawDataToModel(self, code, rawBar):
-        model = self._rawDataToModel(code, rawBar, StockDailyBarAdjustPrev)
+        model = self._rawDataToModel(rawBar, StockDailyBarAdjustPrev)
         model.code = code
         model.trade_date = rawBar['eob'].date()
         for key in ['pre_close', 'amount', 'open', 'close', 'high', 'low']:

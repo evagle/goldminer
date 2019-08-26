@@ -17,7 +17,7 @@ class IndexBarSpider(GMBaseSpiderV3):
         self.indexesDao = IndexesDao()
 
     def rawDataToModel(self, code, rawBar):
-        model = self._rawDataToModel(code, rawBar, IndexDailyBar)
+        model = self._rawDataToModel(rawBar, IndexDailyBar)
         model.code = code
         model.trade_date = rawBar['eob'].date()
         for key in ['pre_close', 'amount', 'open', 'close', 'high', 'low']:
