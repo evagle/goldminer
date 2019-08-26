@@ -23,6 +23,13 @@ class StockFundamentalsDao(BaseDao):
             .all()
         return result
 
+    def getBatch(self, codes: list, modelClazz):
+        result = self.session.query(modelClazz) \
+            .filter(modelClazz.code.in_(codes)) \
+            .order_by(modelClazz.end_date.asc()) \
+            .all()
+        return result
+
     def getByDate(self, code: str, tradeDate: date, modelClazz):
         result = self.session.query(modelClazz) \
             .filter(modelClazz.code == code, modelClazz.end_date == tradeDate) \
