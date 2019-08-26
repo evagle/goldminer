@@ -49,12 +49,12 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
         modelsInDB = self.fundamentalsDao.getBatch(codes, self.modelClass)
         modelsDict = {}
         for model in modelsInDB:
-            key = model.code + model.pub_date.strftime("%Y%m%d")
+            key = model.code + model.end_date.strftime("%Y%m%d")
             modelsDict[key] = model
 
         result = []
         for model in models:
-            key = model.code + model.pub_date.strftime("%Y%m%d")
+            key = model.code + model.end_date.strftime("%Y%m%d")
             if key not in modelsDict:
                 result.append(model)
         return result
@@ -101,7 +101,3 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
             if result is not None:
                 time.sleep(0.1)
 
-        # for code in stocks:
-        #     result = self.downloadByCode(code)
-        #     if result is not None:
-        #         time.sleep(0.1)
