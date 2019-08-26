@@ -93,7 +93,15 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
 
     def downloadAll(self):
         stocks = self.stockDao.getStockList()
-        for code in stocks:
-            result = self.downloadByCode(code)
+        batch_size = 100
+        while len(stocks) > 0:
+            batch = stocks[:batch_size]
+            stocks = stocks[batch_size:]
+            result = self.downloadByCode(batch)
             if result is not None:
                 time.sleep(0.1)
+
+        # for code in stocks:
+        #     result = self.downloadByCode(code)
+        #     if result is not None:
+        #         time.sleep(0.1)
