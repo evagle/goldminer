@@ -29,9 +29,8 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
     '''
     Override this function when have special requirements
     '''
-    def rawDataToModel(self, code, rawBar):
-        model = self._rawDataToModel(code, rawBar, self.modelClass)
-        model.code = code
+    def rawDataToModel(self, rawBar):
+        model = self._rawDataToModel(rawBar, self.modelClass)
         model = self.fillWithZero(model)
         return model
 
@@ -42,29 +41,51 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
                 setattr(model, field, 0)
         return model
 
-    def downloadByCode(self, code):
-        startDate = self.fundamentalsDao.getLatestDate(code, self.modelClass) + timedelta(days=1)
+    def removeExists(self, codes, models):
+        modelsInDB = self.fundamentalsDao.getBatch(codes, self.modelClass)
+        modelsDict = {}
+        for model in modelsInDB:
+            key = model.code + model.pub_date.strftime("%Y%m%d")
+            modelsDict[key] = model
+
+        result = []
+        for model in models:
+            key = model.code + model.pub_date.strftime("%Y%m%d")
+            if key not in modelsDict:
+                result.append(model)
+        return result
+
+    def downloadByCode(self, codes):
+        if type(codes) == str:
+            codes = [codes]
+
+        startDate = datetime.now().date()
         endDate = datetime.now() + timedelta(days=1)
-        symbol = self.codeToStockSymbol(code)
+        symbols = []
+        for code in codes:
+            date = self.fundamentalsDao.getLatestDate(code, self.modelClass) + timedelta(days=1)
+            startDate = startDate if startDate <= date else date
+            symbols.append(self.codeToStockSymbol(code))
 
         modelName = self.getModelClassName()
         if startDate >= datetime.now().date():
-            print("[%s\t%s] is up to date" % (code, modelName))
+            print("[%s\t%s] is up to date" % (codes, modelName))
             return None
-        print("[%s\t%s] from %s to %s" % (modelName, code, startDate, endDate))
+        print("[%s\t%s] from %s to %s" % (modelName, codes, startDate, endDate))
 
-        results = self.getFundamentals(table=self.table, symbols=symbol, start_date=startDate, end_date=endDate,
+        results = self.getFundamentals(table=self.table, symbols=symbols, start_date=startDate, end_date=endDate,
                                      limit=10000, fields=self.fields)
 
-        items = [self.rawDataToModel(code, item) for item in results]
+        models = [self.rawDataToModel(item) for item in results]
         try:
-            self.fundamentalsDao.addAll(items)
+            models = self.removeExists(models)
+            self.fundamentalsDao.addAll(models)
         except IntegrityError as e:
             print("[ERROR] failed to save %s, error message = %s " % (modelName, e))
-            print("==data==", items)
+            print("==data==", models)
 
-        print("[%s\t%s] count = %d\n" % (modelName, code, len(items)))
-        return items
+        print("[%s\t%s] count = %d\n" % (modelName, codes, len(models)))
+        return models
 
     def downloadAll(self):
         stocks = self.stockDao.getStockList()

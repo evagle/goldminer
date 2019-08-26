@@ -63,11 +63,13 @@ class GMBaseSpiderV3:
     def getDividend(self, symbol, start_date, end_date=None):
         return get_dividend(symbol, start_date, end_date)
 
-    def _rawDataToModel(self, code: str, raw: dict, modelClass):
+    def _rawDataToModel(self, raw: dict, modelClass):
         model = modelClass()
         for key in raw:
             val = raw[key]
-            if hasattr(model, key):
+            if key == 'symbol':
+                setattr(model, key, self.symbolToCode(val))
+            elif hasattr(model, key):
                 if key in ["trade_date", "pub_date", "end_date"]:
                     if type(val) == date:
                         setattr(model, key, val.date())
@@ -75,7 +77,7 @@ class GMBaseSpiderV3:
                         val = val + timedelta(hours=8)
                         setattr(model, key, val.date())
                     else:
-                        raise Exception("GMBaseSpiderV3: Date format error. data="+dict)
+                        raise Exception("GMBaseSpiderV3: Date format error. data="+raw)
                 else:
                     setattr(model, key, val)
         return model
@@ -95,3 +97,6 @@ class GMBaseSpiderV3:
 
     def codeToStockSymbol(self, code):
         return self.getStockSymbol(code) + "." + code
+
+    def symbolToCode(self, symbol):
+        return symbol[5:]

@@ -17,10 +17,9 @@ class IndexWeightsSpider(GMBaseSpiderV3):
         self.indexWeightDao = IndexWeightDao()
         self.indexesDao = IndexesDao()
 
-    def rawDataToModel(self, code, constituent) -> IndexWeight:
-        model = self._rawDataToModel(code, constituent, IndexWeight)
+    def rawDataToModel(self, constituent) -> IndexWeight:
+        model = self._rawDataToModel(constituent, IndexWeight)
         model.constituents = json.dumps(model.constituents)
-        model.code = code
         return model
 
     def downloadConstituents(self, code):
@@ -34,7 +33,7 @@ class IndexWeightsSpider(GMBaseSpiderV3):
         models = []
         for item in results:
             if item['trade_date'].date() >= startDate:
-                models.append(self.rawDataToModel(code, item))
+                models.append(self.rawDataToModel(item))
 
         print("[Download weights ] count = ", len(models), "\n")
         self.indexWeightDao.addAll(models)
