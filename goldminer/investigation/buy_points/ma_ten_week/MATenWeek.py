@@ -46,7 +46,7 @@ from goldminer.storage.StockDao import StockDao
 
 class MATenWeek(BuyPointBase):
 
-    def find_high_low(self, bars, trade_date, n):
+    def find_high_low(self, bars, trade_date, n, stop_ratio):
         minimum = 1e6
         maximum = 0
         base = 0
@@ -58,18 +58,22 @@ class MATenWeek(BuyPointBase):
                         minimum = bars[j].close
                     if bars[j].close > maximum:
                         maximum = bars[j].close
+                    # 到达止损线停止
+                    if minimum/base < stop_ratio:
+                        break
+
         return [minimum/base, maximum/base]
 
     # 一年新高图形
     def ma_ten_weeks_buy_points(self, code):
-        bars = self.stockBarNoAdjustDao.getAll(code)
-        bars = Utils.pre_adjust(bars)
+        bars = self.stockBarAdjustPrevDao.getAll(code)
+        # bars = Utils.pre_adjust(bars)
 
         # bars = self.tsStockBarSpider.getDailyBars(code, adj='qfq')
 
         # derivatives = self.stockFundamentals.getAll(code, TradingDerivativeIndicator)
         # primary_finance_indicators = self.stockFundamentals.getAll(code, PrimaryFinanceIndicator)
-        # income_statements = self.stockFundamentals.getAll(code, IncomeStatement)
+        income_statements = self.stockFundamentals.getAll(code, IncomeStatement)
 
         week_bars = Utils.dailyBar2WeeklyBar(code, bars)
 
@@ -85,6 +89,8 @@ class MATenWeek(BuyPointBase):
 
 
         buy_points = []
+        a = 0
+        b = 0
         for i in range(50, len(week_bars)):
             bar = week_bars[i]
             pre_bar = week_bars[i-1]
@@ -94,18 +100,37 @@ class MATenWeek(BuyPointBase):
             2. 十周线处于上涨趋势，至少上涨n（暂设n=1）周，n为1表示本周的10周线要比上周10周线高
             3. close / 50周均线 >= 1.45, 满足这个条件的突破80%都失败了
             '''
-            if pre_bar.sma10 < bar.sma10 and \
+            # 前30周到前5周的最低点10周线数值
+            min_in_5_30 = 1e6
+            for j in range(i-20, i-2):
+                if min_in_5_30 > week_bars[j].sma10:
+                    min_in_5_30 = week_bars[j].sma10
+
+            # bar_rps = self.stockBarDao.getByCodeAndDate(code, bar.end_date)
+
+            # bar.sma10 > 1.03 * min_in_5_30 and \
+            #     (bar.close - pre_bar.close ) / pre_bar.close < 0.2 and \
+            #     (pre_bar.close - week_bars[i-2].close) / week_bars[i-2].close > -0.1 \
+
+            profit_growth = self.calculate_quarter_profit_growth(income_statements, bar.end_date) * 100
+
+            if pre_bar.sma10 <= bar.sma10 and \
                 bar.close > bar.sma10 and pre_bar.close < pre_bar.sma10 and \
-                bar.close / bar.sma50 < 1.45:
+                bar.close / bar.sma50 < 1.45 and \
+                bar.rps50 > 85 and \
+                profit_growth > 20 \
+                :
 
-                minimum, maximum = self.find_high_low(bars, bar.end_date, 60)
+                minimum, maximum = self.find_high_low(bars, bar.end_date, 120, 0.93)
                 # 获取rps数据
-                # bar_rps = self.stockBarDao.getByCodeAndDate(code, bar.end_date)
 
-                if minimum < 0.95 or maximum < 1.05:
-                    print(code, bar.end_date, bar.close, bar.close / bar.sma50, [minimum, maximum], "*****")
+
+                if maximum < 1.1:
+                    print(code, bar.end_date, bar.close, [minimum, maximum], "*****")
+                    target = 0
                 else:
-                    print(code, bar.end_date, bar.close, bar.close / bar.sma50, [minimum, maximum])
+                    print(code, bar.end_date, bar.close, [minimum, maximum])
+                    target = 1
 
                 buy_point = {}
                 buy_point['code'] = code
@@ -113,6 +138,7 @@ class MATenWeek(BuyPointBase):
                 buy_point['close_sma50'] = bar.close / bar.sma50
                 buy_point['minimum_60d'] = minimum
                 buy_point['maximum_60d'] = maximum
+                buy_point['target'] = target
 
                 buy_points.append(buy_point)
 
@@ -124,11 +150,11 @@ if __name__ == "__main__":
     stockDao = StockDao()
     stocks = stockDao.getStockList()
 
-    # analyzer.ma_ten_weeks_buy_points('000001')
+    # analyzer.ma_ten_weeks_buy_points('000032')
     # exit(1)
     training_data = None
     num = len(stocks)
-    for i in range(num):
+    for i in range(50):
         code = stocks[i]
         print("processing", i, code)
         try:
@@ -136,8 +162,8 @@ if __name__ == "__main__":
             if type(df) == tuple:
                 print("Data error ", code)
                 continue
-        except Exception:
-            print("Data error ", code)
+        except Exception as e:
+            print("Data error ", code, e)
             continue
 
         if training_data is None:
