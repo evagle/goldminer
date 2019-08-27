@@ -15,7 +15,7 @@ class StockDao(BaseDao):
         return self.session.query(Stock).filter(Stock.code == code).first()
 
     def getStockList(self) -> List[str]:
-        result = self.session.query(Stock.code).all()
+        result = self.session.query(Stock.code).filter(Stock.end_date.is_(None)).all()
         return [i[0] for i in result]
 
     def add(self, stock: Stock):
