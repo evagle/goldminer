@@ -138,6 +138,15 @@ class Utils:
 
         return bars
 
+    @staticmethod
+    def maxDate(date1, date2):
+        return date1 if date1 > date2 else date2
+
+    @staticmethod
+    def minDate(date1, date2):
+        return date1 if date1 < date2 else date2
+
+
 if __name__ == "__main__":
     lst = []
     print(Utils.getMedian(lst))
