@@ -85,7 +85,7 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
 
         print("****111", (codesOneYearLatestDate, codesOneYear))
         print("****222", (codesMoreThanOneYearLatestDate, codesMoreThanOneYear))
-        return (codesOneYearLatestDate, codesOneYear), (codesMoreThanOneYearLatestDate, codesMoreThanOneYear)
+        return [(codesOneYearLatestDate, codesOneYear), (codesMoreThanOneYearLatestDate, codesMoreThanOneYear)]
 
     def removeExists(self, currentModelsDict, models):
         """
@@ -111,6 +111,9 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
         currentModelsDict, latestDateDict = self.getCurrentModels(codes)
         models = None
         for startDate, codes in self.groupCodesToTwoByEndDate(latestDateDict):
+            if len(codes) == 0:
+                continue
+
             symbols = [self.codeToStockSymbol(code) for code in codes]
 
             if startDate >= datetime.now().date():
