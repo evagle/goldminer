@@ -58,6 +58,9 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
             else:
                 latestDateDict[model.code] = Utils.maxDate(model.end_date,  latestDateDict[model.code])
 
+        for code in codes:
+            if code not in latestDateDict:
+                latestDateDict[code] = datetime(2005, 1, 1).date()
         return modelsDict, latestDateDict
 
     def groupCodesToTwoByEndDate(self, latestDateDict):
