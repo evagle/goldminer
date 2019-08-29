@@ -33,7 +33,7 @@ class StockDailyBarAdjustNoneSpider(GMBaseSpiderV3):
     def downloadBarsByDateRange(self, code, startDate, endDate):
         if startDate >= datetime.now().date():
             print("[%s] is up to date" % code)
-            return None
+            return []
 
         symbol = self.codeToStockSymbol(code)
         print("[Download Stock Bars][%s] From %s to %s" % (symbol, startDate, endDate))
@@ -54,15 +54,21 @@ class StockDailyBarAdjustNoneSpider(GMBaseSpiderV3):
                     bar.upper_limit = instrument['upper_limit']
                     bar.lower_limit = instrument['lower_limit']
 
-        self.stockBarDao.addAll(bars)
+        # self.stockBarDao.addAll(bars)
         print("[Download Stock Bars][%s] count = %d\n" %(symbol, len(bars)))
         return bars
 
     def downloadAll(self):
         stocks = self.stockDao.getStockList()
+        temp = []
         for code in stocks:
-            if self.downloadBars(code) is not None:
-                time.sleep(0.1)
+            bars = self.downloadBars(code)
+            temp.extend(bars)
+            if len(temp) > 200:
+                self.stockDao.bulkSave(temp)
+                temp = []
+            if len(bars):
+                time.sleep(0.05)
 
 
 if __name__ == "__main__":
