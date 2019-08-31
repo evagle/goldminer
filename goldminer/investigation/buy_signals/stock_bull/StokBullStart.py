@@ -11,7 +11,7 @@ import talib
 from goldminer.common import functions
 from goldminer.common.BarAttribute import BarAttribute
 from goldminer.common.Utils import Utils
-from goldminer.investigation.buy_points.BuyPointBase import BuyPointBase
+from goldminer.investigation.buy_signals.BuyPointBase import BuyPointBase
 from goldminer.models.models import TradingDerivativeIndicator, IncomeStatement, PrimaryFinanceIndicator
 from goldminer.spider.tushare.TSStockBarSpider import TSStockBarSpider
 from goldminer.storage.StockDao import StockDao
