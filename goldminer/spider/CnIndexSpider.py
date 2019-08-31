@@ -5,6 +5,7 @@ from datetime import datetime
 from urllib.error import HTTPError
 
 import xlrd
+import re
 
 from goldminer.common import GMConsts
 from goldminer.common.Utils import Utils
@@ -21,6 +22,30 @@ class CnIndexSpider:
     def __init__(self):
         self.constituentsDao = IndexConstituentDao()
         self.indexesDao = IndexesDao()
+
+    def parseDate(self, datestr):
+        if type(datestr) == float:
+            tuple = xlrd.xldate_as_tuple(datestr, 0)
+            return datetime(tuple[0], tuple[1], tuple[2])
+
+        datestr = datestr.strip()
+        if len(datestr) == 8:
+            format = "%Y%m%d"
+        elif datestr.find("-") >= 0:
+            parts = datestr.split("-")
+            if len(parts) != 3:
+                return None
+            if len(parts[0]) != 4:
+                return None
+            format = "%Y-%m-%d"
+        elif datestr.find("/") >=0:
+            parts = datestr.split("/")
+            if len(parts) != 3:
+                return None
+            if len(parts[2]) != 4:
+                return None
+            format = "%m/%d/%Y"
+        return datetime.strptime(datestr, format)
 
     def fetchConstituentByCode(self, code):
         url = self.CNINDEX_CONSTITUENT_URL % code
@@ -40,29 +65,29 @@ class CnIndexSpider:
                 workbook = xlrd.open_workbook(file_contents = content)
                 # sheet_names = workbook
                 sheet = workbook.sheet_by_index(0)
-                cols = sheet.col_values(2)
+
+                headers = sheet.row(0)
+                cols = None
+                tradeDate = None
+                for i in range(len(headers)):
+                    cell = headers[i]
+                    columnName = cell.value
+                    if columnName.startswith("证券代码") or columnName.startswith("样本股代码"):
+                        cols = sheet.col_values(i)
+                    elif columnName.startswith("日期"):
+                        tradeDate = self.parseDate(sheet.row(1)[i].value)
+                    elif columnName.startswith("更新时间") or columnName.startswith("更新日期"):
+                        result = re.match(r".*([\d]{4}-[\d]{1,2}-[\d]{1,2}).*", columnName)
+                        if len(result.groups()) >0:
+                            tradeDate = self.parseDate(result.groups()[0])
+
+                if cols is None or tradeDate is None:
+                    raise Exception("[{}]Failed to extract constituents of tradedate from excel.".format(code))
 
                 if '证券代码' in cols:
                     cols.remove('证券代码')
                 elif '样本股代码' in cols:
                     cols.remove('样本股代码')
-
-                tradeDate = None
-                today = datetime.now().date()
-                if sheet.col_values(4)[0] == "":
-                    tradeDate = sheet.col_values(5)[0]
-                else:
-                    tradeDate = sheet.col_values(7)[0]
-
-                if tradeDate and (tradeDate.startswith("更新时间") or tradeDate.startswith("更新日期")):
-                    try:
-                        tradeDate = datetime.strptime(tradeDate[5:], "%Y-%m-%d").date()
-                    except Exception as e:
-                        print("[%s] Wrong update date format: %s" % (code, tradeDate))
-
-                if tradeDate is None:
-                    print("[%s] Failed to parse update date or date is wrong: %s" % (code, tradeDate))
-                    tradeDate = today
 
                 return [tradeDate, cols]
 
@@ -99,9 +124,8 @@ class CnIndexSpider:
         elif not Utils.isListEqual(newConstituents, json.loads(last.constituents)):
             # 如果已经存在比当前还要新的数据，说明国政公司的tradeDate填错了，用今天的日期作为指数更新日期
             if last.trade_date > tradeDate:
-                today = datetime.now().date()
-                print("[%s] CN Index give a wrong trade date: %s, change to %s" % (code, tradeDate, today))
-                tradeDate = today
+                print("[%s] CN Index give a wrong trade date: %s, lastest trade_date found %s" % (code, tradeDate, last.trade_date))
+                return
 
             model = self.constituentsDao.getByDate(code, tradeDate)
             if model is None:
@@ -121,10 +145,12 @@ class CnIndexSpider:
         indexes = self.indexesDao.getIndexList()
         for code in indexes:
             if self.isCnIndex(code):
-                self.checkAndUpdateLatestConstituents(code)
-                # time.sleep(1)
+                try:
+                    self.checkAndUpdateLatestConstituents(code)
+                except Exception as e:
+                    print("Failed to download constituent for code {}, error message={}".format(code, e))
 
 
 if __name__ == "__main__":
     spider = CnIndexSpider()
-    spider.checkAndUpdateAllLatestConstituents()
+    spider.checkAndUpdateLatestConstituents('399001')
