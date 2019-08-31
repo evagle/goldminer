@@ -10,3 +10,5 @@ log
 build/
 dist/
 *.egg-info
+*.csv
+*.tsv
