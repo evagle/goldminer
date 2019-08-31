@@ -29,7 +29,7 @@ class CnIndexSpider:
             return datetime(tuple[0], tuple[1], tuple[2])
 
         datestr = datestr.strip()
-        if len(datestr) == 8:
+        if len(datestr) == 8 and datestr.find("-") < 0:
             format = "%Y%m%d"
         elif datestr.find("-") >= 0:
             parts = datestr.split("-")
@@ -89,7 +89,7 @@ class CnIndexSpider:
                 elif '样本股代码' in cols:
                     cols.remove('样本股代码')
 
-                return [tradeDate, cols]
+                return [tradeDate.date(), cols]
 
     def isCnIndex(self, code):
         model = self.indexesDao.getByCode(code)
@@ -122,7 +122,7 @@ class CnIndexSpider:
                 self.constituentsDao.add(model)
                 print("[%s] no last found. Add first one, %s" % (code, model))
         elif not Utils.isListEqual(newConstituents, json.loads(last.constituents)):
-            # 如果已经存在比当前还要新的数据，说明国政公司的tradeDate填错了，用今天的日期作为指数更新日期
+            # 如果已经存在比当前还要新的数据，报错
             if last.trade_date > tradeDate:
                 print("[%s] CN Index give a wrong trade date: %s, lastest trade_date found %s" % (code, tradeDate, last.trade_date))
                 return
@@ -153,4 +153,4 @@ class CnIndexSpider:
 
 if __name__ == "__main__":
     spider = CnIndexSpider()
-    spider.checkAndUpdateLatestConstituents('399001')
+    spider.checkAndUpdateLatestConstituents('399435')

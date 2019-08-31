@@ -22,6 +22,7 @@ setup(name='GoldMinder',
       install_requires=[
           'numpy',
           'pandas',
+          'pymysql'
       ],
       classifiers=[
           'Development Status :: 1 - Development/Unstable',
