@@ -15,10 +15,10 @@ class StockDailyBarAdjustNoneSpider(GMBaseSpiderV3):
         self.stockBarDao = StockDailyBarAdjustNoneDao()
         self.stockDao = StockDao()
 
-    def rawDataToModel(self, code, rawBar):
+    def rawDataToModel(self, rawBar):
         model = self._rawDataToModel(rawBar, StockDailyBarAdjustNone)
         model.trade_date = rawBar['eob'].date()
-        model.code = code
+        model.code = self.symbolToCode(rawBar['symbol'])
         for key in ['pre_close', 'amount', 'open', 'close', 'high', 'low']:
             if getattr(model, key) is None:
                 setattr(model, key, 0)
@@ -43,7 +43,7 @@ class StockDailyBarAdjustNoneSpider(GMBaseSpiderV3):
         '''
         stock bar does not contains adj_factor, get it from instruments
         '''
-        bars = [self.rawDataToModel(code, bar) for bar in bars]
+        bars = [self.rawDataToModel(bar) for bar in bars]
         for instrument in instruments:
             for bar in bars:
                 if instrument['trade_date'] == bar.trade_date:
