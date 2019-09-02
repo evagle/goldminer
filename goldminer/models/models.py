@@ -194,6 +194,24 @@ class BalanceSheet(Base):
     WARLIABRESE = Column(Float(asdecimal=True))
 
 
+class StockCustomIndicator(Base):
+    __tablename__ = 'StockCustomIndicator'
+    __table_args__ = (
+        Index('code_date', 'code', 'trade_date', unique=True),
+    )
+    id = Column(Integer, primary_key=True)
+    code = Column(String(16), nullable=False)
+    trade_date = Column(Date, nullable=False)
+    gain50 = Column(Float, nullable=True)
+    gain120 = Column(Float, nullable=True)
+    gain250 = Column(Float, nullable=True)
+    rps50 = Column(Float, nullable=True)
+    rps120 = Column(Float, nullable=True)
+    rps250 = Column(Float, nullable=True)
+    eps_score = Column(Float, nullable=True)
+    eps_rank = Column(Float, nullable=True)
+
+
 class StockDailyBarAdjustNone(Base):
     __tablename__ = 'StockDailyBarAdjustNone'
     __table_args__ = (
