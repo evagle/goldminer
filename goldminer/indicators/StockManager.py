@@ -1,6 +1,6 @@
 # coding: utf-8
 import time
-from datetime import date
+from datetime import date, datetime
 
 from goldminer.common.Utils import Utils
 from goldminer.models.models import IndexDailyBar, TradingDerivativeIndicator
@@ -130,6 +130,8 @@ class StockManager:
         return self.__tradeDatesCache[-1:]
 
     def isTradeDate(self, d: date):
+        if type(d) is datetime:
+            d = d.date()
         return d in self.__tradeDatesCache
 
     def getPreviousTradeDate(self, d):
