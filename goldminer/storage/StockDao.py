@@ -14,9 +14,22 @@ class StockDao(BaseDao):
     def getByCode(self, code) -> Stock:
         return self.session.query(Stock).filter(Stock.code == code).first()
 
-    def getStockList(self) -> List[str]:
+    def getStockList(self, includeB=False) -> List[str]:
+        """
+        Retrieve unlisted stock code list
+        :param includeB: whether to include B stock
+        :return: stock code list
+        """
         result = self.session.query(Stock.code).filter(Stock.end_date.is_(None)).all()
-        return [i[0] for i in result]
+        codes = [i[0] for i in result]
+        if not includeB:
+            codesA = []
+            for code in codes:
+                if code[0] != "9":
+                    codesA.append(code)
+            return codesA
+        else:
+            return codes
 
     def add(self, stock: Stock):
         self.session.add(stock)
