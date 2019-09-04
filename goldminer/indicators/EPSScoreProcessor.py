@@ -162,19 +162,19 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
             self.pubDates[code] = pubdate
         return self.pubDates[code]
 
-    def processAll(self, date=None):
+    def processAll(self, targetDate:date=None):
         stocks = self.stocks
         scores = []
-        if date is None:
-            date = datetime.today().date()
+        if targetDate is None:
+            targetDate = datetime.today().date()
 
-        logger.info("Start to process eps score/rank for date {}".format(date))
+        logger.info("Start to process eps score/rank for date {}".format(targetDate))
         for code in stocks:
             pubDate = self.getPubDate(code)
-            if pubDate is None or pubDate > date:
+            if pubDate is None or pubDate > targetDate:
                 continue
             logger.info("start calculate eps score code={}".format(code))
-            score = self.process(code, date=date)
+            score = self.process(code, date=targetDate)
             scores.append((code, score))
             logger.info("end code={}".format(code))
 
@@ -186,7 +186,7 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
             key = model.code + model.trade_date.strftime("%Y%m%d")
             customIndicatorsDict[key] = model
 
-        dateStr = date.strftime("%Y%m%d")
+        dateStr = targetDate.strftime("%Y%m%d")
         updatedModels = []
         for i in range(len(scores)):
             code, score = scores[i]
@@ -197,19 +197,19 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
             else:
                 model = StockCustomIndicator()
                 model.code = code
-                model.trade_date = date
+                model.trade_date = targetDate
             model.eps_score = score
             model.eps_rank = rank
             updatedModels.append(model)
 
         self.stockCustomIndicatorDao.bulkSave(updatedModels)
-        logger.info("End of eps score/rank for date {}, {} models updated".format(date, len(updatedModels)))
+        logger.info("End of eps score/rank for date {}, {} models updated".format(targetDate, len(updatedModels)))
 
 
 if __name__ == "__main__":
     processor = EPSScoreProcessor()
-    date = datetime(2005,1,1)
-    today = datetime.today()
+    date = datetime(2005,1,1).date()
+    today = datetime.today().date()
     stockManager = StockManager()
     while date <= today:
         if stockManager.isTradeDate(date):
