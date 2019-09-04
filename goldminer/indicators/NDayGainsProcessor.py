@@ -54,10 +54,9 @@ class NDayGainsProcessor(BaseIndicatorProcessor):
 
     def updateAll(self, nDays = 7):
         stocks = self.stockDao.getStockList()
-        processor = NDayGainsProcessor()
         for code in stocks:
             print("start calculate n days gain for", code)
-            processor.process(code, n = nDays)
+            self.process(code, n = nDays)
             print("end", code)
 
 if __name__ == "__main__":
