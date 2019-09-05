@@ -1,5 +1,6 @@
 # coding: utf-8
 import math
+import time
 from datetime import date, datetime, timedelta
 
 from goldminer.common.logger import get_logger
@@ -63,7 +64,7 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
                 current = models[i]
                 for j in range(i + 1, n):
                     if models[j].NPCUT == 0:
-                        print("Error NPCUT", code, current.end_date, models[j].end_date)
+                        logger.warn("[{}] NPCUT = 0 at trade date {} ".format(code, models[j].end_date))
                         continue
                     if self.isDiffOneYear(current.end_date, models[j].end_date):
                         current.NPCUTGrowth = current.NPCUT / models[j].NPCUT - 1
@@ -106,7 +107,7 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
         :return: score
         """
         if abs(growth) > 10:
-            logger.error("Error growth {}".format(growth))
+            logger.warn("Imposible growth {}".format(growth))
             growth = 10 if growth > 0 else -10
         return 1/(1+math.exp(-float(growth)*10/1.3))
 
@@ -120,7 +121,6 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
         quarterScore = 0
         sumWeight = 0
         for i in range(2):
-            print(quarterModels[i].end_date, quarterModels[i].NPCUTGrowth)
             quarterScore += EPSScoreProcessor.QUARTER_WEIGHTS[i] * self.growth2Score(quarterModels[i].NPCUTGrowth)
             sumWeight += EPSScoreProcessor.QUARTER_WEIGHTS[i]
         quarterScore /= sumWeight
@@ -128,7 +128,6 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
         # year score
         yearScore = 0
         for i in range(min(3, len(yearModels))):
-            print(yearModels[i].end_date, yearModels[i].NPCUTGrowth)
             yearScore += EPSScoreProcessor.YEAR_WEIGHTS[i] * self.growth2Score(yearModels[i].NPCUTGrowth)
             sumWeight += EPSScoreProcessor.YEAR_WEIGHTS[i]
         yearScore /= sumWeight
@@ -137,7 +136,6 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
                  EPSScoreProcessor.OVERALL_YEAR_SCORE_WEIGHT * yearScore) / \
                 (EPSScoreProcessor.OVERALL_QUARTER_SCORE_WEIGHT + EPSScoreProcessor.OVERALL_YEAR_SCORE_WEIGHT)
 
-        print(quarterScore, yearScore, score)
         return score
 
     def process(self, code, **kwargs):
@@ -149,7 +147,13 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
         """
         models = self.derivativeFinanceIndicatorModels[code]
         endDate = self.get_args(kwargs, 'date')
-        score = self.generateEPSScore(self.getLast2Quarter(models, endDate), self.getLast3Year(models, endDate))
+        logger.info("111  %s" % time.clock())
+        quarterModels = self.getLast2Quarter(models, endDate)
+        logger.info("222  %s" % time.clock())
+        yearModels = self.getLast3Year(models, endDate)
+        logger.info("333  %s" % time.clock())
+        score = self.generateEPSScore(quarterModels, yearModels)
+        logger.info("444  %s"% time.clock())
         if score is not None:
             return score
         return 0
@@ -208,7 +212,7 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
 
 if __name__ == "__main__":
     processor = EPSScoreProcessor()
-    date = datetime(2005,1,1).date()
+    date = datetime(2005,3,1).date()
     today = datetime.today().date()
     stockManager = StockManager()
     while date <= today:
