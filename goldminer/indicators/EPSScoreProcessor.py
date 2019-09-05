@@ -43,7 +43,7 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
         self.derivativeFinanceIndicatorModels = self.prepareNetProfitCutGrowth()
 
         self.stocks = self.stockDao.getStockList()
-        self.pubDates = {}
+        self.pubDates = self.stockDao.getAllStockPublishDate()
 
     def prepareNetProfitCutGrowth(self):
         dic = {}
@@ -158,14 +158,6 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
             return score
         return 0
 
-    def getPubDate(self, code):
-        if code in self.pubDates:
-            return self.pubDates[code]
-        else:
-            pubdate = self.stockDao.getStockPublishDate(code)
-            self.pubDates[code] = pubdate
-        return self.pubDates[code]
-
     def processAll(self, targetDate:date=None):
         stocks = self.stocks
         scores = []
@@ -174,9 +166,13 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
 
         logger.info("Start to process eps score/rank for date {}".format(targetDate))
         for code in stocks:
-            pubDate = self.getPubDate(code)
-            if pubDate is None or pubDate > targetDate:
+            if code not in self.pubDates:
                 continue
+
+            pubDate = self.pubDates[code]
+            if pubDate > targetDate:
+                continue
+
             logger.info("start calculate eps score code={}".format(code))
             score = self.process(code, date=targetDate)
             scores.append((code, score))

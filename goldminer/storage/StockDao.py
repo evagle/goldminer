@@ -41,3 +41,13 @@ class StockDao(BaseDao):
         if result is not None:
             return result[0]
         return None
+
+    def getAllStockPublishDate(self):
+        result = self.session.query(Stock.code, Stock.pub_date).all()
+
+        if result is not None:
+            dic = {}
+            for i in result:
+                dic[i[0]] = i[1]
+            return dic
+        return None
