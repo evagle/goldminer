@@ -1,6 +1,5 @@
 # coding: utf-8
 import math
-import time
 from datetime import date, datetime, timedelta
 
 from goldminer.common.logger import get_logger
@@ -12,6 +11,7 @@ from goldminer.storage.StockCustomIndicatorDao import StockCustomIndicatorDao
 from goldminer.storage.StockDao import StockDao
 
 logger = get_logger(__name__)
+
 
 class EPSScoreProcessor(BaseIndicatorProcessor):
     """
@@ -40,10 +40,14 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
         self.stockDao = StockDao()
         self.derivativeFinanceDao = DerivativeFinanceIndicatorDao()
         self.stockCustomIndicatorDao = StockCustomIndicatorDao()
-        self.derivativeFinanceIndicatorModels = self.prepareNetProfitCutGrowth()
 
+        self.prepareData()
+
+    def prepareData(self):
+        self.derivativeFinanceIndicatorModels = self.prepareNetProfitCutGrowth()
         self.stocks = self.stockDao.getStockList()
         self.pubDates = self.stockDao.getAllStockPublishDate()
+        self.customIndicatorsDict = self.prepareCustomIndicatorsDict()
 
     def prepareNetProfitCutGrowth(self):
         dic = {}
@@ -52,9 +56,11 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
             if model.code not in dic:
                 dic[model.code] = []
             dic[model.code].append(model)
+
         # 财报时间排序
         for code in dic:
             dic[code] = sorted(dic[code], key=lambda model: model.end_date, reverse=True)
+            dic[code] = list(filter(lambda model: model.NPCUT != 0, dic[code]))
 
         # 计算同比增速
         for code in dic:
@@ -62,29 +68,42 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
             n = len(models)
             for i in range(n):
                 current = models[i]
+                current.NPCUTGrowth = None
                 for j in range(i + 1, n):
-                    if models[j].NPCUT == 0:
-                        logger.warn("[{}] NPCUT = 0 at trade date {} ".format(code, models[j].end_date))
-                        continue
                     if self.isDiffOneYear(current.end_date, models[j].end_date):
                         current.NPCUTGrowth = current.NPCUT / models[j].NPCUT - 1
                         break
+
         return dic
 
-    def isDiffOneYear(self, date1:date, date2:date):
+    def prepareCustomIndicatorsDict(self):
+        customIndicators = self.stockCustomIndicatorDao.all()
+        customIndicatorsDict = {}
+        for model in customIndicators:
+            key = model.code + model.trade_date.strftime("%Y%m%d")
+            customIndicatorsDict[key] = model
+        return customIndicatorsDict
+
+    def isDiffOneYear(self, date1: date, date2: date):
         return abs(date1.year - date2.year) == 1 and date1.month == date2.month and date1.day == date2.day
 
-    def getLast2Quarter(self, models, endDate:date):
+    def getLast2Quarter(self, models, endDate):
         """
         Given sorted derivative finance indicators of one code, return latest two indicators with NPCUTGrowth
+        :param endDate: pub_date,end_date < endDate
         :param models: derivative finance indicators of one code
         :return: latest two indicators has NPCUTGrowth
         """
         result = []
         for model in models:
-            if hasattr(model, 'NPCUTGrowth') and model.end_date <= endDate and model.pub_date <= endDate:
+            if model.NPCUTGrowth is None:
+                continue
+            if model.end_date > endDate:
+                continue
+            if model.pub_date <= endDate:
                 result.append(model)
-
+                if len(result) == 2:
+                    return result
         return result[:2]
 
     def getLast3Year(self, models, endDate):
@@ -95,10 +114,13 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
         """
         result = []
         for model in models:
-            if hasattr(model, 'NPCUTGrowth') and model.end_date.month == 12 and\
+            if model.NPCUTGrowth is not None and model.end_date.month == 12 and \
                     model.end_date <= endDate and model.pub_date <= endDate:
                 result.append(model)
-        return result[:3]
+                if len(result) == 3:
+                    return result
+
+        return result
 
     def growth2Score(self, growth):
         """
@@ -109,7 +131,7 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
         if abs(growth) > 10:
             logger.warn("Imposible growth {}".format(growth))
             growth = 10 if growth > 0 else -10
-        return 1/(1+math.exp(-float(growth)*10/1.3))
+        return 1 / (1 + math.exp(-float(growth) * 10 / 1.3))
 
     def generateEPSScore(self, quarterModels, yearModels):
         # quater score
@@ -147,18 +169,18 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
         """
         models = self.derivativeFinanceIndicatorModels[code]
         endDate = self.get_args(kwargs, 'date')
-        logger.info("111  %s" % time.clock())
+        # logger.info("111  %s" % time.clock())
         quarterModels = self.getLast2Quarter(models, endDate)
-        logger.info("222  %s" % time.clock())
+        # logger.info("222  %s" % time.clock())
         yearModels = self.getLast3Year(models, endDate)
-        logger.info("333  %s" % time.clock())
+        # logger.info("333  %s" % time.clock())
         score = self.generateEPSScore(quarterModels, yearModels)
-        logger.info("444  %s"% time.clock())
+        # logger.info("444  %s" % time.clock())
         if score is not None:
             return score
         return 0
 
-    def processAll(self, targetDate:date=None):
+    def processByDate(self, targetDate: date = None):
         stocks = self.stocks
         scores = []
         if targetDate is None:
@@ -174,26 +196,23 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
                 continue
 
             logger.info("start calculate eps score code={}".format(code))
+            # p = Profile()
             score = self.process(code, date=targetDate)
+            # score = p.runcall(self.process, code, date=targetDate)
+            # p.print_stats()
             scores.append((code, score))
-            logger.info("end code={}".format(code))
+            logger.info("end code={} score={}".format(code, score))
 
         scores = sorted(scores, key=lambda x: x[1], reverse=True)
-
-        customIndicators = self.stockCustomIndicatorDao.all()
-        customIndicatorsDict = {}
-        for model in customIndicators:
-            key = model.code + model.trade_date.strftime("%Y%m%d")
-            customIndicatorsDict[key] = model
 
         dateStr = targetDate.strftime("%Y%m%d")
         updatedModels = []
         for i in range(len(scores)):
             code, score = scores[i]
-            rank = 100-i*100/len(scores)
+            rank = 100 - i * 100 / len(scores)
             key = code + dateStr
-            if key in customIndicatorsDict:
-                model = customIndicatorsDict[key]
+            if key in self.customIndicatorsDict:
+                model = self.customIndicatorsDict[key]
             else:
                 model = StockCustomIndicator()
                 model.code = code
@@ -202,16 +221,28 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
             model.eps_rank = rank
             updatedModels.append(model)
 
-        self.stockCustomIndicatorDao.bulkSave(updatedModels)
         logger.info("End of eps score/rank for date {}, {} models updated".format(targetDate, len(updatedModels)))
+        return updatedModels
+
+    def processByDateRange(self, startDate, endDate):
+        logger.info("Range {} to {}".format(startDate, endDate))
+        stockManager = StockManager()
+        date = startDate
+        result = []
+        while date <= endDate:
+            if stockManager.isTradeDate(date):
+                result.extend(processor.processByDate(date))
+            date += timedelta(days=1)
+        self.stockCustomIndicatorDao.bulkSave(result)
+
+    def processAll(self):
+        lastDate = self.stockCustomIndicatorDao.getLatestDate(columnName='eps_score')
+        startDate = lastDate + timedelta(days=1)
+        endDate = datetime.today().date()
+        self.processByDateRange(startDate, endDate)
 
 
 if __name__ == "__main__":
     processor = EPSScoreProcessor()
-    date = datetime(2005,3,1).date()
-    today = datetime.today().date()
-    stockManager = StockManager()
-    while date <= today:
-        if stockManager.isTradeDate(date):
-            processor.processAll(date)
-        date += timedelta(days=1)
+
+    processor.processAll()

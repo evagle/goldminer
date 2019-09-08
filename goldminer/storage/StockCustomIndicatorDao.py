@@ -31,18 +31,25 @@ class StockCustomIndicatorDao(BaseDao):
                 result.append(bar)
         return result
 
-    def getLatestDate(self, code, columnName):
+    def getLatestDate(self, code=None, columnName=None):
         """
         Get latest Date where attr is not None
-        :param code: stock code
         :param columnName: column should not be none
         :return:
         """
-        result = self.session.query(StockCustomIndicator.trade_date)\
-                             .filter(StockCustomIndicator.code == code)\
-                             .filter(Column(columnName).isnot(None)) \
-                             .order_by(StockCustomIndicator.trade_date.desc())\
-                             .first()
+        if columnName is None:
+            raise Exception("columnName could not be None")
+        if code is None:
+            result = self.session.query(StockCustomIndicator.trade_date) \
+                .filter(Column(columnName).isnot(None)) \
+                .order_by(StockCustomIndicator.trade_date.desc()) \
+                .first()
+        else:
+            result = self.session.query(StockCustomIndicator.trade_date) \
+                .filter(Column(columnName).isnot(None)) \
+                .filter(StockCustomIndicator.code == code) \
+                .order_by(StockCustomIndicator.trade_date.desc()) \
+                .first()
         return date(2005, 1, 1) if result is None else result[0]
 
     def getByCode(self, code):
