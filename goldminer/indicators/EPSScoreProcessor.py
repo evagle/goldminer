@@ -49,9 +49,10 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
         self.pubDates = self.stockDao.getAllStockPublishDate()
         self.customIndicatorsDict = self.prepareCustomIndicatorsDict()
 
+
     def prepareNetProfitCutGrowth(self):
         dic = {}
-        models = self.derivativeFinanceDao.all()
+        models = self.derivativeFinanceDao.getAllNPCUT()
         for model in models:
             if model.code not in dic:
                 dic[model.code] = []
