@@ -72,6 +72,9 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
                 for j in range(i + 1, n):
                     if self.isDiffOneYear(current.end_date, models[j].end_date):
                         current.NPCUTGrowth = current.NPCUT / models[j].NPCUT - 1
+                        if abs(current.NPCUTGrowth) > 10:
+                            logger.warn("Imposible growth {}".format(current.NPCUTGrowth))
+                            current.NPCUTGrowth = 10 if current.NPCUTGrowth > 0 else -10
                         break
 
         return dic
@@ -128,9 +131,6 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
         :param growth: growth in percent
         :return: score
         """
-        if abs(growth) > 10:
-            logger.warn("Imposible growth {}".format(growth))
-            growth = 10 if growth > 0 else -10
         return 1 / (1 + math.exp(-float(growth) * 10 / 1.3))
 
     def generateEPSScore(self, quarterModels, yearModels):
