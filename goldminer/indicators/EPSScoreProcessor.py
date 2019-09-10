@@ -47,7 +47,6 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
         self.derivativeFinanceIndicatorModels = self.prepareNetProfitCutGrowth()
         self.stocks = self.stockDao.getStockList()
         self.pubDates = self.stockDao.getAllStockPublishDate()
-        self.customIndicatorsDict = self.prepareCustomIndicatorsDict()
 
 
     def prepareNetProfitCutGrowth(self):
@@ -199,18 +198,14 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
 
         scores = sorted(scores, key=lambda x: x[1], reverse=True)
 
-        dateStr = targetDate.strftime("%Y%m%d")
         updatedModels = []
         for i in range(len(scores)):
             code, score = scores[i]
             rank = 100 - i * 100 / len(scores)
-            key = code + dateStr
-            if key in self.customIndicatorsDict:
-                model = self.customIndicatorsDict[key]
-            else:
-                model = StockCustomIndicator()
-                model.code = code
-                model.trade_date = targetDate
+
+            model = StockCustomIndicator()
+            model.code = code
+            model.trade_date = targetDate
             model.eps_score = score
             model.eps_rank = rank
             updatedModels.append(model)
