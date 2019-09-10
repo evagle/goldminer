@@ -164,19 +164,17 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
     def process(self, code, **kwargs):
         """
         Calculate eps score for stock by the end of `date`
+
+        ## 中途调用bulksave会导致getLast2Quarter运行缓慢，debug发现在执行getLast2Quarter时出现了sql相关调用
         :param code:
         :param kwargs: args `date` for end date of finance indicator
         :return: float eps score, 0 for no score based on finance indicators
         """
         models = self.derivativeFinanceIndicatorModels[code]
         endDate = self.get_args(kwargs, 'date')
-        # logger.info("111  %s" % time.clock())
         quarterModels = self.getLast2Quarter(models, endDate)
-        # logger.info("222  %s" % time.clock())
         yearModels = self.getLast3Year(models, endDate)
-        # logger.info("333  %s" % time.clock())
         score = self.generateEPSScore(quarterModels, yearModels)
-        # logger.info("444  %s" % time.clock())
         if score is not None:
             return score
         return 0
@@ -196,13 +194,8 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
             if pubDate > targetDate:
                 continue
 
-            logger.info("start calculate eps score code={}".format(code))
-            # p = Profile()
             score = self.process(code, date=targetDate)
-            # score = p.runcall(self.process, code, date=targetDate)
-            # p.print_stats()
             scores.append((code, score))
-            logger.info("end code={} score={}".format(code, score))
 
         scores = sorted(scores, key=lambda x: x[1], reverse=True)
 
