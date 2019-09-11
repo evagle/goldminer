@@ -214,7 +214,7 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
         return updatedModels
 
     def processByDateRange(self, startDate, endDate):
-        logger.info("Range {} to {}".format(startDate, endDate))
+        logger.info("Start range {} to {}".format(startDate, endDate))
         stockManager = StockManager()
         date = startDate
         result = []
@@ -223,6 +223,7 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
                 result.extend(processor.processByDate(date))
             date += timedelta(days=1)
         self.stockCustomIndicatorDao.bulkSave(result)
+        logger.info("End range {} to {}".format(startDate, endDate))
 
     def processAll(self):
         lastDate = self.stockCustomIndicatorDao.getLatestDate(columnName='eps_score')
