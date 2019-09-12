@@ -2,7 +2,6 @@
 from datetime import timedelta, datetime
 import time
 
-from goldminer.common.Utils import Utils
 from sqlalchemy.exc import IntegrityError
 
 from goldminer.spider.v3.GMBaseSpiderV3 import GMBaseSpiderV3
@@ -46,101 +45,33 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
                 setattr(model, field, 0)
         return model
 
-    def getCurrentModels(self, codes):
-        modelsInDB = self.fundamentalsDao.getBatch(codes, self.modelClass)
-        modelsDict = {}
-        latestDateDict = {}
-        for model in modelsInDB:
-            key = model.code + model.end_date.strftime("%Y%m%d")
-            modelsDict[key] = model
-            if model.code not in latestDateDict:
-                latestDateDict[model.code] = model.end_date
-            else:
-                latestDateDict[model.code] = Utils.maxDate(model.end_date,  latestDateDict[model.code])
-
-        for code in codes:
-            if code not in latestDateDict:
-                latestDateDict[code] = datetime(2005, 1, 1).date()
-        return modelsDict, latestDateDict
-
-    def groupCodesToTwoByEndDate(self, latestDateDict):
-        """
-        将codes按照latest end date分成两组，一组大于一年，一组小于一年
-        :return:
-        """
-        today = datetime.now().date()
-        oneYearBefore = today - timedelta(days=365)
-        codesOneYearLatestDate = today
-        codesMoreThanOneYearLatestDate = today
-        codesOneYear = []
-        codesMoreThanOneYear = []
-        for code in latestDateDict:
-            date = latestDateDict[code]
-            if date < oneYearBefore:
-                codesMoreThanOneYear.append(code)
-                codesMoreThanOneYearLatestDate = Utils.minDate(codesMoreThanOneYearLatestDate, date)
-            else:
-                codesOneYear.append(code)
-                codesOneYearLatestDate = Utils.minDate(codesOneYearLatestDate, date)
-
-        return [(codesOneYearLatestDate, codesOneYear), (codesMoreThanOneYearLatestDate, codesMoreThanOneYear)]
-
-    def removeExists(self, currentModelsDict, models):
-        """
-
-        :param currentModelsDict: key : code + end_date.strftime("%Y%m%d"), value : model
-        :param models:
-        :return:
-        """
-        result = []
-        for model in models:
-            key = model.code + model.end_date.strftime("%Y%m%d")
-            if key not in currentModelsDict:
-                result.append(model)
-        return result
-
-    def downloadByCode(self, codes):
-        if type(codes) == str:
-            codes = [codes]
-
+    def downloadByCode(self, code):
+        startDate = self.fundamentalsDao.getLatestDate(code, self.modelClass) + timedelta(days=1)
         endDate = datetime.now() + timedelta(days=1)
+        symbol = self.codeToStockSymbol(code)
+
         modelName = self.getModelClassName()
+        if startDate >= datetime.now().date():
+            print("[%s\t%s] is up to date" % (code, modelName))
+            return None
+        print("[%s\t%s] from %s to %s" % (modelName, code, startDate, endDate))
 
-        currentModelsDict, latestDateDict = self.getCurrentModels(codes)
-        models = None
-        for startDate, codes in self.groupCodesToTwoByEndDate(latestDateDict):
-            if len(codes) == 0:
-                continue
+        results = self.getFundamentals(table=self.table, symbols=symbol, start_date=startDate, end_date=endDate,
+                                     limit=10000, fields=self.fields)
 
-            symbols = [self.codeToStockSymbol(code) for code in codes]
+        items = [self.rawDataToModel(code, item) for item in results]
+        try:
+            self.fundamentalsDao.addAll(items)
+        except IntegrityError as e:
+            print("[ERROR] failed to save %s, error message = %s " % (modelName, e))
+            print("==data==", items)
 
-            if startDate >= datetime.now().date():
-                print("[%s\t%s] is up to date" % (codes, modelName))
-                return None
-            print("[%s\t%s] from %s to %s" % (modelName, codes, startDate, endDate))
-
-            results = self.getFundamentals(table=self.table, symbols=symbols, start_date=startDate, end_date=endDate,
-                                         limit=10000, fields=self.fields)
-
-            models = [self.rawDataToModel(item) for item in results]
-            try:
-                models = self.removeExists(currentModelsDict, models)
-                self.fundamentalsDao.addAll(models)
-            except IntegrityError as e:
-                print("[ERROR] failed to save %s, error message = %s " % (modelName, e))
-                print("==data==", models)
-
-            print("[%s\t%s] count = %d\n" % (modelName, codes, len(models)))
-
-        return models
+        print("[%s\t%s] count = %d\n" % (modelName, code, len(items)))
+        return items
 
     def downloadAll(self):
         stocks = self.stockDao.getStockList()
-        batch_size = 100
-        while len(stocks) > 0:
-            batch = stocks[:batch_size]
-            stocks = stocks[batch_size:]
-            result = self.downloadByCode(batch)
+        for code in stocks:
+            result = self.downloadByCode(code)
             if result is not None:
                 time.sleep(0.1)
-
