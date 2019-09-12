@@ -18,6 +18,7 @@ class IndexEqualWeightPBProcessor(IndexPEPBBaseProcessor):
         self.tradingDerivativeDao = TradingDerivativeIndicatorDao()
 
     def calcIndicatorByDate(self, indexCode, d):
+        logger.info("IndexEqualWeightPB started code={}, date={}".format(indexCode, d))
         model = self.indexPrimaryIndicatorDao.getByDate(indexCode, d)
         if model is None:
             model = IndexPrimaryIndicator()
@@ -30,15 +31,12 @@ class IndexEqualWeightPBProcessor(IndexPEPBBaseProcessor):
         if constituents is None:
             logger.warn("No constituent found for code {} date {}".format(indexCode, d))
             return None
-
         stockPB = []
         for stock in constituents:
             if stock in pbDict:
                 stockPB.append(pbDict[stock])
-                
+
         pbsum = sum([1 / p if p > 0 else 0 for p in stockPB])
-        if pbsum == 0:
-            print("ERROR empty stock pb", indexCode, d, constituents)
         if pbsum > 0:
             pb = Utils.formatFloat(len(stockPB) / pbsum, 6)
             model.equal_weight_pb = pb
@@ -57,9 +55,10 @@ class IndexEqualWeightPBProcessor(IndexPEPBBaseProcessor):
         models = []
         logger.info("Start calcEqualWeightedPB for {} from {} to {} ".format(indexCode, d, now))
         while d <= now:
-            model = self.calcIndicatorByDate(indexCode, d)
-            if model:
-                models.append(model)
+            if self.stockManager.isTradeDate(d):
+                model = self.calcIndicatorByDate(indexCode, d)
+                if model:
+                    models.append(model)
             d = d + timedelta(days=1)
 
         self.indexPrimaryIndicatorDao.bulkSave(models)
