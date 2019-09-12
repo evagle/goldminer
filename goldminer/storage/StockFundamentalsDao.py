@@ -10,9 +10,9 @@ class StockFundamentalsDao(BaseDao):
         self.session.commit()
 
     def getLatestDate(self, code: str, modelClazz):
-        result = self.session.query(modelClazz.end_date)\
+        result = self.session.query(modelClazz.pub_date)\
                              .filter(modelClazz.code == code)\
-                             .order_by(modelClazz.end_date.desc())\
+                             .order_by(modelClazz.pub_date.desc())\
                              .first()
         return date(2001, 1, 1) if result is None else result[0]
 
@@ -29,8 +29,3 @@ class StockFundamentalsDao(BaseDao):
             .order_by(modelClazz.end_date.asc()) \
             .all()
         return result
-
-    def getByDate(self, code: str, tradeDate: date, modelClazz):
-        result = self.session.query(modelClazz) \
-            .filter(modelClazz.code == code, modelClazz.end_date == tradeDate) \
-            .first()
