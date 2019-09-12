@@ -21,6 +21,7 @@ class IndexWeightedPEProcessor(IndexPEPBBaseProcessor):
         self.tradingDerivativeDao = TradingDerivativeIndicatorDao()
 
     def calcIndicatorByDate(self, indexCode, d):
+        logger.info("IndexWeightedPE started code={}, date={}".format(indexCode, d))
         model = self.indexPrimaryIndicatorDao.getByDate(indexCode, d)
         if model is None:
             model = IndexPrimaryIndicator()

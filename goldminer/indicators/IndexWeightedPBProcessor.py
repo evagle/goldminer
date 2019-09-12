@@ -9,7 +9,6 @@ from goldminer.indicators.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
 from goldminer.models.models import IndexPrimaryIndicator, TradingDerivativeIndicator
 from goldminer.storage.TradingDerivativeIndicatorDao import TradingDerivativeIndicatorDao
 
-
 logger = get_logger(__name__)
 
 
@@ -20,7 +19,7 @@ class IndexWeightedPBProcessor(IndexPEPBBaseProcessor):
         self.tradingDerivativeDao = TradingDerivativeIndicatorDao()
 
     def calcIndicatorByDate(self, indexCode, d):
-
+        logger.info("IndexWeightedPB started code={}, date={}".format(indexCode, d))
         model = self.indexPrimaryIndicatorDao.getByDate(indexCode, d)
         if model is None:
             model = IndexPrimaryIndicator()
@@ -53,7 +52,7 @@ class IndexWeightedPBProcessor(IndexPEPBBaseProcessor):
             if value < 1 or math.fabs(pb) < 1e-6:
                 logger.warn(
                     "Invalid pb(=0) or total market value(<1), code {}, date {}, pe={}, total market value={}".
-                    format(stock, d, pb, value))
+                        format(stock, d, pb, value))
                 continue
 
             netAsset = value / Decimal(pb)
@@ -69,17 +68,15 @@ class IndexWeightedPBProcessor(IndexPEPBBaseProcessor):
             logger.warn("code {}, date {} skipping weighted pb because net assets < 0".format(indexCode, d))
             return None
 
-
-
     def process(self, indexCode):
         d = self.getStartDate(indexCode)
         if d is None:
-            print("[Error] Invalid start date, code = ", indexCode)
+            logger.error("Invalid start date, skipping, code = {}".format(indexCode))
             return
 
         now = datetime.now().date()
         models = []
-        print("[%s] calcWeightedPB from %s to %s " % (indexCode, d, now))
+        logger.info("Start calcWeightedPE for {} from {} to {} ".format(indexCode, d, now))
         while d <= now:
             if self.stockManager.isTradeDate(d):
                 model = self.calcIndicatorByDate(indexCode, d)
@@ -96,5 +93,3 @@ class IndexWeightedPBProcessor(IndexPEPBBaseProcessor):
 if __name__ == "__main__":
     peManager = IndexWeightedPBProcessor()
     peManager.process('000009')
-
-
