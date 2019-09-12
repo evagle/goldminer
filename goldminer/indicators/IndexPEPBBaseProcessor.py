@@ -1,5 +1,5 @@
 # coding: utf-8
-from datetime import date
+from datetime import date, timedelta
 
 from goldminer.indicators.IndexConstituentManager import IndexConstituentManager
 from goldminer.indicators.StockManager import StockManager
@@ -22,7 +22,7 @@ class IndexPEPBBaseProcessor:
     def getStartDate(self, code):
         if self.fieldName is None:
             raise Exception("Field name is not given.")
-        d = self.indexPrimaryIndicatorDao.getLatestDate(code, self.fieldName)
+        d = self.indexPrimaryIndicatorDao.getLatestDate(code, self.fieldName) + timedelta(days=1)
         if d is None:
             d = self.indexDao.getIndexPublishDate(code)
 

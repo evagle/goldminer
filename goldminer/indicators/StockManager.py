@@ -10,6 +10,7 @@ from goldminer.storage.StockFundamentalsDao import StockFundamentalsDao
 
 
 class StockManager:
+    __tradeDatesCache = []
 
     def __init__(self):
         self.fundamentalsDao = StockFundamentalsDao()
@@ -33,7 +34,6 @@ class StockManager:
         }
         '''
         self.__stockCache = {}
-        self.__tradeDatesCache = []
 
         # load trade dates when initiate
         self.__loadTradeDates()
@@ -120,32 +120,32 @@ class StockManager:
         dates = session.query(IndexDailyBar.trade_date) \
             .filter(IndexDailyBar.code == '000001')
         for d in dates:
-            self.__tradeDatesCache.append(d[0])
-        self.__tradeDatesCache.sort()
+            StockManager.__tradeDatesCache.append(d[0])
+        StockManager.__tradeDatesCache.sort()
 
     def getTradeDates(self):
-        return self.__tradeDatesCache
+        return StockManager.__tradeDatesCache
 
     def getLastTradeDate(self):
-        return self.__tradeDatesCache[-1:]
+        return StockManager.__tradeDatesCache[-1:]
 
     def isTradeDate(self, d: date):
         if type(d) is datetime:
             d = d.date()
-        return d in self.__tradeDatesCache
+        return d in StockManager.__tradeDatesCache
 
     def getPreviousTradeDate(self, d):
-        pos = self.__tradeDatesCache.index(d)
+        pos = StockManager.__tradeDatesCache.index(d)
         if pos > 0:
             pos = pos - 1
         else:
             raise Exception("No previous trade date found.")
-        return self.__tradeDatesCache[pos]
+        return StockManager.__tradeDatesCache[pos]
 
     def getSuspensionDates(self, code):
         stockBarDao = StockDailyBarAdjustNoneDao()
         tradeDates = stockBarDao.getAllTradeDatesByCode(code)
-        candidates = list(set(self.__tradeDatesCache).difference(set(tradeDates)))
+        candidates = list(set(StockManager.__tradeDatesCache).difference(set(tradeDates)))
         startDate = self.stockDao.getStockPublishDate(code)
         suspensionDates = [d for d in candidates if d >= startDate]
         suspensionDates.sort()
