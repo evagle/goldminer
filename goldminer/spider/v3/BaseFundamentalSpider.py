@@ -59,7 +59,7 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
         results = self.getFundamentals(table=self.table, symbols=symbol, start_date=startDate, end_date=endDate,
                                      limit=10000, fields=self.fields)
 
-        items = [self.rawDataToModel(code, item) for item in results]
+        items = [self.rawDataToModel(item) for item in results]
         try:
             self.fundamentalsDao.addAll(items)
         except IntegrityError as e:

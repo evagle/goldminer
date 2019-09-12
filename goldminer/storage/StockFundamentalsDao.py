@@ -3,6 +3,7 @@ from datetime import date
 
 from goldminer.storage.BaseDao import BaseDao
 
+
 class StockFundamentalsDao(BaseDao):
 
     def add(self, model):
