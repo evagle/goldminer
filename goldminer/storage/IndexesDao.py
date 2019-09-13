@@ -15,9 +15,9 @@ class IndexesDao(BaseDao):
         return self.session.query(Indexes).filter(Indexes.code == code).first()
 
     def getIndexList(self) -> List[str]:
-        excludeIndexTypes = ["债券指数", "基金指数"]
+        excludeCategories = ["债券指数", "基金指数"]
         result = self.session.query(Indexes.code)\
-            .filter(Indexes.index_type.notin_(excludeIndexTypes))\
+            .filter(Indexes.category.notin_(excludeCategories))\
             .filter(Indexes.end_date.is_(None))\
             .all()
         return [i[0] for i in result]
@@ -31,3 +31,7 @@ class IndexesDao(BaseDao):
         if result is not None:
             return result[0]
         return None
+
+if __name__ == "__main__":
+    dao = IndexesDao()
+    print(dao.getIndexList())
