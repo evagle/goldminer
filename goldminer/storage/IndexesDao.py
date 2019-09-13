@@ -16,7 +16,10 @@ class IndexesDao(BaseDao):
 
     def getIndexList(self) -> List[str]:
         excludeIndexTypes = ["债券指数", "基金指数"]
-        result = self.session.query(Indexes.code).filter(Indexes.index_type.notin_(excludeIndexTypes)).all()
+        result = self.session.query(Indexes.code)\
+            .filter(Indexes.index_type.notin_(excludeIndexTypes))\
+            .filter(Indexes.end_date.isnot(None))\
+            .all()
         return [i[0] for i in result]
 
     def add(self, index: Indexes):

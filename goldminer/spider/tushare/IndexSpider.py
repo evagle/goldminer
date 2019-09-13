@@ -3,6 +3,7 @@ import decimal
 from datetime import datetime
 from decimal import Decimal
 from math import fabs
+import pandas as pd
 
 from goldminer.common.logger import get_logger
 from goldminer.models.models import Indexes
@@ -21,7 +22,7 @@ class IndexSpider(TushareBase):
 
 
     def _diff(self, indexA, indexB):
-        fields = ["code", 'publisher', 'index_type', 'category', 'base_date', 'base_point', 'pub_date', 'weight_rule', 'description']
+        fields = ["code", 'publisher', 'index_type', 'category', 'base_date', 'base_point', 'pub_date', 'weight_rule', 'description', 'end_date']
         changed = False
         for field in fields:
             if field == 'base_point':
@@ -47,8 +48,8 @@ class IndexSpider(TushareBase):
 
         currentIndexes = self.indexDao.all()
         currentIndexesDict = {}
-        for idx in currentIndexes:
-            currentIndexesDict[idx.code] = idx
+        for model in currentIndexes:
+            currentIndexesDict[model.code] = model
 
         newIndexes = {}
         for market in self.markets.keys():
@@ -76,8 +77,14 @@ class IndexSpider(TushareBase):
                 index.category = row['category']
                 index.full_name = row['fullname']
                 index.pub_date = datetime.strptime(row['list_date'], '%Y%m%d').date()
-                index.base_date = datetime.strptime(row['base_date'], '%Y%m%d').date()
-                index.base_point = Decimal(round(row['base_point'], 2))
+                if row['base_date'] is not None:
+                    index.base_date = datetime.strptime(row['base_date'], '%Y%m%d').date()
+                if row['exp_date'] is not None:
+                    index.end_date = datetime.strptime(row['exp_date'], '%Y%m%d').date()
+                if pd.isna(row['base_point']):
+                    index.base_point = 0
+                else:
+                    index.base_point = Decimal(round(row['base_point'], 2))
                 index.weight_rule = row['weight_rule']
                 index.publisher = row['publisher']
                 index.description = row['desc']

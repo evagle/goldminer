@@ -838,6 +838,7 @@ class Indexes(Base):
     full_name = Column(String(128), nullable=False)
     pub_date = Column(DateTime, nullable=False)
     base_date = Column(DateTime, nullable=False)
+    end_date = Column(DateTime, nullable=False)
     base_point = Column(Float(asdecimal=True))
     weight_rule = Column(String(64), nullable=False)
     publisher = Column(String(64), nullable=False)
