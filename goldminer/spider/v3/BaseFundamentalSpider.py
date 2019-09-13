@@ -70,7 +70,7 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
         return items
 
     def downloadAll(self):
-        stocks = self.stockDao.getStockList()
+        stocks = self.stockDao.getStockList(includeB=True)
         for code in stocks:
             result = self.downloadByCode(code)
             if result is not None:
