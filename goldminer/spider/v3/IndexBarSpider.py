@@ -30,7 +30,7 @@ class IndexBarSpider(GMBaseSpiderV3):
         endDate = datetime.now() + timedelta(days=1)
         return self.downloadBarsByDateRange(code, startDate, endDate.date())
 
-    def downloadBarsByDateRange(self, code, startDate: date, endDate: date):
+    def downloadBarsByDateRange(self, code, startDate: date, endDate: date, save=True):
 
         if startDate >= datetime.now().date():
             print("[%s] is up to date" % code)
@@ -40,7 +40,8 @@ class IndexBarSpider(GMBaseSpiderV3):
         print("[Download Index Bars] start=", startDate, "end=", endDate, "code=", symbol)
         bars = self.getHistory(symbol, "1d", startDate, endDate)
         bars = [self.rawDataToModel(code, bar) for bar in bars]
-        self.indexBarDao.addAll(bars)
+        if save:
+            self.indexBarDao.addAll(bars)
         print("[Download Index Bars] count=", len(bars), "\n")
         return bars
 
