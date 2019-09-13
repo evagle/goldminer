@@ -120,7 +120,3 @@ class IndexSpider(TushareBase):
 if __name__ == "__main__":
     spider = IndexSpider()
     spider.getIndexListFromTushare()
-    # dao = IndexesDao()
-    # print(dao.getIndexList())
-    # spider.verifyExpDate('399908.SZ')
-    # spider.verifyExpDate('000001.SH')
