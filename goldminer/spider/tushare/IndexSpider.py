@@ -1,6 +1,6 @@
 # coding: utf-8
 import decimal
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 from math import fabs
 import pandas as pd
@@ -8,6 +8,7 @@ import pandas as pd
 from goldminer.common.logger import get_logger
 from goldminer.models.models import Indexes
 from goldminer.spider.tushare.TushareBase import TushareBase
+from goldminer.spider.v3.IndexBarSpider import IndexBarSpider
 from goldminer.storage.IndexesDao import IndexesDao
 
 logger = get_logger(__name__)
@@ -38,6 +39,18 @@ class IndexSpider(TushareBase):
             return indexA
         else:
             return None
+
+    def isExpired(self, code):
+        """
+        如果最近7天有daily bar则认为指数并未过期
+        :param tsCode:
+        :return:
+        """
+        today = datetime.today().date()
+        date = today - timedelta(days=7)
+        barSpider = IndexBarSpider()
+        bars = barSpider.downloadBarsByDateRange(code, startDate=date, endDate=today)
+        return len(bars) == 0
 
     def getIndexListFromTushare(self):
         """
@@ -80,7 +93,9 @@ class IndexSpider(TushareBase):
                 if row['base_date'] is not None:
                     index.base_date = datetime.strptime(row['base_date'], '%Y%m%d').date()
                 if row['exp_date'] is not None:
-                    index.end_date = datetime.strptime(row['exp_date'], '%Y%m%d').date()
+                    isExpired = self.isExpired(code)
+                    if isExpired:
+                        index.end_date = datetime.strptime(row['exp_date'], '%Y%m%d').date()
                 if pd.isna(row['base_point']):
                     index.base_point = 0
                 else:
@@ -105,3 +120,7 @@ class IndexSpider(TushareBase):
 if __name__ == "__main__":
     spider = IndexSpider()
     spider.getIndexListFromTushare()
+    # dao = IndexesDao()
+    # print(dao.getIndexList())
+    # spider.verifyExpDate('399908.SZ')
+    # spider.verifyExpDate('000001.SH')

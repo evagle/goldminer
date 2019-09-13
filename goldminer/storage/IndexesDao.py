@@ -18,7 +18,7 @@ class IndexesDao(BaseDao):
         excludeIndexTypes = ["债券指数", "基金指数"]
         result = self.session.query(Indexes.code)\
             .filter(Indexes.index_type.notin_(excludeIndexTypes))\
-            .filter(Indexes.end_date.isnot(None))\
+            .filter(Indexes.end_date.is_(None))\
             .all()
         return [i[0] for i in result]
 
