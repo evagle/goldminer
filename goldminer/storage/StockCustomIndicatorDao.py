@@ -19,16 +19,21 @@ class StockCustomIndicatorDao(BaseDao):
             .filter(StockCustomIndicator.trade_date == d) \
             .first()
 
-    def getBatchByDate(self, codes: list, d: date) -> List[StockCustomIndicator]:
-        if codes is None:
-            return []
+    def getAllAtDate(self, d: date):
+        """
+        Get all StockCustomIndicator bars for given date, return in dict
+        {(code, trade_date): bar,...}
+        :param d: date to retrieve
+        :return:
+        Dict:
+        {(code, trade_date): bar,...}
+        """
         bars = self.session.query(StockCustomIndicator) \
             .filter(StockCustomIndicator.trade_date == d) \
             .all()
-        result = []
+        result = {}
         for bar in bars:
-            if bar.code in codes:
-                result.append(bar)
+            result[(bar.code, bar.trade_date)] = bar
         return result
 
     def getLatestDate(self, code=None, columnName=None):
