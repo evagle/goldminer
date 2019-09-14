@@ -5,14 +5,15 @@ from goldminer.indicators.IndexPEPBGenerator import IndexPEPBGenerator
 from goldminer.indicators.NDayGainsProcessor import NDayGainsProcessor
 from goldminer.indicators.RPSProcessor import RPSProcessor
 
+eps = EPSScoreProcessor()
+eps.processAll()
+
 pepbGenerator = IndexPEPBGenerator()
 pepbGenerator.updateAll()
 
 processor = NDayGainsProcessor()
-processor.updateAll(7)
+processor.updateAll()
 
 rps = RPSProcessor()
 rps.buildLastWeek()
 
-eps = EPSScoreProcessor()
-eps.processAll()
