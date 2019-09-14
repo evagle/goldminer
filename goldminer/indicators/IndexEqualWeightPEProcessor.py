@@ -56,7 +56,7 @@ class IndexEqualWeightPEProcessor(IndexPEPBBaseProcessor):
 
         now = datetime.now().date()
         models = []
-        logger.info("Start calcEqualWeightedPE for {} from {} to {} ".format(indexCode, d, now))
+        logger.info("Start {} from {} to {} ".format(indexCode, d, now))
         while d <= now:
             if self.stockManager.isTradeDate(d):
                 model = self.calcIndicatorByDate(indexCode, d)
@@ -64,7 +64,7 @@ class IndexEqualWeightPEProcessor(IndexPEPBBaseProcessor):
                     models.append(model)
             d = d + timedelta(days=1)
 
-        logger.info("End calcEqualWeightedPE for {}, save {} equal weight pe".format(indexCode, len(models)))
+        logger.info("End {}, save {} equal weight pe".format(indexCode, len(models)))
         self.indexPrimaryIndicatorDao.bulkSave(models)
 
         return models
