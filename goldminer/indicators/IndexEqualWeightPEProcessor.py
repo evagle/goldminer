@@ -51,7 +51,7 @@ class IndexEqualWeightPEProcessor(IndexPEPBBaseProcessor):
     def process(self, indexCode):
         d = self.getStartDate(indexCode)
         if d is None:
-            logger.error("Invalid start date, code = ", indexCode)
+            logger.error("Invalid start date, code = {}".format(indexCode))
             return
 
         now = datetime.now().date()
