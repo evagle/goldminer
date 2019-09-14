@@ -1,5 +1,5 @@
 # coding: utf-8
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 from goldminer.indicators.IndexConstituentManager import IndexConstituentManager
 from goldminer.indicators.StockManager import StockManager
@@ -26,9 +26,10 @@ class IndexPEPBBaseProcessor:
         if d is None:
             d = self.indexDao.getIndexPublishDate(code)
 
-        # recalculate from last constituent date
+        # recalculate from last constituent date, but only when constituent update date is in 5 days,
+        # otherwise it should already have been recalculated
         latestDate = self.indexConstituentDao.getLatestDate(code)
-        if latestDate is not None and latestDate < d:
+        if latestDate is not None and latestDate < d and (latestDate - datetime.today().date()).days < 5:
             d = latestDate
 
         # stock data starts from 2005-01-04
