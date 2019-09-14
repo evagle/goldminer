@@ -19,7 +19,7 @@ class NDayGainsProcessor(BaseIndicatorProcessor):
         self.stockDao = StockDao()
         self.customIndicatorDao = StockCustomIndicatorDao()
 
-    def process1(self, code):
+    def process(self, code):
         latestDate = self.customIndicatorDao.getLatestDate(code, columnName='gain50')
         startDate = latestDate
         endDate = datetime.today().date()
@@ -69,7 +69,7 @@ class NDayGainsProcessor(BaseIndicatorProcessor):
         logger.info("End NDayGains code {} has {} updates".format(code, len(customIndicatorsChanged)))
         self.customIndicatorDao.bulkSave(customIndicatorsChanged.values())
 
-    def process(self, code, **kwargs):
+    def process_old(self, code, **kwargs):
         '''
 
         :param code:
@@ -113,10 +113,10 @@ class NDayGainsProcessor(BaseIndicatorProcessor):
     def updateAll(self):
         stocks = self.stockDao.getStockList()
         for code in stocks:
-            self.process1(code)
+            self.process(code)
 
 if __name__ == "__main__":
     stockDao = StockDao()
     stocks = stockDao.getStockList()
     processor = NDayGainsProcessor()
-    processor.process1('000001')
+    processor.process('000002')
