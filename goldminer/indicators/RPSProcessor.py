@@ -2,7 +2,6 @@
 from datetime import date, datetime
 
 from goldminer.common.Utils import Utils
-
 from goldminer.common.logger import get_logger
 from goldminer.indicators.StockManager import StockManager
 from goldminer.storage.StockCustomIndicatorDao import StockCustomIndicatorDao
@@ -25,7 +24,6 @@ class RPSProcessor:
                 left.append(bar)
         bars = left
 
-        print("====", len(bars), trade_date)
         total_count = len(bars)
         MIN = -1e6
 
@@ -35,7 +33,7 @@ class RPSProcessor:
                 has_rps = False
 
         if has_rps:
-            print("rps already calculated for trade_date", trade_date)
+            logger.info("RPS had already been calculated for trade_date {}".format(trade_date))
             return None
 
         bars50 = sorted(bars, key=lambda bar: bar.gain50 if bar.gain50 is not None else MIN, reverse=True)
@@ -68,9 +66,9 @@ class RPSProcessor:
 
     def getLastRPSDate(self):
         lastDate = date(2015, 1, 1)
-        lastDate = Utils.minDate(lastDate, self.customIndicatorDao.getLatestDate(columnName='rps50'))
-        lastDate = Utils.minDate(lastDate, self.customIndicatorDao.getLatestDate(columnName='rps120'))
-        lastDate = Utils.minDate(lastDate, self.customIndicatorDao.getLatestDate(columnName='rps250'))
+        lastDate = Utils.minDate(lastDate, self.customIndicatorDao.getLatestDate(code='000001', columnName='rps50'))
+        lastDate = Utils.minDate(lastDate, self.customIndicatorDao.getLatestDate(code='000001', columnName='rps120'))
+        lastDate = Utils.minDate(lastDate, self.customIndicatorDao.getLatestDate(code='000001', columnName='rps250'))
         return lastDate
 
     def buildAll(self):
