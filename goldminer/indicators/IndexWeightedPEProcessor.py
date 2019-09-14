@@ -101,6 +101,6 @@ class IndexWeightedPEProcessor(IndexPEPBBaseProcessor):
 
 if __name__ == "__main__":
     peManager = IndexWeightedPEProcessor()
-    peManager.process('000001')
+    peManager.process('000003')
 
 

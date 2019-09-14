@@ -29,7 +29,7 @@ class IndexPEPBBaseProcessor:
         # recalculate from last constituent date, but only when constituent update date is in 5 days,
         # otherwise it should already have been recalculated
         latestDate = self.indexConstituentDao.getLatestDate(code)
-        if latestDate is not None and latestDate < d and (latestDate - datetime.today().date()).days < 5:
+        if latestDate is not None and latestDate < d and (datetime.today().date() - latestDate).days < 5:
             d = latestDate
 
         # stock data starts from 2005-01-04
