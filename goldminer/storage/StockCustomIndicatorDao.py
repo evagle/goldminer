@@ -52,6 +52,17 @@ class StockCustomIndicatorDao(BaseDao):
                 .first()
         return date(2005, 1, 1) if result is None else result[0]
 
+    def getByDateRange(self, code, startDate, endDate):
+        query = self.session.query(StockCustomIndicator) \
+            .filter(StockCustomIndicator.code == code)
+        if startDate is not None:
+            query = query.filter(StockCustomIndicator.trade_date >= startDate)
+        if endDate is not None:
+            query = query.filter(StockCustomIndicator.trade_date <= endDate)
+
+        result = query.all()
+        return result
+
     def getByCode(self, code):
         result = self.session.query(StockCustomIndicator) \
             .filter(StockCustomIndicator.code == code) \
