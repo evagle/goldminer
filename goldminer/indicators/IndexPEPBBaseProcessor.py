@@ -22,10 +22,11 @@ class IndexPEPBBaseProcessor:
     def getStartDate(self, code):
         if self.fieldName is None:
             raise Exception("Field name is not given.")
-        d = self.indexPrimaryIndicatorDao.getLatestDate(code, self.fieldName) + timedelta(days=1)
+        d = self.indexPrimaryIndicatorDao.getLatestDate(code, self.fieldName)
         if d is None:
             d = self.indexDao.getIndexPublishDate(code)
-
+        else:
+            d = d + timedelta(days=1)
         # recalculate from last constituent date, but only when constituent update date is in 5 days,
         # otherwise it should already have been recalculated
         latestDate = self.indexConstituentDao.getLatestDate(code)
