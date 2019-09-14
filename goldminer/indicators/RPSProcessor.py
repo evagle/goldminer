@@ -1,21 +1,31 @@
 # coding: utf-8
+from datetime import date, datetime
+
+from goldminer.common.Utils import Utils
+
+from goldminer.common.logger import get_logger
 from goldminer.indicators.StockManager import StockManager
-from goldminer.storage.StockDailyBarAdjustPrevDao import StockDailyBarAdjustPrevDao
+from goldminer.storage.StockCustomIndicatorDao import StockCustomIndicatorDao
+
+logger = get_logger(__name__)
 
 
 class RPSProcessor:
     def __init__(self):
-        self.stockBarPrevDao = StockDailyBarAdjustPrevDao()
+        self.customIndicatorDao = StockCustomIndicatorDao()
 
     def process(self, trade_date):
-        bars = self.stockBarPrevDao.getByDate(trade_date)
+        logger.info("Start processing rps for date {}".format(trade_date))
+
+        bars = list(self.customIndicatorDao.getAllAtDate(trade_date).values())
         # 过滤掉B股
-        filtered = []
+        left = []
         for bar in bars:
             if not bar.code.startswith("9"):
-                filtered.append(bar)
-        bars = filtered
+                left.append(bar)
+        bars = left
 
+        print("====", len(bars), trade_date)
         total_count = len(bars)
         MIN = -1e6
 
@@ -52,24 +62,31 @@ class RPSProcessor:
             else:
                 bar.rps250 = 100 - (i + 1) * 100 / total_count
 
-        print(len(bars), "updated")
-        self.stockBarPrevDao.bulkSave(bars)
+        logger.info("{} rps bars updated".format(len(bars)))
+        self.customIndicatorDao.bulkSave(bars)
+        logger.info("End processing rps for date {}".format(trade_date))
+
+    def getLastRPSDate(self):
+        lastDate = date(2015, 1, 1)
+        lastDate = Utils.minDate(lastDate, self.customIndicatorDao.getLatestDate(columnName='rps50'))
+        lastDate = Utils.minDate(lastDate, self.customIndicatorDao.getLatestDate(columnName='rps120'))
+        lastDate = Utils.minDate(lastDate, self.customIndicatorDao.getLatestDate(columnName='rps250'))
+        return lastDate
 
     def buildAll(self):
         stockManager = StockManager()
-        trade_dates = stockManager.getTradeDates()
-        for d in trade_dates:
-            print("start", d)
-            self.process(d)
-            print("end", d)
+        date = self.getLastRPSDate()
+        endDate = datetime.today().date()
+        logger.info("Start RPS processor from date {} to {}".format(date, endDate))
+        while date <= endDate:
+            if stockManager.isTradeDate(date):
+                self.process(date)
 
     def buildLastWeek(self):
         stockManager = StockManager()
         trade_dates = stockManager.getTradeDates()
         for d in trade_dates[-50:]:
-            print("start", d)
             self.process(d)
-            print("end", d)
 
 
 if __name__ == "__main__":

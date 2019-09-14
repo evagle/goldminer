@@ -15,5 +15,5 @@ processor = NDayGainsProcessor()
 processor.updateAll()
 
 rps = RPSProcessor()
-rps.buildLastWeek()
+rps.buildAll()
 
