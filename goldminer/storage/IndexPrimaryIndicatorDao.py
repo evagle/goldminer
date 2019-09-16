@@ -1,6 +1,6 @@
 # coding: utf-8
 from datetime import date, timedelta
-from typing import List
+from typing import List, Dict
 
 from sqlalchemy import Column
 
@@ -18,6 +18,21 @@ class IndexPrimaryIndicatorDao(BaseDao):
                             .filter(IndexPrimaryIndicator.code == code) \
                             .order_by(IndexPrimaryIndicator.trade_date.asc())\
                             .all()
+
+    def getByCodeDict(self, code: str) -> Dict[tuple, IndexPrimaryIndicator]:
+        """
+        Get all IndexPrimaryIndicator for code and return in dict format
+        :param code:
+        :return: Dict
+        {
+            tuple(code, trade_date): IndexPrimaryIndicator
+        }
+        """
+        result = self.getByCode(code)
+        dic = {}
+        for model in result:
+            dic[(model.code, model.trade_date)] = model
+        return dic
 
     def getLatestDate(self, code: str, columnName):
         result = self.session.query(IndexPrimaryIndicator.trade_date)\
