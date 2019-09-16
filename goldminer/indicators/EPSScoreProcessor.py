@@ -215,7 +215,7 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
         date = startDate
         while date <= endDate:
             if stockManager.isTradeDate(date):
-                processor.processByDate(date)
+                self.processByDate(date)
             date += timedelta(days=1)
         logger.info("End range {} to {}".format(startDate, endDate))
 
