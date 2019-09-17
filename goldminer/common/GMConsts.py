@@ -1,5 +1,5 @@
 # coding: utf-8
-
+from datetime import date
 
 ADJUST_NONE = 0  # 不复权
 ADJUST_PREV = 1  # 前复权
@@ -16,3 +16,4 @@ CN_INDEX = "cnindex"
 
 MIN_GAIN = -1e6
 
+TRADE_INIT_DATE = date(2005, 1, 1)
