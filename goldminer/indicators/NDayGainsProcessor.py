@@ -1,6 +1,6 @@
 # coding: utf-8
 import math
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from goldminer.common.logger import get_logger
 from goldminer.indicators.BaseIndicatorProcessor import BaseIndicatorProcessor
@@ -19,7 +19,7 @@ class NDayGainsProcessor(BaseIndicatorProcessor):
         self.customIndicatorDao = StockCustomIndicatorDao()
 
     def process(self, code, **kwargs):
-        latestDate = self.customIndicatorDao.getLatestDate(code, columnName='gain50')
+        latestDate = self.customIndicatorDao.getLatestDate(code, columnName='gain50') + timedelta(days=1)
         startDate = latestDate
         endDate = datetime.today().date()
         if startDate == endDate:
@@ -65,8 +65,9 @@ class NDayGainsProcessor(BaseIndicatorProcessor):
                     setattr(model, attr, gain)
                     customIndicatorsChanged[(code, model.trade_date)] = model
 
-        logger.info("End NDayGains code {} has {} updates".format(code, len(customIndicatorsChanged)))
+        logger.info("{} bars updates".format(len(customIndicatorsChanged)))
         self.customIndicatorDao.bulkSave(customIndicatorsChanged.values())
+        logger.info("End NDayGains code {}  ".format(code))
 
     def updateAll(self):
         stocks = self.stockDao.getStockList()
