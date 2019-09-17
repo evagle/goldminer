@@ -10,7 +10,8 @@ from goldminer.storage.StockFundamentalsDao import StockFundamentalsDao
 
 
 class StockManager:
-    __tradeDatesCache = []
+    __tradeDatesCache = None
+    __tradeDatesDict = None
 
     def __init__(self):
         self.fundamentalsDao = StockFundamentalsDao()
@@ -28,11 +29,17 @@ class StockManager:
             return TradingDerivativeIndicator.TOTMKTCAP
 
     def __loadTradeDates(self):
+        if StockManager.__tradeDatesCache is not None:
+            return
+        StockManager.__tradeDatesCache = []
+        StockManager.__tradeDatesDict = {}
+
         session = self.fundamentalsDao.getSession()
         dates = session.query(IndexDailyBar.trade_date) \
             .filter(IndexDailyBar.code == '000001')
         for d in dates:
             StockManager.__tradeDatesCache.append(d[0])
+            StockManager.__tradeDatesDict[d[0]] = True
         StockManager.__tradeDatesCache.sort()
 
     def getTradeDates(self):
@@ -41,10 +48,10 @@ class StockManager:
     def getLastTradeDate(self):
         return StockManager.__tradeDatesCache[-1:]
 
-    def isTradeDate(self, d: date):
+    def isTradeDate(self, d):
         if type(d) is datetime:
             d = d.date()
-        return d in StockManager.__tradeDatesCache
+        return d in StockManager.__tradeDatesDict
 
     def getPreviousTradeDate(self, d):
         pos = StockManager.__tradeDatesCache.index(d)
