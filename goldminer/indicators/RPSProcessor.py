@@ -1,6 +1,7 @@
 # coding: utf-8
-from datetime import date, datetime
+from datetime import datetime, timedelta
 
+from goldminer.common import GMConsts
 from goldminer.common.Utils import Utils
 from goldminer.common.logger import get_logger
 from goldminer.indicators.StockManager import StockManager
@@ -65,10 +66,8 @@ class RPSProcessor:
         logger.info("End processing rps for date {}".format(trade_date))
 
     def getLastRPSDate(self):
-        lastDate = date(2015, 1, 1)
+        lastDate = GMConsts.TRADE_INIT_DATE
         lastDate = Utils.minDate(lastDate, self.customIndicatorDao.getLatestDate(code='000001', columnName='rps50'))
-        lastDate = Utils.minDate(lastDate, self.customIndicatorDao.getLatestDate(code='000001', columnName='rps120'))
-        lastDate = Utils.minDate(lastDate, self.customIndicatorDao.getLatestDate(code='000001', columnName='rps250'))
         return lastDate
 
     def buildAll(self):
@@ -79,6 +78,7 @@ class RPSProcessor:
         while date <= endDate:
             if stockManager.isTradeDate(date):
                 self.process(date)
+            date = date + timedelta(days=1)
 
     def buildLastWeek(self):
         stockManager = StockManager()
