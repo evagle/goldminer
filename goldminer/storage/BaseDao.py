@@ -6,6 +6,8 @@ from goldminer.storage.DBHelper import DBHelper
 class BaseDao:
     def __init__(self):
         self.session = DBHelper.getSession()
+        self.engine = DBHelper.getEngine()
+        self.pymysqlConn = DBHelper.getPymysqlConn()
         self.__cache = {}
 
     def add(self, instance):
