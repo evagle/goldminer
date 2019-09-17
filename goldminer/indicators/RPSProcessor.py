@@ -30,8 +30,11 @@ class RPSProcessor:
 
         has_rps = True
         for bar in bars:
-            if bar.rps50 is None or bar.gain50 is None or bar.rps120 is None or bar.rps250 is None:
+            if bar.rps50 is None or bar.rps120 is None or bar.rps250 is None:
                 has_rps = False
+            if bar.gain50 is None or bar.gain120 is None or bar.gain120 is None:
+                logger.info('gain50,gain120,gain250 are not ready')
+                return None
 
         if has_rps:
             logger.info("RPS had already been calculated for trade_date {}".format(trade_date))
