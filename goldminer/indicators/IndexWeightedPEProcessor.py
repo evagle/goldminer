@@ -1,46 +1,36 @@
 # coding: utf-8
 import math
-from datetime import datetime, timedelta
 from decimal import Decimal
 
 from goldminer.common import GMConsts
 from goldminer.common.Utils import Utils
 from goldminer.common.logger import get_logger
-from goldminer.indicators.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
-from goldminer.models.models import IndexPrimaryIndicator, TradingDerivativeIndicator
+from goldminer.indicators.IndexPEPBProcessor import IndexPEPBProcessor
 from goldminer.storage.TradingDerivativeIndicatorDao import TradingDerivativeIndicatorDao
 
 logger = get_logger(__name__)
 
 
-class IndexWeightedPEProcessor(IndexPEPBBaseProcessor):
+class IndexWeightedPEProcessor(IndexPEPBProcessor):
 
     def __init__(self):
         super(IndexWeightedPEProcessor, self).__init__()
         self.fieldName = "weighted_pe"
         self.tradingDerivativeDao = TradingDerivativeIndicatorDao()
 
-    def calcIndicatorByDate(self, indexCode, d):
-        logger.info("IndexWeightedPE started code={}, date={}".format(indexCode, d))
-        model = self.indexPrimaryIndicatorDao.getByDate(indexCode, d)
-        if model is None:
-            model = IndexPrimaryIndicator()
-            model.code = indexCode
-            model.trade_date = d
-
-        constituents = self.indexConstituentManager.getConstituents(indexCode, d)
-        if constituents is None:
-            logger.warn("No constituent found for code {} date {}".format(indexCode, d))
-            return None
+    def calculatePEPBIndicator(self,  pepbList, **params):
+        indexCode = params['indexCode']
+        d = params['date']
+        constituents = params['constituents']
+        pepbDict = params['pepbDict']
+        totalMarketValueDict = params['totalMarketValueDict']
 
         profitSum = 0
         totalMarketValueSum = 0
-        peDict = self.tradingDerivativeDao.getColumnValuesByDate(d, TradingDerivativeIndicator.PETTM)
-        totalMarketValueDict = self.tradingDerivativeDao.getColumnValuesByDate(d, TradingDerivativeIndicator.TOTMKTCAP)
 
         for stock in constituents:
 
-            if stock not in peDict:
+            if stock not in pepbDict:
                 logger.warn("No pe found for stock {}, date {}".format(stock, d))
                 continue
 
@@ -48,7 +38,7 @@ class IndexWeightedPEProcessor(IndexPEPBBaseProcessor):
                 logger.warn("No total market value found for stock {}, date {}".format(stock, d))
                 continue
 
-            pe = peDict[stock]
+            pe = pepbDict[stock]
             value = totalMarketValueDict[stock]
 
             if value < 1 or math.fabs(pe) < 1e-6:
@@ -73,34 +63,11 @@ class IndexWeightedPEProcessor(IndexPEPBBaseProcessor):
             pe = Utils.formatFloat(totalMarketValueSum / profitSum, 6)
             pe = max(pe, GMConsts.ABNORMAL_MIN_PE)
 
-        model.weighted_pe = pe
-        logger.info("New weighted pe code {}, date {}, pe {}".format(indexCode, d, pe))
-        return model
-
-    def process(self, indexCode):
-        d = self.getStartDate(indexCode)
-        if d is None:
-            logger.error("Invalid start date, skipping, code = {}".format(indexCode))
-            return
-
-        now = datetime.now().date()
-        models = []
-        logger.info("Start calcWeightedPE for {} from {} to {} ".format(indexCode, d, now))
-        while d <= now:
-            if self.stockManager.isTradeDate(d):
-                model = self.calcIndicatorByDate(indexCode, d)
-                if model is not None:
-                    models.append(model)
-            d = d + timedelta(days=1)
-
-        logger.info("[%s] Save %d weighted pe" % (indexCode, len(models)))
-        self.indexPrimaryIndicatorDao.bulkSave(models)
-
-        return models
+        return pe
 
 
 if __name__ == "__main__":
     peManager = IndexWeightedPEProcessor()
-    peManager.process('000003')
+    peManager.process('000009')
 
 

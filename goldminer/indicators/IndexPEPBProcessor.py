@@ -2,12 +2,10 @@
 from abc import abstractmethod
 from datetime import datetime, timedelta
 
-from goldminer.common.Utils import Utils
 from goldminer.common.logger import get_logger
 from goldminer.indicators.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
 from goldminer.models.models import IndexPrimaryIndicator, TradingDerivativeIndicator
 from goldminer.storage.TradingDerivativeIndicatorDao import TradingDerivativeIndicatorDao
-
 
 logger = get_logger(__name__)
 
@@ -28,7 +26,7 @@ class IndexPEPBProcessor(IndexPEPBBaseProcessor):
         return model
 
     @abstractmethod
-    def calculatePEPBIndicator(self, pepbList):
+    def calculatePEPBIndicator(self, pepbList, **params):
         pass
 
     def calcIndicatorByDate(self, indexCode, d, primaryIndicatorDict):
@@ -46,6 +44,10 @@ class IndexPEPBProcessor(IndexPEPBBaseProcessor):
             column = TradingDerivativeIndicator.PETTM
 
         pepbDict = self.tradingDerivativeDao.getColumnValuesByDate(d, column)
+        totalMarketValueDict = None
+        if self.fieldName in ["weighted_pe", "weighted_pb"]:
+            totalMarketValueDict = self.tradingDerivativeDao.getColumnValuesByDate(d,
+                                                                                   TradingDerivativeIndicator.TOTMKTCAP)
 
         filteredPEPB = []
         for stock in constituents:
@@ -53,13 +55,17 @@ class IndexPEPBProcessor(IndexPEPBBaseProcessor):
                 filteredPEPB.append(pepbDict[stock])
 
         if len(filteredPEPB) == 0:
-            logger.warn("[{}] code {} date {} has no PB/PETTM found, constituents={}".format(self.fieldName, indexCode, d, constituents))
+            logger.warn(
+                "[{}] code {} date {} has no PB/PETTM found, constituents={}".format(self.fieldName, indexCode, d,
+                                                                                     constituents))
             return None
 
-        indicatorVal = self.calculatePEPBIndicator(filteredPEPB)
+        indicatorVal = self.calculatePEPBIndicator(filteredPEPB, indexCode=indexCode, date=d, constituents=constituents,
+                                                   pepbDict=pepbDict, totalMarketValueDict=totalMarketValueDict)
         if indicatorVal is not None:
             setattr(model, self.fieldName, indicatorVal)
-            logger.info("[{}] new indicator value code={}, date={}, value={}".format(self.fieldName, indexCode, d, indicatorVal))
+            logger.info("[{}] new indicator value code={}, date={}, value={}".format(self.fieldName, indexCode, d,
+                                                                                     indicatorVal))
             return model
         else:
             return None
@@ -86,5 +92,3 @@ class IndexPEPBProcessor(IndexPEPBBaseProcessor):
         logger.info("[{}]  End {}".format(self.fieldName, indexCode))
 
         return models
-
-
