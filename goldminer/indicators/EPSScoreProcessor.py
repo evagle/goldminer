@@ -67,7 +67,7 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
                 current.NPCUTGrowth = None
                 for j in range(i + 1, n):
                     if self.isDiffOneYear(current.end_date, models[j].end_date):
-                        current.NPCUTGrowth = current.NPCUT / models[j].NPCUT - 1
+                        current.NPCUTGrowth = (current.NPCUT - models[j].NPCUT) / math.fabs(models[j].NPCUT)
                         if abs(current.NPCUTGrowth) > 10:
                             logger.warn("Imposible growth {}".format(current.NPCUTGrowth))
                             current.NPCUTGrowth = 10 if current.NPCUTGrowth > 0 else -10
