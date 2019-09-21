@@ -221,7 +221,7 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
         logger.info("End range {} to {}".format(startDate, endDate))
 
     def processAll(self):
-        lastDate = self.stockCustomIndicatorDao.getLatestDate(columnName='eps_score')
+        lastDate = self.stockCustomIndicatorDao.getLatestDate(code='000001', columnName='eps_score')
         startDate = lastDate + timedelta(days=1)
         endDate = datetime.today().date()
         self.processByDateRange(startDate, endDate)

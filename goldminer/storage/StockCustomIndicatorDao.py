@@ -41,6 +41,9 @@ class StockCustomIndicatorDao(BaseDao):
         :param columnName: column should not be none
         :return:
         """
+        if code is None:
+            raise Exception("code could not be None")
+
         if columnName is None:
             raise Exception("columnName could not be None")
 
