@@ -1,6 +1,7 @@
 # coding: utf-8
 import math
 from datetime import date, datetime, timedelta
+from decimal import Decimal
 
 from goldminer.common.logger import get_logger
 from goldminer.indicators.BaseIndicatorProcessor import BaseIndicatorProcessor
@@ -67,7 +68,7 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
                 current.NPCUTGrowth = None
                 for j in range(i + 1, n):
                     if self.isDiffOneYear(current.end_date, models[j].end_date):
-                        current.NPCUTGrowth = (current.NPCUT - models[j].NPCUT) / math.fabs(models[j].NPCUT)
+                        current.NPCUTGrowth = float((current.NPCUT - models[j].NPCUT) / Decimal(math.fabs(models[j].NPCUT)))
                         if abs(current.NPCUTGrowth) > 10:
                             logger.warn("Imposible growth {}".format(current.NPCUTGrowth))
                             current.NPCUTGrowth = 10 if current.NPCUTGrowth > 0 else -10
