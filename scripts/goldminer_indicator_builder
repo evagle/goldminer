@@ -4,6 +4,7 @@ from goldminer.indicators.EPSScoreProcessor import EPSScoreProcessor
 from goldminer.indicators.IndexPEPBGenerator import IndexPEPBGenerator
 from goldminer.indicators.NDayGainsProcessor import NDayGainsProcessor
 from goldminer.indicators.RPSProcessor import RPSProcessor
+from goldminer.investigation.buy_signals.pivot_point.PivotPoint import PivotPoint
 
 eps = EPSScoreProcessor()
 eps.processAll()
@@ -17,3 +18,5 @@ processor.updateAll()
 rps = RPSProcessor()
 rps.buildAll()
 
+processor = PivotPoint()
+processor.processAll()
