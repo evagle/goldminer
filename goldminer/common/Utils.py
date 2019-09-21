@@ -122,19 +122,23 @@ class Utils:
         return bars
 
     @staticmethod
-    def sma(bars, periods):
+    def sma(bars, periods, field='close'):
         if len(bars) == 0 or len(periods) == 0:
             return None
 
-        closes = np.array([bar.close for bar in bars])
-        if np.isnan(np.mean(closes)):
+        values = np.array([float(getattr(bar, field)) for bar in bars])
+        if np.isnan(np.mean(values)):
             return None
 
         for n in periods:
-            attr = 'sma' + str(n)
-            sman = talib.SMA(closes, n)
-            for i in range(len(closes)):
-                setattr(bars[i], attr, sman[i])
+            if field == 'close':
+                attr = 'sma' + str(n)
+            else:
+                attr = 'sma_{}{}'.format(field, str(n))
+            sma_n = talib.SMA(values, n)
+
+            for i in range(len(values)):
+                setattr(bars[i], attr, sma_n[i])
 
         return bars
 
