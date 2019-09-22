@@ -40,9 +40,6 @@ class IndexPEPBGradeProcessor(IndexPEPBBaseProcessor):
         queue = []
         date_queue = []
         for current in indicators:
-            if getattr(current, self.fieldName) is not None:
-                continue
-
             val = getattr(current, self.sourceFieldName)
             if val is not None:
                 queue.append(val)
@@ -51,6 +48,8 @@ class IndexPEPBGradeProcessor(IndexPEPBBaseProcessor):
                     queue.pop(0)
                     date_queue.pop(0)
 
+            if getattr(current, self.fieldName) is not None:
+                continue
             pes = queue.copy()
 
             if len(pes) == 0:
@@ -77,7 +76,7 @@ class IndexPEPBGradeProcessor(IndexPEPBBaseProcessor):
 if __name__ == "__main__":
     manager = IndexPEPBGradeProcessor()
     manager.runWeightedPBGrade()
-    manager.process('399001')
+    manager.process('399319')
 
 
 
