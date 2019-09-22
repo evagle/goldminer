@@ -14,7 +14,7 @@ class IndexMedianPEProcessor(IndexPEPBProcessor):
         self.fieldName = "median_pe"
         self.tradingDerivativeDao = TradingDerivativeIndicatorDao()
 
-    def calculatePEPBIndicator(self, pepbList):
+    def calculatePEPBIndicator(self, pepbList, **params):
         pes = [p for p in pepbList if p > 0]
         pes.sort()
         if len(pes) == 0:

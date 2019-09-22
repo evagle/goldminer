@@ -14,7 +14,7 @@ class IndexEqualWeightPBProcessor(IndexPEPBProcessor):
         self.fieldName = "equal_weight_pb"
         self.tradingDerivativeDao = TradingDerivativeIndicatorDao()
 
-    def calculatePEPBIndicator(self, pepbList):
+    def calculatePEPBIndicator(self, pepbList, **params):
         # TODO 需要研究一下用filter之前的count还是之后的
         c = len(pepbList)
         pepbList = Utils.iqrFilter(pepbList)

@@ -44,6 +44,7 @@ class IndexPEPBProcessor(IndexPEPBBaseProcessor):
             column = TradingDerivativeIndicator.PETTM
 
         pepbDict = self.tradingDerivativeDao.getColumnValuesByDate(d, column)
+
         totalMarketValueDict = None
         if self.fieldName in ["weighted_pe", "weighted_pb"]:
             totalMarketValueDict = self.tradingDerivativeDao.getColumnValuesByDate(d,
