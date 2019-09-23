@@ -34,6 +34,7 @@ class IndexesDao(BaseDao):
             return result[0]
         return None
 
+
 if __name__ == "__main__":
     dao = IndexesDao()
     print(dao.getIndexList())
