@@ -49,7 +49,7 @@ class IndexSpider(TushareBase):
         :return:
         """
         today = datetime.today().date()
-        date = today - timedelta(days=7)
+        date = today - timedelta(days=15)
         barSpider = IndexBarSpider()
         bars = barSpider.downloadBarsByDateRange(code, startDate=date, endDate=today, save=False)
         return len(bars) == 0
