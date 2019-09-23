@@ -24,7 +24,7 @@ class IndexPEPBGenerator:
         self.heightProcessor = IndexPEPBHeightProcessor()
         self.gradeProcessor = IndexPEPBGradeProcessor()
 
-    def execOneIndex(self,code):
+    def execOneIndex(self, code):
         self.equalWeightPEProcessor.process(code)
         self.weightedPEProcessor.process(code)
         self.medianPEProcessor.process(code)
@@ -32,29 +32,9 @@ class IndexPEPBGenerator:
         self.weightedPBProcessor.process(code)
         self.medianPBProcessor.process(code)
 
-        self.heightProcessor.runEqualWeightPEHeight()
-        self.heightProcessor.process(code)
+        self.heightProcessor.buildAllHeightIndicators(code)
 
-        self.heightProcessor.runEqualWeightPBHeight()
-        self.heightProcessor.process(code)
-
-        self.heightProcessor.runWeightedPEHeight()
-        self.heightProcessor.process(code)
-
-        self.heightProcessor.runWeightedPBHeight()
-        self.heightProcessor.process(code)
-
-        self.gradeProcessor.runEqualWeightPEGrade()
-        self.gradeProcessor.process(code)
-
-        self.gradeProcessor.runEqualWeightPBGrade()
-        self.gradeProcessor.process(code)
-
-        self.gradeProcessor.runWeightedPEGrade()
-        self.gradeProcessor.process(code)
-
-        self.gradeProcessor.runWeightedPBGrade()
-        self.gradeProcessor.process(code)
+        self.gradeProcessor.buildAllGradeIndicators(code)
 
     def updateAll(self):
         indexes = self.indexDao.getIndexList()

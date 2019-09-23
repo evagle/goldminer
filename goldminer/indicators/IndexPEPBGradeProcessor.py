@@ -30,8 +30,27 @@ class IndexPEPBGradeProcessor(IndexPEPBBaseProcessor):
         self.fieldName = "w_pb_grade_ten_year"
         self.sourceFieldName = "weighted_pb"
 
-    def process(self, indexCode):
+    def buildAllGradeIndicators(self, indexCode):
         indicators = self.indexPrimaryIndicatorDao.getByCode(indexCode)
+
+        self.runEqualWeightPEGrade()
+        self.process(indexCode, indicators)
+
+        self.runEqualWeightPBGrade()
+        self.process(indexCode, indicators)
+
+        self.runWeightedPEGrade()
+        self.process(indexCode, indicators)
+
+        self.runWeightedPBGrade()
+        self.process(indexCode, indicators)
+
+    def process(self, indexCode, indexPrimaryIndicators=None):
+        if not indexPrimaryIndicators:
+            indicators = self.indexPrimaryIndicatorDao.getByCode(indexCode)
+        else:
+            indicators = indexPrimaryIndicators
+
         if len(indicators) == 0:
             print("[%s] PEPBGradeProcessor  no data found." % indexCode)
             return

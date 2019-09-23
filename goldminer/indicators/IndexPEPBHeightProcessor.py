@@ -35,10 +35,29 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
         self.baseFieldName = "weighted_pb"
         self.fieldName = self.baseFieldName
 
-    def process(self, indexCode):
+    def buildAllHeightIndicators(self, indexCode):
+        indicators = self.indexPrimaryIndicatorDao.getByCode(indexCode)
+
+        self.runEqualWeightPEHeight()
+        self.process(indexCode, indicators)
+
+        self.runEqualWeightPBHeight()
+        self.process(indexCode, indicators)
+
+        self.runWeightedPEHeight()
+        self.process(indexCode, indicators)
+
+        self.runWeightedPBHeight()
+        self.process(indexCode, indicators)
+
+    def process(self, indexCode, indexPrimaryIndicators=None):
         logger.info("[{}] Start processing {} ".format(indexCode, self.heightFieldName))
 
-        indicators = self.indexPrimaryIndicatorDao.getByCode(indexCode)
+        if not indexPrimaryIndicators:
+            indicators = self.indexPrimaryIndicatorDao.getByCode(indexCode)
+        else:
+            indicators = indexPrimaryIndicators
+
         if len(indicators) == 0:
             logger.error("[{}] No primary indicators found.".format(indexCode))
             return
