@@ -59,6 +59,9 @@ class IndexPEPBGenerator:
     def updateAll(self):
         indexes = self.indexDao.getIndexList()
         for code in indexes:
+            # 跳过申万指数，没有数据
+            if code.startswith("8"):
+                continue
             self.execOneIndex(code)
 
     def updateImportant(self):
