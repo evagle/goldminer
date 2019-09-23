@@ -2,11 +2,14 @@
 import time
 from datetime import timedelta, datetime, date
 
+from goldminer.common.logger import get_logger
 from goldminer.indicators.StockManager import StockManager
 from goldminer.models.models import IndexDailyBar
 from goldminer.spider.v3.GMBaseSpiderV3 import GMBaseSpiderV3
 from goldminer.storage.IndexDailyBarDao import IndexDailyBarDao
 from goldminer.storage.IndexesDao import IndexesDao
+
+logger = get_logger(__name__)
 
 
 class IndexBarSpider(GMBaseSpiderV3):
@@ -32,17 +35,17 @@ class IndexBarSpider(GMBaseSpiderV3):
 
     def downloadBarsByDateRange(self, code, startDate: date, endDate: date, save=True):
 
-        if startDate >= datetime.now().date():
-            print("[%s] is up to date" % code)
+        if startDate > datetime.now().date():
+            logger.info("[%s] is up to date" % code)
             return None
 
         symbol = self.getIndexSymbol(code) + "." + code
-        print("[Download Index Bars] start=", startDate, "end=", endDate, "code=", symbol)
+        logger.info("[Download Index Bars] start=", startDate, "end=", endDate, "code=", symbol)
         bars = self.getHistory(symbol, "1d", startDate, endDate)
         bars = [self.rawDataToModel(code, bar) for bar in bars]
         if save:
             self.indexBarDao.addAll(bars)
-        print("[Download Index Bars] count=", len(bars), "\n")
+            logger.info("[Download Index Bars] count=", len(bars), "\n")
         return bars
 
     def downloadAllIndexBars(self):
