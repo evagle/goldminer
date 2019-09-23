@@ -3,12 +3,14 @@ import time
 from datetime import timedelta, datetime
 
 from goldminer.common import GMConsts
+from goldminer.common.logger import get_logger
 from goldminer.indicators.NDayGainsProcessor import NDayGainsProcessor
 from goldminer.models.models import StockDailyBarAdjustPrev
 from goldminer.spider.v3.GMBaseSpiderV3 import GMBaseSpiderV3
 from goldminer.storage.StockDailyBarAdjustPrevDao import StockDailyBarAdjustPrevDao
 from goldminer.storage.StockDao import StockDao
 
+logger = get_logger(__name__)
 
 class StockDailyBarAdjustPrevSpider(GMBaseSpiderV3):
 
@@ -32,12 +34,12 @@ class StockDailyBarAdjustPrevSpider(GMBaseSpiderV3):
         startDate = self.stockBarDao.getLatestDate(code) + timedelta(days=1)
         endDate = datetime.now() + timedelta(days=1)
 
-        if startDate >= datetime.now().date():
-            print("[%s] is up to date" % code)
+        if startDate > datetime.now().date():
+            logger.info("[%s] is up to date" % code)
             return
 
         symbol = self.codeToStockSymbol(code)
-        print("[Download Stock Bars][%s] From %s to %s" % (symbol, startDate, endDate))
+        logger.info("[Download Stock Bars][%s] From %s to %s" % (symbol, startDate, endDate))
         bars = self.getHistory(symbol, "1d", startDate, endDate, adjust=GMConsts.ADJUST_PREV)
         instruments = self.getHistoryInstruments(symbol, None, startDate, endDate)
 
@@ -56,7 +58,7 @@ class StockDailyBarAdjustPrevSpider(GMBaseSpiderV3):
                     bar.lower_limit = instrument['lower_limit']
 
         self.stockBarDao.addAll(bars)
-        print("[Download Stock Bars][%s] count = %d\n" %(symbol, len(bars)))
+        logger.info("[Download Stock Bars][%s] count = %d\n" %(symbol, len(bars)))
         return bars
 
     def downloadAll(self):

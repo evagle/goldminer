@@ -2,10 +2,13 @@
 import time
 from datetime import timedelta, datetime
 
+from goldminer.common.logger import get_logger
 from goldminer.models.models import StockDailyBarAdjustNone
 from goldminer.spider.v3.GMBaseSpiderV3 import GMBaseSpiderV3
 from goldminer.storage.StockDailyBarAdjustNoneDao import StockDailyBarAdjustNoneDao
 from goldminer.storage.StockDao import StockDao
+
+logger = get_logger(__name__)
 
 
 class StockDailyBarAdjustNoneSpider(GMBaseSpiderV3):
@@ -31,12 +34,12 @@ class StockDailyBarAdjustNoneSpider(GMBaseSpiderV3):
         return self.downloadBarsByDateRange(code, startDate, endDate)
 
     def downloadBarsByDateRange(self, code, startDate, endDate):
-        if startDate >= datetime.now().date():
-            print("[%s] is up to date" % code)
+        if startDate > datetime.now().date():
+            logger.info("[%s] is up to date" % code)
             return []
 
         symbol = self.codeToStockSymbol(code)
-        print("[Download Stock Bars][%s] From %s to %s" % (symbol, startDate, endDate))
+        logger.info("[Download Stock Bars][%s] From %s to %s" % (symbol, startDate, endDate))
         bars = self.getHistory(symbol, "1d", startDate, endDate)
         instruments = self.getHistoryInstruments(symbol, None, startDate, endDate)
 
@@ -55,7 +58,7 @@ class StockDailyBarAdjustNoneSpider(GMBaseSpiderV3):
                     bar.lower_limit = instrument['lower_limit']
 
         # self.stockBarDao.addAll(bars)
-        print("[Download Stock Bars][%s] count = %d\n" %(symbol, len(bars)))
+        logger.info("[Download Stock Bars][%s] count = %d\n" %(symbol, len(bars)))
         return bars
 
     def downloadAll(self):
