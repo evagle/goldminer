@@ -21,6 +21,8 @@ class IndexSpider(TushareBase):
         self.exchangeMap = {"SSE": 1, "SZSE": 2}
         self.markets = {'MSCI':'MSCI指数', 'CSI':'中证指数', 'SSE':'上交所指数','SZSE':'深交所指数','CICC':'中金所指数','SW':'申万指数'}
 
+    def isIndexNoDataSource(self, code):
+        return code in ['000837', '000849', '000850', '000851', '000856', '000857', '000858', '000863', '000865', '000867', '000869']
 
     def _diff(self, indexA, indexB):
         fields = ["code", 'publisher', 'index_type', 'category', 'base_date', 'base_point', 'pub_date', 'weight_rule', 'description', 'end_date']
@@ -70,8 +72,8 @@ class IndexSpider(TushareBase):
             logger.info("[IndexSpider] Get {} stocks from tushare market={}.".format(data.shape[0], market))
             for _, row in data.iterrows():
                 code = row['ts_code'][:6]
-                # 只保留0，3，8开头的指数，8是申万指数
-                if code[:1] not in ['0','3', '8']:
+                # 只保留0，3开头的指数，申万指数没数据，不存储
+                if code[:1] not in ['0', '3']:
                     continue
 
                 if row['list_date'] is None:
@@ -96,6 +98,11 @@ class IndexSpider(TushareBase):
                     isExpired = self.isExpired(code)
                     if isExpired:
                         index.end_date = datetime.strptime(row['exp_date'], '%Y%m%d').date()
+
+                # 对于没有数据源的index标记为已过期
+                if self.isIndexNoDataSource(code):
+                    index.end_date = "1900-01-01"
+
                 if pd.isna(row['base_point']):
                     index.base_point = 0
                 else:
