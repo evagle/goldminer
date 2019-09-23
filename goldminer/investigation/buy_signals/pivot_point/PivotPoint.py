@@ -155,9 +155,14 @@ class PivotPoint(BuyPointBase):
         if len(signals) == 0:
             return
 
-        sql_values = ["(\"{}\",\"{}\",1)".format(code, date.strftime("%Y-%m-%d")) for code, date in signals]
-        sql = 'replace into StockCustomIndicator (`code`,`trade_date`,`pivot_point`) values {};'.format(",".join(sql_values))
-        self.customIndicatorDao.engine.execute(sql)
+        models = []
+        for code, trade_date in signals:
+            model = self.customIndicatorDao.getByDate(code, trade_date)
+            if model:
+                model.pivot_point = 1
+                models.append(model)
+        self.customIndicatorDao.bulkSave(models)
+
         logger.info("code {} save {} pivot points".format(signals[0][0], len(signals)))
 
     def clearAll(self):
