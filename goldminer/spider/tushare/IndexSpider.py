@@ -72,8 +72,8 @@ class IndexSpider(TushareBase):
             logger.info("[IndexSpider] Get {} stocks from tushare market={}.".format(data.shape[0], market))
             for _, row in data.iterrows():
                 code = row['ts_code'][:6]
-                # 只保留0，3开头的指数，申万指数没数据，不存储
-                if code[:1] not in ['0', '3']:
+                # 只保留0，3开头的指数
+                if code[:1] not in ['0', '3', '8']:
                     continue
 
                 if row['list_date'] is None:
