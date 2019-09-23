@@ -8,12 +8,14 @@ from goldminer.indicators.IndexPEPBGradeProcessor import IndexPEPBGradeProcessor
 from goldminer.indicators.IndexPEPBHeightProcessor import IndexPEPBHeightProcessor
 from goldminer.indicators.IndexWeightedPBProcessor import IndexWeightedPBProcessor
 from goldminer.indicators.IndexWeightedPEProcessor import IndexWeightedPEProcessor
+from goldminer.storage.IndexPrimaryIndicatorDao import IndexPrimaryIndicatorDao
 from goldminer.storage.IndexesDao import IndexesDao
 
 
 class IndexPEPBGenerator:
     def __init__(self):
         self.indexDao = IndexesDao()
+        self.indexPrimaryIndicatorDao = IndexPrimaryIndicatorDao()
 
         self.equalWeightPEProcessor = IndexEqualWeightPEProcessor()
         self.weightedPEProcessor = IndexWeightedPEProcessor()
@@ -25,12 +27,14 @@ class IndexPEPBGenerator:
         self.gradeProcessor = IndexPEPBGradeProcessor()
 
     def execOneIndex(self, code):
-        self.equalWeightPEProcessor.process(code)
-        self.weightedPEProcessor.process(code)
-        self.medianPEProcessor.process(code)
-        self.equalWeightPBProcessor.process(code)
-        self.weightedPBProcessor.process(code)
-        self.medianPBProcessor.process(code)
+        indexPrimaryIndicatorDict = self.indexPrimaryIndicatorDao.getByCodeDict(code)
+
+        self.equalWeightPEProcessor.process(code, indexPrimaryIndicatorDict)
+        self.weightedPEProcessor.process(code, indexPrimaryIndicatorDict)
+        self.medianPEProcessor.process(code, indexPrimaryIndicatorDict)
+        self.equalWeightPBProcessor.process(code, indexPrimaryIndicatorDict)
+        self.weightedPBProcessor.process(code, indexPrimaryIndicatorDict)
+        self.medianPBProcessor.process(code, indexPrimaryIndicatorDict)
 
         self.heightProcessor.buildAllHeightIndicators(code)
 

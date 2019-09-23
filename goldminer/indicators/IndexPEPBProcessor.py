@@ -71,7 +71,7 @@ class IndexPEPBProcessor(IndexPEPBBaseProcessor):
         else:
             return None
 
-    def process(self, indexCode):
+    def process(self, indexCode, indexPrimaryIndicatorDict=None):
         d = self.getStartDate(indexCode)
         if d is None:
             logger.error("[{}] Invalid start date, code = {}".format(self.fieldName, indexCode))
@@ -80,16 +80,22 @@ class IndexPEPBProcessor(IndexPEPBBaseProcessor):
         now = datetime.now().date()
         models = []
         logger.info("[{}] Start {} from {} to {} ".format(self.fieldName, indexCode, d, now))
-        primaryIndicatorDict = self.indexPrimaryIndicatorDao.getByCodeDict(indexCode)
+        if indexPrimaryIndicatorDict is None:
+            indexPrimaryIndicatorDict = self.indexPrimaryIndicatorDao.getByCodeDict(indexCode)
+
         while d <= now:
             if self.stockManager.isTradeDate(d):
-                model = self.calcIndicatorByDate(indexCode, d, primaryIndicatorDict)
+                model = self.calcIndicatorByDate(indexCode, d, indexPrimaryIndicatorDict)
                 if model:
                     models.append(model)
             d = d + timedelta(days=1)
 
-        logger.info("[{}] {} values updated".format(self.fieldName, len(models)))
+        if len(models) == 0:
+            logger.info("[{}] is up to date.".format(self.fieldName))
+            return
+
+        logger.info("[{}] {} values to save".format(self.fieldName, len(models)))
         self.indexPrimaryIndicatorDao.bulkSave(models)
-        logger.info("[{}]  End {}".format(self.fieldName, indexCode))
+        logger.info("[{}] End {}".format(self.fieldName, indexCode))
 
         return models
