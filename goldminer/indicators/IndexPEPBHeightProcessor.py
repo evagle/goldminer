@@ -2,6 +2,7 @@
 from collections import deque
 from datetime import timedelta, datetime
 from decimal import Decimal
+from profile import Profile
 
 from goldminer.common.logger import get_logger
 from goldminer.indicators.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
@@ -40,16 +41,29 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
         indicators = self.indexPrimaryIndicatorDao.getByCode(indexCode)
 
         self.runEqualWeightPEHeight()
-        self.process(indexCode, indicators)
+        profile = Profile()
+        profile.runcall(self.process, indexCode, indicators)
+        profile.print_stats()
+        # self.process(indexCode, indicators)
 
         self.runEqualWeightPBHeight()
-        self.process(indexCode, indicators)
+        # self.process(indexCode, indicators)
+        profile = Profile()
+        profile.runcall(self.process, indexCode, indicators)
+        profile.print_stats()
 
         self.runWeightedPEHeight()
-        self.process(indexCode, indicators)
+        # self.process(indexCode, indicators)
+        profile = Profile()
+        profile.runcall(self.process, indexCode, indicators)
+        profile.print_stats()
 
         self.runWeightedPBHeight()
-        self.process(indexCode, indicators)
+        # self.process(indexCode, indicators)
+        profile = Profile()
+        profile.runcall(self.process, indexCode, indicators)
+        profile.print_stats()
+
 
     def process(self, indexCode, indexPrimaryIndicators=None):
         logger.info("[{}] Start processing {} ".format(indexCode, self.heightFieldName))
@@ -62,20 +76,21 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
         if len(indicators) == 0:
             logger.error("[{}] No primary indicators found.".format(indexCode))
             return
+
         changed = []
         queue = deque()
         date_queue = deque()
         logger.info("[{}] 111 ".format(indexCode))
+
         for current in indicators:
             cur_val = getattr(current, self.baseFieldName)
-            if cur_val is not None:
-                queue.append(cur_val)
-                date_queue.append(current.trade_date)
-                if (current.trade_date - date_queue[0]).days > 3650:
-                    queue.popleft()
-                    date_queue.popleft()
-            else:
+            if cur_val is None:
                 continue
+            queue.append(cur_val)
+            date_queue.append(current.trade_date)
+            if (current.trade_date - date_queue[0]).days > 3650:
+                queue.popleft()
+                date_queue.popleft()
 
             # If field(w_pb/pe_height_ten_year) is not None, no need to calculate
             if getattr(current, self.heightFieldName) is not None:
