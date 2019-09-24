@@ -66,9 +66,9 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
         queue = deque()
         date_queue = deque()
         for current in indicators:
-            if getattr(current, self.baseFieldName) is not None:
-                val = getattr(current, self.baseFieldName)
-                queue.append(val)
+            cur_val = getattr(current, self.baseFieldName)
+            if cur_val is not None:
+                queue.append(cur_val)
                 date_queue.append(current.trade_date)
                 if (current.trade_date - date_queue[0]).days > 3650:
                     queue.popleft()
@@ -82,7 +82,7 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
 
             totalCount = len(queue)
             smallerCount = 0
-            cur_val = getattr(current, self.baseFieldName)
+
             for v in queue:
                 if v < cur_val:
                     smallerCount += 1
@@ -109,5 +109,4 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
 
 if __name__ == "__main__":
     manager = IndexPEPBHeightProcessor()
-    manager.runWeightedPBHeight()
-    manager.process('000009')
+    manager.buildAllHeightIndicators('000021')

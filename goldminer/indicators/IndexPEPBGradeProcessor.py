@@ -49,6 +49,7 @@ class IndexPEPBGradeProcessor(IndexPEPBBaseProcessor):
         self.process(indexCode, indicators)
 
     def process(self, indexCode, indexPrimaryIndicators=None):
+        logger.info("[{}] Start processing {} ".format(indexCode, self.fieldName))
         if not indexPrimaryIndicators:
             indicators = self.indexPrimaryIndicatorDao.getByCode(indexCode)
         else:
