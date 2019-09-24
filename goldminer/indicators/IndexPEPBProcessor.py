@@ -88,6 +88,7 @@ class IndexPEPBProcessor(IndexPEPBBaseProcessor):
                 model = self.calcIndicatorByDate(indexCode, d, indexPrimaryIndicatorDict)
                 if model:
                     models.append(model)
+                    indexPrimaryIndicatorDict[(model.code, model.trade_date)] = model
             d = d + timedelta(days=1)
 
         if len(models) == 0:
