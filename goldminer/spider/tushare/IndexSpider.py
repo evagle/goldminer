@@ -22,7 +22,7 @@ class IndexSpider(TushareBase):
         self.markets = {'MSCI':'MSCI指数', 'CSI':'中证指数', 'SSE':'上交所指数','SZSE':'深交所指数','CICC':'中金所指数','SW':'申万指数'}
 
     def isIndexNoDataSource(self, code):
-        return code in ['000836', '000837', '000849', '000850', '000851', '000856', '000857', '000858', '000863', '000865', '000867', '000869']
+        return code in ['000836', '000837', '000847', '000849', '000850', '000851', '000853', '000854', '000856', '000857', '000858', '000863', '000865', '000867', '000869']
 
     def _diff(self, indexA, indexB):
         fields = ["code", 'publisher', 'index_type', 'category', 'base_date', 'base_point', 'pub_date', 'weight_rule', 'description', 'end_date']
