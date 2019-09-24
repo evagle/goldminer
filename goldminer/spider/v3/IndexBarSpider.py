@@ -40,12 +40,12 @@ class IndexBarSpider(GMBaseSpiderV3):
             return None
 
         symbol = self.getIndexSymbol(code) + "." + code
-        logger.info("[Download Index Bars] code from {} to {}.".format(symbol, startDate, endDate))
+        logger.info("[Download Index Bars] {} from {} to {}.".format(symbol, startDate, endDate))
         bars = self.getHistory(symbol, "1d", startDate, endDate)
         bars = [self.rawDataToModel(code, bar) for bar in bars]
         if save:
             self.indexBarDao.addAll(bars)
-            logger.info("[Download Index Bars] code {} has {} bars updated".format(symbol, len(bars)))
+            logger.info("[Download Index Bars] {} has {} bars updated".format(symbol, len(bars)))
         return bars
 
     def downloadAllIndexBars(self):
