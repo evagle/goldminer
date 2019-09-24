@@ -40,7 +40,7 @@ class IndexConstituentManager:
         if code == self.__lastQueryIndexCode:
             canUseCache = True
             for idate in self.__updateDates:
-                if idate[0] == d and idate != self.__lastQueryDate:
+                if idate[0] == d and idate[0] != self.__lastQueryDate:
                     canUseCache = False
             if canUseCache:
                 return self.__lastConstituents
