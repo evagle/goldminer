@@ -83,6 +83,5 @@ class IndexPEPBGenerator:
 
 if __name__ == "__main__":
     peManager = IndexPEPBGenerator()
-    # peManager.updateImportant()
-    peManager.execOneIndex('399102')
+    peManager.updateAll()
 
