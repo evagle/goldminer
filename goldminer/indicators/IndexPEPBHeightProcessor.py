@@ -1,4 +1,5 @@
 # coding: utf-8
+from collections import deque
 from datetime import timedelta, datetime
 from decimal import Decimal
 
@@ -61,18 +62,17 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
         if len(indicators) == 0:
             logger.error("[{}] No primary indicators found.".format(indexCode))
             return
-
         changed = []
-        queue = []
-        date_queue = []
+        queue = deque()
+        date_queue = deque()
         for current in indicators:
             if getattr(current, self.baseFieldName) is not None:
                 val = getattr(current, self.baseFieldName)
                 queue.append(val)
                 date_queue.append(current.trade_date)
                 if (current.trade_date - date_queue[0]).days > 3650:
-                    queue.pop(0)
-                    date_queue.pop(0)
+                    queue.popleft()
+                    date_queue.popleft()
             else:
                 continue
 
@@ -110,4 +110,4 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
 if __name__ == "__main__":
     manager = IndexPEPBHeightProcessor()
     manager.runWeightedPBHeight()
-    manager.process('000001')
+    manager.process('000009')
