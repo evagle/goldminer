@@ -41,29 +41,16 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
         indicators = self.indexPrimaryIndicatorDao.getByCode(indexCode)
 
         self.runEqualWeightPEHeight()
-        profile = Profile()
-        profile.runcall(self.process, indexCode, indicators)
-        profile.print_stats()
-        # self.process(indexCode, indicators)
+        self.process(indexCode, indicators)
 
         self.runEqualWeightPBHeight()
-        # self.process(indexCode, indicators)
-        profile = Profile()
-        profile.runcall(self.process, indexCode, indicators)
-        profile.print_stats()
+        self.process(indexCode, indicators)
 
         self.runWeightedPEHeight()
-        # self.process(indexCode, indicators)
-        profile = Profile()
-        profile.runcall(self.process, indexCode, indicators)
-        profile.print_stats()
+        self.process(indexCode, indicators)
 
         self.runWeightedPBHeight()
-        # self.process(indexCode, indicators)
-        profile = Profile()
-        profile.runcall(self.process, indexCode, indicators)
-        profile.print_stats()
-
+        self.process(indexCode, indicators)
 
     def process(self, indexCode, indexPrimaryIndicators=None):
         logger.info("[{}] Start processing {} ".format(indexCode, self.heightFieldName))
@@ -80,7 +67,6 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
         changed = []
         queue = deque()
         date_queue = deque()
-        logger.info("[{}] 111 ".format(indexCode))
 
         for current in indicators:
             cur_val = getattr(current, self.baseFieldName)
@@ -95,15 +81,13 @@ class IndexPEPBHeightProcessor(IndexPEPBBaseProcessor):
             # If field(w_pb/pe_height_ten_year) is not None, no need to calculate
             if getattr(current, self.heightFieldName) is not None:
                 continue
-            logger.info("[{}] 222 ".format(indexCode))
+
             totalCount = len(queue)
-            logger.info("[{}] 333 ".format(indexCode))
             smallerCount = 0
 
             for v in queue:
                 if v < cur_val:
                     smallerCount += 1
-            logger.info("[{}] 444 ".format(indexCode))
 
             if totalCount == 0:
                 continue
