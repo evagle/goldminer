@@ -1,11 +1,14 @@
 # coding: utf-8
 import json
 import math
+from collections import deque
 from datetime import timedelta, datetime
 
 from goldminer.common.Utils import Utils
+from goldminer.common.logger import get_logger
 from goldminer.indicators.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
 
+logger = get_logger(__name__)
 
 class IndexPEPBGradeProcessor(IndexPEPBBaseProcessor):
 
@@ -52,20 +55,20 @@ class IndexPEPBGradeProcessor(IndexPEPBBaseProcessor):
             indicators = indexPrimaryIndicators
 
         if len(indicators) == 0:
-            print("[%s] PEPBGradeProcessor  no data found." % indexCode)
+            logger.info("[%s] PEPBGradeProcessor  no data found." % indexCode)
             return
 
         changed = []
-        queue = []
-        date_queue = []
+        queue = deque()
+        date_queue = deque()
         for current in indicators:
             val = getattr(current, self.sourceFieldName)
             if val is not None:
                 queue.append(val)
                 date_queue.append(current.trade_date)
                 if (current.trade_date - date_queue[0]).days > 3650:
-                    queue.pop(0)
-                    date_queue.pop(0)
+                    queue.popleft()
+                    date_queue.popleft()
 
             if getattr(current, self.fieldName) is not None:
                 continue
@@ -82,12 +85,12 @@ class IndexPEPBGradeProcessor(IndexPEPBBaseProcessor):
             grades = [Utils.formatFloat(i, 1) for i in grades]
             gradesJson = json.dumps(grades)
             setattr(current, self.fieldName, gradesJson)
-            print("[%s] %s trade_date = %s, grades = %s"% (indexCode, self.fieldName, current.trade_date, gradesJson))
+            logger.info("[%s] %s trade_date = %s, grades = %s" % (indexCode, self.fieldName, current.trade_date, gradesJson))
             changed.append(current)
 
         if len(changed) > 0:
             self.indexPrimaryIndicatorDao.bulkSave(changed)
-            print("[%s] %d %s updated" % (indexCode, len(changed), self.fieldName))
+            logger.info("[%s] %d %s updated" % (indexCode, len(changed), self.fieldName))
 
         return 0
 
