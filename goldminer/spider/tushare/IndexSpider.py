@@ -55,7 +55,7 @@ class IndexSpider(TushareBase):
         bars = barSpider.downloadBarsByDateRange(code, startDate=date, endDate=today, save=False)
         return len(bars) == 0
 
-    def getIndexListFromTushare(self):
+    def updateIndexListFromTushare(self):
         """
         从tushare下载所有指数列表，更新index数据库
         """
@@ -127,4 +127,4 @@ class IndexSpider(TushareBase):
 
 if __name__ == "__main__":
     spider = IndexSpider()
-    spider.getIndexListFromTushare()
+    spider.updateIndexListFromTushare()

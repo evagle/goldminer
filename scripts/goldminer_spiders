@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # coding: utf-8
+from goldminer.spider.tushare.IndexSpider import IndexSpider
 from goldminer.spider.tushare.StockSpider import StockSpider
 from goldminer.spider.v3.IndexBarSpider import IndexBarSpider
 from goldminer.spider.v3.IndexWeightsSpider import IndexWeightsSpider
@@ -26,6 +27,9 @@ Update stock industry from goldminer
 
 spider = StockIndustrySpider()
 spider.updateIndustry()
+
+spider = IndexSpider()
+spider.updateIndexListFromTushare()
 
 
 '''
