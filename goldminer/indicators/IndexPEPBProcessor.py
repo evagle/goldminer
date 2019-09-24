@@ -88,7 +88,6 @@ class IndexPEPBProcessor(IndexPEPBBaseProcessor):
                 model = self.calcIndicatorByDate(indexCode, d, indexPrimaryIndicatorDict)
                 if model:
                     models.append(model)
-                    indexPrimaryIndicatorDict[(model.code, model.trade_date)] = model
             d = d + timedelta(days=1)
 
         if len(models) == 0:
@@ -98,5 +97,10 @@ class IndexPEPBProcessor(IndexPEPBBaseProcessor):
         logger.info("[{}] {} values to save".format(self.fieldName, len(models)))
         self.indexPrimaryIndicatorDao.bulkSave(models)
         logger.info("[{}] End {}".format(self.fieldName, indexCode))
+
+        for model in models:
+            if (model.code, model.trade_date) not in indexPrimaryIndicatorDict:
+                model = self.indexPrimaryIndicatorDao.getByDate(indexCode, model.trade_date)
+                indexPrimaryIndicatorDict[(model.code, model.trade_date)] = model
 
         return models
