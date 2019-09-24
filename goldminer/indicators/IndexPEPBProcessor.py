@@ -99,4 +99,9 @@ class IndexPEPBProcessor(IndexPEPBBaseProcessor):
         self.indexPrimaryIndicatorDao.bulkSave(models)
         logger.info("[{}] End {}".format(self.fieldName, indexCode))
 
+        for model in models:
+            if (model.code, model.trade_date) not in indexPrimaryIndicatorDict:
+                model = self.indexPrimaryIndicatorDao.getByDate(indexCode, model.trade_date)
+                indexPrimaryIndicatorDict[(model.code, model.trade_date)] = model
+
         return models
