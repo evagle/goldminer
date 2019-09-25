@@ -9,9 +9,12 @@ import xlrd
 
 from goldminer.common import GMConsts
 from goldminer.common.Utils import Utils
+from goldminer.common.logger import get_logger
 from goldminer.models.models import IndexConstituent
 from goldminer.storage.IndexConstituentDao import IndexConstituentDao
 from goldminer.storage.IndexesDao import IndexesDao
+
+logger = get_logger(__name__)
 
 
 class CSIndexSpider:
@@ -27,7 +30,7 @@ class CSIndexSpider:
             response = urllib.request.urlopen(url)
             content = response.read()
         except HTTPError:
-            print("Fail to download file : ", url)
+            logger.error("Fail to download file : {}".format(url))
             return None
         else:
             if content is None or content == "":
@@ -47,12 +50,12 @@ class CSIndexSpider:
 
     def checkAndUpdateLatestConstituents(self, code):
         if not self.isCSIndex(code):
-            print("[%s] not CSIndex index" % code)
+            logger.info("[%s] not CSIndex index" % code)
             return
 
         result = self.fetchConstituentByCode(code)
         if result is None:
-            print("[%s] no new constituent found")
+            logger.info("[%s] no new constituent found" % code)
             return
 
         tradeDate = result[0]
@@ -62,7 +65,7 @@ class CSIndexSpider:
         last = self.constituentsDao.getConstituents(code, today)
         if last is None:
             if len(newConstituents) == 0:
-                print("[%s] has no constituent found" % code)
+                logger.info("[%s] has no constituent found" % code)
             else:
                 model = IndexConstituent()
                 model.code = code
@@ -70,7 +73,7 @@ class CSIndexSpider:
                 model.trade_date = tradeDate
                 model.source = GMConsts.CS_INDEX
                 self.constituentsDao.add(model)
-                print("[%s] not last found. Add first one, %s" % (code, model))
+                logger.info("[%s] not last found. Add first one, %s" % (code, model))
         elif not Utils.isListEqual(newConstituents, json.loads(last.constituents)):
             model = self.constituentsDao.getByDate(code, tradeDate)
             if model is None:
@@ -80,10 +83,10 @@ class CSIndexSpider:
             model.trade_date = tradeDate
             model.source = GMConsts.CS_INDEX
             self.constituentsDao.add(model)
-            print("[%s] new constituents date = %s" % (code, model.trade_date))
+            logger.info("[%s] new constituents date = %s" % (code, model.trade_date))
 
         else:
-            print("[%s] constituent is up to date." % code)
+            logger.info("[%s] constituent is up to date." % code)
 
     def checkAndUpdateAllLatestConstituents(self):
         indexes = self.indexesDao.getIndexList()
