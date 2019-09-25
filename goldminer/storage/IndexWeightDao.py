@@ -42,6 +42,12 @@ class IndexWeightDao(BaseDao):
             .first()
         return result
 
+    def getByCode(self, code):
+        return self.session.query(IndexWeight) \
+            .filter(IndexWeight.code == code) \
+            .order_by(IndexWeight.trade_date.desc()) \
+            .all()
+
 
 if __name__ == "__main__":
     constituentDao = IndexWeightDao()
