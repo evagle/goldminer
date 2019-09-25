@@ -13,10 +13,12 @@ from goldminer.models.models import IndexConstituent
 from goldminer.storage.IndexConstituentDao import IndexConstituentDao
 from goldminer.storage.IndexesDao import IndexesDao
 
-'''
-从cnindex下载最新的constituent数据，更新时间和更新日期不靠谱，经常出错
-'''
+
 class CnIndexSpider:
+    """
+    从cnindex下载最新的constituent数据，更新时间和更新日期不靠谱，经常出错
+    """
+
     CNINDEX_CONSTITUENT_URL = "http://www.cnindex.com.cn/docs/yb_%s.xls"
 
     def __init__(self):
@@ -38,7 +40,7 @@ class CnIndexSpider:
             if len(parts[0]) != 4:
                 return None
             format = "%Y-%m-%d"
-        elif datestr.find("/") >=0:
+        elif datestr.find("/") >= 0:
             parts = datestr.split("/")
             if len(parts) != 3:
                 return None
@@ -62,7 +64,7 @@ class CnIndexSpider:
             if content is None or content == "":
                 return None
             else:
-                workbook = xlrd.open_workbook(file_contents = content)
+                workbook = xlrd.open_workbook(file_contents=content)
                 # sheet_names = workbook
                 sheet = workbook.sheet_by_index(0)
 
@@ -78,7 +80,7 @@ class CnIndexSpider:
                         tradeDate = self.parseDate(sheet.row(1)[i].value)
                     elif columnName.startswith("更新时间") or columnName.startswith("更新日期"):
                         result = re.match(r".*([\d]{4}-[\d]{1,2}-[\d]{1,2}).*", columnName)
-                        if len(result.groups()) >0:
+                        if len(result.groups()) > 0:
                             tradeDate = self.parseDate(result.groups()[0])
 
                 if cols is None or tradeDate is None:
@@ -93,7 +95,7 @@ class CnIndexSpider:
 
     def isCnIndex(self, code):
         model = self.indexesDao.getByCode(code)
-        return model.source == GMConsts.CN_INDEX
+        return model.source == GMConsts.CN_INDEX or model.publisher == "深交所"
 
     def checkAndUpdateLatestConstituents(self, code):
         if not self.isCnIndex(code):
@@ -124,7 +126,8 @@ class CnIndexSpider:
         elif not Utils.isListEqual(newConstituents, json.loads(last.constituents)):
             # 如果已经存在比当前还要新的数据，报错
             if last.trade_date > tradeDate:
-                print("[%s] CN Index give a wrong trade date: %s, lastest trade_date found %s" % (code, tradeDate, last.trade_date))
+                print("[%s] CN Index give a wrong trade date: %s, lastest trade_date found %s" % (
+                code, tradeDate, last.trade_date))
                 return
 
             model = self.constituentsDao.getByDate(code, tradeDate)
@@ -153,4 +156,4 @@ class CnIndexSpider:
 
 if __name__ == "__main__":
     spider = CnIndexSpider()
-    spider.checkAndUpdateLatestConstituents('399435')
+    spider.checkAndUpdateLatestConstituents('399989')

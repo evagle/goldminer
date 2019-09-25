@@ -43,7 +43,7 @@ class CSIndexSpider:
 
     def isCSIndex(self, code):
         model = self.indexesDao.getByCode(code)
-        return model.source == GMConsts.CS_INDEX or code[0:2] == "00"
+        return model.source == GMConsts.CS_INDEX or code[0:2] == "00" or model.publisher == "中证公司"
 
     def checkAndUpdateLatestConstituents(self, code):
         if not self.isCSIndex(code):
@@ -95,4 +95,4 @@ class CSIndexSpider:
 
 if __name__ == "__main__":
     spider = CSIndexSpider()
-    spider.checkAndUpdateLatestConstituents('399971')
+    spider.checkAndUpdateLatestConstituents('399989')
