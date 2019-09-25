@@ -19,14 +19,21 @@ class IndexSpider(TushareBase):
         super(IndexSpider, self).__init__()
         self.indexDao = IndexesDao()
         self.exchangeMap = {"SSE": 1, "SZSE": 2}
-        self.markets = {'MSCI':'MSCI指数', 'CSI':'中证指数', 'SSE':'上交所指数','SZSE':'深交所指数','CICC':'中金所指数','SW':'申万指数'}
+        self.markets = {'MSCI': 'MSCI指数', 'CSI': '中证指数', 'SSE': '上交所指数', 'SZSE': '深交所指数', 'CICC': '中金所指数', 'SW': '申万指数'}
 
-    def isIndexNoDataSource(self, code):
-        return code in ['000836', '000837', '000847', '000849', '000850', '000851', '000853', '000854', '000856',
-                        '000857', '000858', '000863', '000865', '000867', '000869', "399003", "399108"]
+    def hasNoIndexConstituentData(self, code):
+        return code in ["000013", "000022", "000023", "000140", "000170", "000188", "000834", "000836", "000837",
+                        "000845", "000847", "000849", "000850", "000851", "000853", "000854", "000856", "000857",
+                        "000858", "000863", "000865", "000867", "000869", "000923", "000924", "000999", "399110",
+                        "399120", "399130", "399131", "399132", "399133", "399134", "399135", "399136", "399137",
+                        "399138", "399139", "399140", "399150", "399160", "399170", "399180", "399190", "399200",
+                        "399210", "399220", "399230", "399290", "399294", "399297", "399298", "399299", "399329",
+                        "399902", "399906", "399921", "399923", "399924", "399940", "399955", "399981", "399984",
+                        "399985"]
 
     def _diff(self, indexA, indexB):
-        fields = ["code", 'publisher', 'index_type', 'category', 'base_date', 'base_point', 'pub_date', 'weight_rule', 'description', 'end_date']
+        fields = ["code", 'publisher', 'index_type', 'category', 'base_date', 'base_point', 'pub_date', 'weight_rule',
+                  'description', 'end_date']
         changed = False
         for field in fields:
             if field == 'base_point':
@@ -101,7 +108,7 @@ class IndexSpider(TushareBase):
                         index.end_date = datetime.strptime(row['exp_date'], '%Y%m%d').date()
 
                 # 对于没有数据源的index标记为已过期
-                if self.isIndexNoDataSource(code):
+                if self.hasNoIndexConstituentData(code):
                     index.end_date = "1900-01-01"
 
                 if pd.isna(row['base_point']):
