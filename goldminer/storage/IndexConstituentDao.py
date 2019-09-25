@@ -1,5 +1,5 @@
 # coding: utf-8
-from datetime import date
+from datetime import date, datetime
 
 from goldminer.models.models import IndexConstituent
 from goldminer.storage.BaseDao import BaseDao
@@ -39,23 +39,25 @@ class IndexConstituentDao(BaseDao):
     1. Find first record with trade_date <= date
     2. If date < all trade_date, return first one
     '''
-    # TODO if date is too earlier more than 1 year than first trade_date, better to return None
     def getConstituents(self, code, tradeDate) -> IndexConstituent:
         result = self.session.query(IndexConstituent) \
                              .filter(IndexConstituent.code == code, IndexConstituent.trade_date <= tradeDate) \
                              .order_by(IndexConstituent.trade_date.desc()) \
                              .first()
-        if result is not None:
+        if result is not None and (tradeDate - result.trade_date).days < 200:
             return result
 
         result = self.session.query(IndexConstituent) \
             .filter(IndexConstituent.code == code, IndexConstituent.trade_date > tradeDate) \
             .order_by(IndexConstituent.trade_date.asc()) \
             .first()
-        return result
 
+        if result is not None and (result.trade_date - tradeDate).days < 200:
+            return result
+        else:
+            return None
 
 
 if __name__ == "__main__":
     constituentDao = IndexConstituentDao()
-    print(constituentDao.getConstituents('000001', date(2005, 1, 1)))
+    print(constituentDao.getConstituents('399006', date(2012, 1, 1)))
