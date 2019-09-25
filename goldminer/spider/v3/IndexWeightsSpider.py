@@ -29,7 +29,7 @@ class IndexWeightsSpider(GMBaseSpiderV3):
             return None
 
         weightsFormated = {}
-        for k in data:
+        for k in weights:
             weightsFormated[k[5:]] = weights[k]
 
         model.constituents = json.dumps(weightsFormated)
@@ -57,7 +57,7 @@ class IndexWeightsSpider(GMBaseSpiderV3):
 
     def downloadAllIndexConstituents(self):
         if datetime.now().day < 25:
-            print("NO UPDATE: Index Weights from gm are published at the end of each month")
+            logger.info("NO UPDATE: Index Weights from gm are published at the end of each month")
             return
         indexes = self.indexesDao.getIndexList()
         for code in indexes:
@@ -67,4 +67,4 @@ class IndexWeightsSpider(GMBaseSpiderV3):
 
 if __name__ == "__main__":
     spider = IndexWeightsSpider()
-    spider.downloadConstituents('000001')
+    spider.downloadAllIndexConstituents()
