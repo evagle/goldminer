@@ -2,6 +2,8 @@
 from datetime import date
 from typing import List
 
+from sqlalchemy import Column
+
 from goldminer.common import GMConsts
 from goldminer.models.models import StockCustomIndicator
 from goldminer.storage.BaseDao import BaseDao
@@ -47,14 +49,12 @@ class StockCustomIndicatorDao(BaseDao):
         if columnName is None:
             raise Exception("columnName could not be None")
 
-        sql = 'SELECT `trade_date` FROM StockCustomIndicator WHERE `code` = "{}" AND `{}` is not NULL  order by ' \
-              'trade_date desc limit 1 '
-        sql = sql.format(code, columnName)
-        cursor = self.pymysqlConn.cursor()
-        n = cursor.execute(sql)
-        if n == 0:
-            return GMConsts.TRADE_INIT_DATE
-        return cursor.fetchone()[0]
+        result = self.session.query(StockCustomIndicator.trade_date) \
+            .filter(Column(columnName).isnot(None)) \
+            .filter(StockCustomIndicator.code == code) \
+            .order_by(StockCustomIndicator.trade_date.desc()) \
+            .first()
+        return GMConsts.TRADE_INIT_DATE if result is None else result[0]
 
     def getByDateRange(self, code, startDate, endDate):
         query = self.session.query(StockCustomIndicator) \
