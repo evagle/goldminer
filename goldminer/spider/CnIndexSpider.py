@@ -49,7 +49,7 @@ class CnIndexSpider(CSCNIndexBaseSpider):
         elif '样本股代码' in cols:
             cols.remove('样本股代码')
 
-        return [tradeDate.date(), cols]
+        return [tradeDate, cols]
 
     def isCorrectIndexType(self, code):
         model = self.indexesDao.getByCode(code)
