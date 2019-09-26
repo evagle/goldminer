@@ -36,7 +36,7 @@ class CnIndexSpider(CSCNIndexBaseSpider):
                 cols = sheet.col_values(i)
             elif columnName.startswith("日期"):
                 tradeDate = Utils.parseConstituentUpdateDate(sheet.row(1)[i].value)
-            elif columnName.startswith("更新时间") or columnName.startswith("更新日期"):
+            elif columnName.startswith("更新时间") or columnName.startswith("更新日期") or columnName.startswith("截止日期"):
                 result = re.match(r".*([\d]{4}-[\d]{1,2}-[\d]{1,2}).*", columnName)
                 if len(result.groups()) > 0:
                     tradeDate = Utils.parseConstituentUpdateDate(result.groups()[0])
