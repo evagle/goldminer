@@ -1,10 +1,11 @@
 # coding: utf-8
-import datetime
 import math
+from datetime import datetime
 from decimal import Decimal
 
 import talib
 import numpy as np
+import xlrd
 
 from goldminer.common import GMConsts
 from goldminer.models.IndexWeeklyBar import IndexWeeklyBar
@@ -149,6 +150,31 @@ class Utils:
     @staticmethod
     def minDate(date1, date2):
         return date1 if date1 < date2 else date2
+
+    @staticmethod
+    def parseConstituentUpdateDate(datestr):
+        if type(datestr) == float:
+            tuple = xlrd.xldate_as_tuple(datestr, 0)
+            return datetime(tuple[0], tuple[1], tuple[2])
+
+        datestr = datestr.strip()
+        if len(datestr) == 8 and datestr.find("-") < 0:
+            format = "%Y%m%d"
+        elif datestr.find("-") >= 0:
+            parts = datestr.split("-")
+            if len(parts) != 3:
+                return None
+            if len(parts[0]) != 4:
+                return None
+            format = "%Y-%m-%d"
+        elif datestr.find("/") >= 0:
+            parts = datestr.split("/")
+            if len(parts) != 3:
+                return None
+            if len(parts[2]) != 4:
+                return None
+            format = "%m/%d/%Y"
+        return datetime.strptime(datestr, format).date()
 
 
 if __name__ == "__main__":
