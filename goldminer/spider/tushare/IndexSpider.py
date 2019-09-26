@@ -117,6 +117,10 @@ class IndexSpider(TushareBase):
                     index.base_point = Decimal(round(row['base_point'], 2))
                 index.weight_rule = row['weight_rule']
                 index.publisher = row['publisher']
+                # 错误数据修正
+                if code in ['399701', '399702', '399703', '399704', '399705', '399706']:
+                    index.publisher = "中证公司"
+
                 index.description = row['desc']
 
                 if code not in currentIndexesDict:
