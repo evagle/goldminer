@@ -66,7 +66,7 @@ class CSCNIndexBaseSpider:
         result = self.parseConstituent(content)
 
         if result is None or len(result[1]) is None:
-            logger.info("[{}] no new constituent found".format(code))
+            logger.info("[{}] parse xls content failed or constituents empty".format(code))
             return
         if result[0] is None:
             logger.info("[{}] trade date is none.".format(code))

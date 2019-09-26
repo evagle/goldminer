@@ -42,7 +42,7 @@ class CnIndexSpider(CSCNIndexBaseSpider):
                     tradeDate = Utils.parseConstituentUpdateDate(result.groups()[0])
 
         if cols is None or tradeDate is None:
-            raise Exception("Failed to extract constituents of tradedate from excel. content={}".format(xlsContent))
+            return None
 
         if '证券代码' in cols:
             cols.remove('证券代码')
