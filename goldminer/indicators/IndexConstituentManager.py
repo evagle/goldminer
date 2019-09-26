@@ -2,9 +2,12 @@
 import json
 from datetime import date
 
+from goldminer.common.logger import get_logger
 from goldminer.models.models import IndexConstituent
-from goldminer.storage.IndexWeightDao import IndexWeightDao
 from goldminer.storage.IndexConstituentDao import IndexConstituentDao
+from goldminer.storage.IndexWeightDao import IndexWeightDao
+
+logger = get_logger(__name__)
 
 
 class IndexConstituentManager:
@@ -21,11 +24,11 @@ class IndexConstituentManager:
         if model is None:
             return None
 
-        data = json.loads(model.constituents)
-        weights = {}
-        for k in data:
-            weights[k[5:]] = data[k]
-        print(weights)
+        weights = json.loads(model.constituents)
+        # Skip incorrect data
+        if len(weights) <= 1:
+            return None
+
         return weights
 
     def __formatConstituents(self, model: IndexConstituent):
@@ -61,10 +64,17 @@ class IndexConstituentManager:
             return None
         return result[1]
 
+    def getConstituentsFromWeights(self, code, date):
+        weights = self.getWeights(code, date)
+        if weights is None:
+            return None
+        return list(weights.keys())
+
     def getConstituents(self, code, date):
         result = self._getConstituents(code, date)
         if result is None:
-            return None
+            return self.getConstituentsFromWeights(code, date)
+
         if isinstance(result[2], list):
             return result[2]
         data = json.loads(result[2])
@@ -73,5 +83,7 @@ class IndexConstituentManager:
             constituents.append(c[5:])
         return constituents
 
+
 if __name__ == "__main__":
     manager = IndexConstituentManager()
+    print(manager.getConstituents('399989', date(2019, 9, 20)))
