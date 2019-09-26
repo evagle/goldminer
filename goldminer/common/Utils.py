@@ -155,7 +155,7 @@ class Utils:
     def parseConstituentUpdateDate(datestr):
         if type(datestr) == float:
             tuple = xlrd.xldate_as_tuple(datestr, 0)
-            return datetime(tuple[0], tuple[1], tuple[2])
+            return datetime(tuple[0], tuple[1], tuple[2]).date()
 
         datestr = datestr.strip()
         if len(datestr) == 8 and datestr.find("-") < 0:
