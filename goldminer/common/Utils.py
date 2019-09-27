@@ -112,6 +112,9 @@ class Utils:
 
     @staticmethod
     def pre_adjust(bars):
+        if bars is None or len(bars) == 0:
+            return bars
+
         factor = bars[-1].adj_factor
         for bar in bars:
             bar.high = float(Decimal(bar.high) * bar.adj_factor / factor)
