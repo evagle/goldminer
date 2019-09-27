@@ -17,10 +17,10 @@ class RPSProcessor:
     def hasRPS(self, bars):
         """
         Given a list of bars of one day,
-        if 90% of the bars have rps, then we can think rps was already generated for that day,
+        if 95% of the bars have rps, then we can think rps was already generated for that day,
         else the rps is not generated
         :param bars: all bars for one day
-        :return: true if 90% bars have rps else false
+        :return: true if 95% bars have rps else false
         """
         if len(bars) == 0:
             return False
@@ -29,7 +29,7 @@ class RPSProcessor:
         for bar in bars:
             if bar.rps50 is not None and bar.rps120 is not None and bar.rps250 is not None:
                 n += 1
-        return n / len(bars) > 0.9
+        return n / len(bars) > 0.95
 
     def calculateRPS(self, bars, period):
         validBars = []
