@@ -20,11 +20,12 @@ class StockCustomIndicatorDao(BaseDao):
             .filter(StockCustomIndicator.trade_date == d) \
             .first()
 
-    def getAllAtDate(self, d: date):
+    def getAllAtDate(self, d: date, excludeB=True):
         """
         Get all StockCustomIndicator bars for given date, return in dict
         {(code, trade_date): bar,...}
         :param d: date to retrieve
+        :param excludeB: exclude B stocks start with 9
         :return:
         Dict:
         {(code, trade_date): bar,...}
@@ -34,7 +35,8 @@ class StockCustomIndicatorDao(BaseDao):
             .all()
         result = {}
         for bar in bars:
-            result[(bar.code, bar.trade_date)] = bar
+            if not excludeB or not bar.code.startswith("9"):
+                result[(bar.code, bar.trade_date)] = bar
         return result
 
     def getLatestDate(self, code=None, columnName=None):
