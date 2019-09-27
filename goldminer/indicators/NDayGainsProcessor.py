@@ -2,11 +2,12 @@
 import math
 from datetime import datetime, timedelta
 
+from goldminer.common.Utils import Utils
 from goldminer.common.logger import get_logger
 from goldminer.indicators.BaseIndicatorProcessor import BaseIndicatorProcessor
 from goldminer.models.models import StockCustomIndicator
 from goldminer.storage.StockCustomIndicatorDao import StockCustomIndicatorDao
-from goldminer.storage.StockDailyBarAdjustPrevDao import StockDailyBarAdjustPrevDao
+from goldminer.storage.StockDailyBarAdjustNoneDao import StockDailyBarAdjustNoneDao
 from goldminer.storage.StockDao import StockDao
 
 logger = get_logger(__name__)
@@ -14,7 +15,7 @@ logger = get_logger(__name__)
 
 class NDayGainsProcessor(BaseIndicatorProcessor):
     def __init__(self):
-        self.stockBarPrevDao = StockDailyBarAdjustPrevDao()
+        self.stockBarDao = StockDailyBarAdjustNoneDao()
         self.stockDao = StockDao()
         self.customIndicatorDao = StockCustomIndicatorDao()
 
@@ -33,7 +34,8 @@ class NDayGainsProcessor(BaseIndicatorProcessor):
             modelsDict[(model.code, model.trade_date)] = model
 
         customIndicatorsChanged = {}
-        bars = self.stockBarPrevDao.getAll(code)
+        bars = self.stockBarDao.getAll(code)
+        bars = Utils.pre_adjust(bars)
         for i in range(len(bars)):
             key = (code, bars[i].trade_date)
             if key in modelsDict:
