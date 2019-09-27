@@ -65,12 +65,12 @@ class NDayGainsProcessor(BaseIndicatorProcessor):
                     setattr(model, attr, gain)
                     customIndicatorsChanged[(code, model.trade_date)] = model
 
-        logger.info("{} bars updates".format(len(customIndicatorsChanged)))
+        logger.info("code {} has {} bars updates".format(code, len(customIndicatorsChanged)))
         self.customIndicatorDao.bulkSave(customIndicatorsChanged.values())
         logger.info("End NDayGains code {}  ".format(code))
 
     def updateAll(self):
-        stocks = self.stockDao.getStockList()
+        stocks = self.stockDao.getStockList(includeDelisted=True)
         for code in stocks:
             self.process(code)
 

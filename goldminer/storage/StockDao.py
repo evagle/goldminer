@@ -14,13 +14,18 @@ class StockDao(BaseDao):
     def getByCode(self, code) -> Stock:
         return self.session.query(Stock).filter(Stock.code == code).first()
 
-    def getStockList(self, includeB=False) -> List[str]:
+    def getStockList(self, includeB=False, includeDelisted=False) -> List[str]:
         """
-        Retrieve unlisted stock code list
+        Retrieve stock code list
+        :param includeDelisted: return delisted stocks if true
         :param includeB: whether to include B stock
         :return: stock code list
         """
-        result = self.session.query(Stock.code).filter(Stock.end_date.is_(None)).all()
+        query = self.session.query(Stock.code)
+        if not includeDelisted:
+            query = query.filter(Stock.end_date.is_(None))
+
+        result = query.all()
         codes = [i[0] for i in result]
         if not includeB:
             codesA = []
