@@ -83,7 +83,7 @@ class RPSProcessor:
 
     def getLastRPSDate(self):
         lastDate = GMConsts.TRADE_INIT_DATE
-        lastDate = Utils.minDate(lastDate, self.customIndicatorDao.getLatestDate(code='000001', columnName='rps50'))
+        lastDate = Utils.maxDate(lastDate, self.customIndicatorDao.getLatestDate(code='000001', columnName='rps50'))
         return lastDate
 
     def buildAll(self):
