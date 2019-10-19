@@ -9,9 +9,6 @@ from goldminer.investigation.buy_signals.pivot_point.PivotPoint import PivotPoin
 eps = EPSScoreProcessor()
 eps.processAll()
 
-pepbGenerator = IndexPEPBGenerator()
-pepbGenerator.updateAll()
-
 processor = NDayGainsProcessor()
 processor.updateAll()
 
@@ -20,3 +17,6 @@ rps.buildAll()
 
 processor = PivotPoint()
 processor.processAll()
+
+pepbGenerator = IndexPEPBGenerator()
+pepbGenerator.updateAll()

@@ -44,6 +44,8 @@ class RPSProcessor:
 
         if len(validBars) / len(bars) < 0.75:
             logger.warning("All bars have no enough(at least 75%) gain{} value".format(period))
+            for bar in bars:
+                setattr(bar, rpsName, None)
             return False
 
         sortedBars = sorted(validBars,
