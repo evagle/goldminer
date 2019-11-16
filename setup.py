@@ -25,7 +25,12 @@ setup(name='GoldMinder',
           'pymysql',
           'xlrd',
           'tushare',
-          'bs4'
+          'bs4',
+          'sqlalchemy',
+          'TA-Lib',
+          'lxml',
+          'requests',
+          'gm'
       ],
       classifiers=[
           'Development Status :: 1 - Development/Unstable',
