@@ -49,7 +49,7 @@ class StockDailyBarAdjustNoneSpider(GMBaseSpiderV3):
         bars = [self.rawDataToModel(bar) for bar in bars]
         for instrument in instruments:
             for bar in bars:
-                if instrument['trade_date'] == bar.trade_date:
+                if instrument['trade_date'].date() == bar.trade_date:
                     bar.adj_factor = instrument['adj_factor']
                     bar.sec_level = instrument['sec_level']
                     bar.is_suspended = instrument['is_suspended']
