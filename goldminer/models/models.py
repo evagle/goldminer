@@ -845,7 +845,7 @@ class Indexes(Base):
     publisher = Column(String(64), nullable=False)
     description = Column(Text, nullable=False)
     analysis = Column(Text, nullable=True)
-    source = Column(String(32), nullable=True)
+    importance = Column(Integer, nullable=False)
 
 
 class PrimaryFinanceIndicator(Base):

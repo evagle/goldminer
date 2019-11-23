@@ -41,7 +41,7 @@ class IndexPEPBGenerator:
         self.gradeProcessor.buildAllGradeIndicators(code)
 
     def updateAll(self):
-        indexes = self.indexDao.getIndexList()
+        indexes = self.indexDao.getImportantIndexList()
         for code in indexes:
             self.execOneIndex(code)
 
@@ -76,6 +76,8 @@ class IndexPEPBGenerator:
             "000993",
             "399967",
             "399971",
+            "399005",
+            "399101"
         ]
         for code in codes:
             self.execOneIndex(code)

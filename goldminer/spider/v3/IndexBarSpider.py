@@ -49,7 +49,7 @@ class IndexBarSpider(GMBaseSpiderV3):
         return bars
 
     def downloadAllIndexBars(self):
-        indexes = self.indexesDao.getIndexList()
+        indexes = self.indexesDao.getImportantIndexList()
         for i in indexes:
             if self.downloadBars(i) is not None:
                 time.sleep(0.1)
@@ -61,7 +61,7 @@ class IndexBarSpider(GMBaseSpiderV3):
         stockManager = StockManager()
         tradeDates = stockManager.getTradeDates()
 
-        indexes = self.indexesDao.getIndexList()
+        indexes = self.indexesDao.getImportantIndexList()
         for code in indexes:
             pubDate = self.indexesDao.getIndexPublishDate(code)
             for d in tradeDates:

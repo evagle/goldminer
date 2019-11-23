@@ -24,6 +24,12 @@ class IndexesDao(BaseDao):
             .all()
         return [i[0] for i in result]
 
+    def getImportantIndexList(self) -> List[str]:
+        result = self.session.query(Indexes.code)\
+            .filter(Indexes.importance == 1) \
+            .all()
+        return [i[0] for i in result]
+
     def add(self, index: Indexes):
         self.session.add(index)
         self.session.commit()
