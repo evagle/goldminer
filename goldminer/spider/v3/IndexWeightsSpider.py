@@ -3,6 +3,8 @@ import json
 import time
 from datetime import timedelta, datetime
 
+from goldminer.common.Utils import Utils
+
 from goldminer.common.logger import get_logger
 from goldminer.models.models import IndexWeight
 from goldminer.spider.v3.GMBaseSpiderV3 import GMBaseSpiderV3
@@ -30,7 +32,7 @@ class IndexWeightsSpider(GMBaseSpiderV3):
 
         weightsFormated = {}
         for k in weights:
-            weightsFormated[k[5:]] = weights[k]
+            weightsFormated[k[5:]] = Utils.formatFloat(weights[k], 6)
 
         model.constituents = json.dumps(weightsFormated)
 
@@ -59,7 +61,7 @@ class IndexWeightsSpider(GMBaseSpiderV3):
         if datetime.now().day < 25:
             logger.info("NO UPDATE: Index Weights from gm are published at the end of each month")
             return
-        indexes = self.indexesDao.getIndexList()
+        indexes = self.indexesDao.getImportantIndexList()
         for code in indexes:
             self.downloadConstituents(code)
             time.sleep(0.1)
