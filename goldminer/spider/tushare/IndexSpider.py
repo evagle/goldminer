@@ -107,10 +107,12 @@ class IndexSpider(TushareBase):
                 index.pub_date = datetime.strptime(row['list_date'], '%Y%m%d').date()
                 if row['base_date'] is not None:
                     index.base_date = datetime.strptime(row['base_date'], '%Y%m%d').date()
-                if row['exp_date'] is not None:
-                    isExpired = self.isExpired(code)
-                    if isExpired:
-                        index.end_date = datetime.strptime(row['exp_date'], '%Y%m%d').date()
+
+                # exp_date不准确，暂时不用
+                # if row['exp_date'] is not None:
+                #     isExpired = self.isExpired(code)
+                #     if isExpired:
+                #         index.end_date = datetime.strptime(row['exp_date'], '%Y%m%d').date()
 
                 # 对于没有数据源的index标记为已过期
                 if self.hasNoIndexConstituentData(code):
