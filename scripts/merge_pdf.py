@@ -11,14 +11,15 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 from PyPDF2 import PdfFileReader, PdfFileWriter, PdfFileMerger
 
 
-def find_candidate_files(root_path='', keyword=None):
+def find_candidate_files(root_path, keyword=None):
     result = []
     for fpath, dirs, fs in os.walk(root_path):
         for f in fs:
             candidate_file = os.path.join(fpath, f)
             if os.path.splitext(candidate_file)[1] != ".pdf":
                 continue
-            if f.find(keyword) == -1:
+
+            if keyword is not None and f.find(keyword) == -1:
                 continue
             result.append(candidate_file)
 
@@ -73,4 +74,4 @@ if __name__ == "__main__":
                         help="Whether to generate bookmarks")
 
     args = parser.parse_args()
-    mergefiles(args.path, args.output_filename, args.import_bookmarks)
+    merge_files(args.path, args.output_filename, args.keyword, args.import_bookmarks)
