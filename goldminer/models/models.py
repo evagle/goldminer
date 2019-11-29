@@ -958,7 +958,6 @@ class TradingDerivativeIndicator(Base):
     TCLOSE = Column(Float, nullable=False)
     TMSTAMP = Column(Integer)
     TOTMKTCAP = Column(Float(asdecimal=True), nullable=False)
-    TRADEDATE = Column(Date, nullable=False)
     TURNRATE = Column(Float, nullable=False)
     TOTAL_SHARE = Column(Float(asdecimal=True), nullable=False)
     FLOW_SHARE = Column(Float(asdecimal=True), nullable=False)
