@@ -9,9 +9,9 @@ class StockTradingDerivativeIndicatorSpider(BaseFundamentalSpider):
         super(StockTradingDerivativeIndicatorSpider, self).__init__()
         self.modelClass = TradingDerivativeIndicator
         self.table = 'trading_derivative_indicator'
-        self.fields = 'DY,EV,EVEBITDA,EVPS,LYDY,NEGOTIABLEMV,PB,PCLFY,PCTTM,PELFY,PELFYNPAAEI,PEMRQ,PEMRQNPAAEI,PETTM,PETTMNPAAEI,PSLFY,PSMRQ,PSTTM,TCLOSE,TOTMKTCAP,TRADEDATE,TURNRATE,TOTAL_SHARE,FLOW_SHARE'
+        self.fields = 'DY,EV,EVEBITDA,EVPS,LYDY,NEGOTIABLEMV,PB,PCLFY,PCTTM,PELFY,PELFYNPAAEI,PEMRQ,PEMRQNPAAEI,PETTM,PETTMNPAAEI,PSLFY,PSMRQ,PSTTM,TCLOSE,TOTMKTCAP,TURNRATE,TOTAL_SHARE,FLOW_SHARE'
 
 
 if __name__ == "__main__":
     spider = StockTradingDerivativeIndicatorSpider()
-    spider.downloadByCode('000001')
+    spider.downloadByCodes('000001')
