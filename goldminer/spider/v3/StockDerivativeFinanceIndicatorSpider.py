@@ -19,4 +19,4 @@ class StockDerivativeFinanceIndicatorSpider(BaseFundamentalSpider):
 
 if __name__ == "__main__":
     spider = StockDerivativeFinanceIndicatorSpider()
-    spider.downloadByCode('000001')
+    spider.downloadByCodes('000001')

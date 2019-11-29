@@ -2,12 +2,17 @@
 from datetime import timedelta, datetime
 import time
 
+from goldminer.common import GMConsts
+
+from goldminer.common.Utils import Utils
 from sqlalchemy.exc import IntegrityError
 
+from goldminer.common.logger import get_logger
 from goldminer.spider.v3.GMBaseSpiderV3 import GMBaseSpiderV3
 from goldminer.storage.StockDao import StockDao
 from goldminer.storage.StockFundamentalsDao import StockFundamentalsDao
 
+logger = get_logger(__name__)
 
 class BaseFundamentalSpider(GMBaseSpiderV3):
 
@@ -45,33 +50,40 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
                 setattr(model, field, 0)
         return model
 
-    def downloadByCode(self, code):
-        startDate = self.fundamentalsDao.getLatestDate(code, self.modelClass) + timedelta(days=1)
+    def downloadByCodes(self, codes):
+        if type(codes) == str:
+            codes = [codes]
+
+        startDate = datetime.now().date()
         endDate = datetime.now() + timedelta(days=1)
-        symbol = self.codeToStockSymbol(code)
+        symbols = []
+        for code in codes:
+            d = self.fundamentalsDao.getLatestDate(code, self.modelClass) + timedelta(days=1)
+            startDate = Utils.minDate(startDate, d)
+            symbols.append(code)
 
         modelName = self.getModelClassName()
         if startDate >= datetime.now().date():
-            print("[%s\t%s] is up to date" % (code, modelName))
+            logger.info("[%s] %s is up to date" % (codes, modelName))
             return None
-        print("[%s\t%s] from %s to %s" % (modelName, code, startDate, endDate))
+        logger.info("[%s] %s from %s to %s" % (modelName, codes, startDate, endDate))
 
-        results = self.getFundamentals(table=self.table, symbols=symbol, start_date=startDate, end_date=endDate,
-                                     limit=10000, fields=self.fields)
-
+        results = self.getFundamentals(table=self.table, symbols=symbols, start_date=startDate, end_date=endDate,
+                                       limit=10000, fields=self.fields)
         items = [self.rawDataToModel(item) for item in results]
+
         try:
             self.fundamentalsDao.addAll(items)
         except IntegrityError as e:
-            print("[ERROR] failed to save %s, error message = %s " % (modelName, e))
-            print("==data==", items)
+            logger.error("[ERROR] failed to save %s, error message = %s " % (modelName, e))
 
-        print("[%s\t%s] count = %d\n" % (modelName, code, len(items)))
+        logger.info("[%s] %s count = %d\n" % (modelName, codes, len(items)))
         return items
 
-    def downloadAll(self):
+    def downloadAll(self, batch_size=GMConsts.GET_FUNDAMENTAL_BATCH_SIZE):
         stocks = self.stockDao.getStockList(includeB=True)
-        for code in stocks:
-            result = self.downloadByCode(code)
+        for i in range(int(len(stocks)/batch_size+1)):
+            codes = stocks[i*batch_size:(i+1)*batch_size]
+            result = self.downloadByCodes(codes)
             if result is not None:
                 time.sleep(0.1)

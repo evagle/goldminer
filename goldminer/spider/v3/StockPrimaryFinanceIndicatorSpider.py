@@ -14,4 +14,4 @@ class StockPrimaryFinanceIndicatorSpider(BaseFundamentalSpider):
 
 if __name__ == "__main__":
     spider = StockPrimaryFinanceIndicatorSpider()
-    spider.downloadByCode('000001')
+    spider.downloadByCodes('000001')

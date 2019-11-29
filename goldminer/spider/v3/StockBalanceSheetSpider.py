@@ -14,4 +14,4 @@ class StockBalanceSheetSpider(BaseFundamentalSpider):
 
 if __name__ == "__main__":
     spider = StockBalanceSheetSpider()
-    spider.downloadByCode('000001')
+    spider.downloadByCodes('000001')

@@ -14,4 +14,4 @@ class StockIncomeStatementSpider(BaseFundamentalSpider):
 
 if __name__ == "__main__":
     spider = StockIncomeStatementSpider()
-    spider.downloadByCode('000001')
+    spider.downloadByCodes('000001')
