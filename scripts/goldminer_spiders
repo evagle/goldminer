@@ -53,39 +53,39 @@ spider = StockDailyBarAdjustNoneSpider()
 spider.downloadAll()
 
 
-'''
-Download all stock bars with prev adjustment
-'''
-spider = StockDailyBarAdjustPrevSpider()
-spider.downloadAll()
+# '''
+# Download all stock bars with prev adjustment
+# '''
+# spider = StockDailyBarAdjustPrevSpider()
+# spider.downloadAll()
 
 
 '''
 Download Balance Sheet
 '''
 spider = StockBalanceSheetSpider()
-spider.downloadAll()
+spider.downloadAll(mode="batch", batch_size=40)
 
 '''
 Download Income Statement
 '''
 spider = StockIncomeStatementSpider()
-spider.downloadAll()
+spider.downloadAll(mode="batch", batch_size=40)
 
 '''
 Download Primary Finance Indicator
 '''
 spider = StockPrimaryFinanceIndicatorSpider()
-spider.downloadAll()
+spider.downloadAll(mode="batch", batch_size=40)
 
 '''
 Download Trading Derivative Indicator
 '''
 spider = StockTradingDerivativeIndicatorSpider()
-spider.downloadAll()
+spider.downloadAll(mode="single")
 
 '''
 Download Derivative Finance Indicator
 '''
 spider = StockDerivativeFinanceIndicatorSpider()
-spider.downloadAll()
+spider.downloadAll(mode="batch", batch_size=40)

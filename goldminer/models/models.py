@@ -1,5 +1,5 @@
 # coding: utf-8
-from sqlalchemy import BigInteger, Column, Date, DateTime, Float, Index, Integer, String, Text
+from sqlalchemy import BigInteger, Column, Date, DateTime, Float, Index, Integer, String, Text, PrimaryKeyConstraint
 from sqlalchemy.ext.declarative import declarative_base
 
 from goldminer.common.Utils import Utils
@@ -38,10 +38,10 @@ Base.__str__ = to_str
 class BalanceSheet(Base):
     __tablename__ = 'BalanceSheet'
     __table_args__ = (
-        Index('code_pub_date_end_date', 'code', 'pub_date', 'end_date', unique=True),
+        PrimaryKeyConstraint( 'code', 'pub_date', 'end_date', name='code_pub_date_end_date'),
     )
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, nullable=False)
     code = Column(String(16), nullable=False)
     pub_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
@@ -402,8 +402,11 @@ class CashflowStatement(Base):
 
 class DerivativeFinanceIndicator(Base):
     __tablename__ = 'DerivativeFinanceIndicator'
+    __table_args__ = (
+        PrimaryKeyConstraint('code', 'pub_date', 'end_date', name='code_pub_date_end_date'),
+    )
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, nullable=False)
     code = Column(String(16), nullable=False)
     pub_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
@@ -617,10 +620,10 @@ class FundDailyBar(Base):
 class IncomeStatement(Base):
     __tablename__ = 'IncomeStatement'
     __table_args__ = (
-        Index('code_pub_date_end_date', 'code', 'pub_date', 'end_date', unique=True),
+        PrimaryKeyConstraint('code', 'pub_date', 'end_date', name='code_pub_date_end_date'),
     )
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, nullable=False)
     code = Column(String(16), nullable=False)
     pub_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
@@ -844,10 +847,10 @@ class Indexes(Base):
 class PrimaryFinanceIndicator(Base):
     __tablename__ = 'PrimaryFinanceIndicator'
     __table_args__ = (
-        Index('code_pub_date_end_date', 'code', 'pub_date', 'end_date', unique=True),
+        PrimaryKeyConstraint('code', 'pub_date', 'end_date', name='code_pub_date_end_date'),
     )
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, nullable=False)
     code = Column(String(16), nullable=False)
     pub_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
@@ -929,10 +932,10 @@ class Stock(Base):
 class TradingDerivativeIndicator(Base):
     __tablename__ = 'TradingDerivativeIndicator'
     __table_args__ = (
-        Index('code_pub_date', 'code', 'pub_date', unique=True),
+        PrimaryKeyConstraint('code', 'pub_date', name='code_pub_date'),
     )
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, nullable=False)
     code = Column(String(16), nullable=False)
     pub_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)

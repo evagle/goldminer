@@ -32,9 +32,10 @@ class BaseDao:
         )
         self.session.commit()
 
-    def merge(self, instances):
+    def insertOrReplace(self, instances):
         for instance in instances:
             self.session.merge(instance)
+        self.session.commit()
 
     def getSession(self):
         return self.session

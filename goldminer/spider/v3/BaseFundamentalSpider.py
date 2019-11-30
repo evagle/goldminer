@@ -54,13 +54,9 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
         if type(codes) == str:
             codes = [codes]
 
-        startDate = datetime.now().date()
+        startDate = self.fundamentalsDao.getLatestDateByCodes(codes, self.modelClass) + timedelta(days=1)
         endDate = datetime.now() + timedelta(days=1)
-        symbols = []
-        for code in codes:
-            d = self.fundamentalsDao.getLatestDate(code, self.modelClass) + timedelta(days=1)
-            startDate = Utils.minDate(startDate, d)
-            symbols.append(code)
+        symbols = [self.codeToStockSymbol(code) for code in codes]
 
         modelName = self.getModelClassName()
         if startDate >= datetime.now().date():
@@ -73,17 +69,58 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
         items = [self.rawDataToModel(item) for item in results]
 
         try:
-            self.fundamentalsDao.addAll(items)
+            self.fundamentalsDao.insertOrReplace(items)
         except IntegrityError as e:
             logger.error("[ERROR] failed to save %s, error message = %s " % (modelName, e))
 
         logger.info("[%s] %s count = %d\n" % (modelName, codes, len(items)))
         return items
 
-    def downloadAll(self, batch_size=GMConsts.GET_FUNDAMENTAL_BATCH_SIZE):
+
+    def downloadByCode(self, code):
+        startDate = self.fundamentalsDao.getLatestDate(code, self.modelClass) + timedelta(days=1)
+        endDate = datetime.now() + timedelta(days=1)
+        symbol = self.codeToStockSymbol(code)
+
+        modelName = self.getModelClassName()
+        if startDate >= datetime.now().date():
+            logger.info("[%s\t%s] is up to date" % (code, modelName))
+            return None
+        logger.info("[%s\t%s] from %s to %s" % (modelName, code, startDate, endDate))
+
+        results = self.getFundamentals(table=self.table, symbols=symbol, start_date=startDate, end_date=endDate,
+                                     limit=10000, fields=self.fields)
+
+        items = [self.rawDataToModel(item) for item in results]
+        try:
+            self.fundamentalsDao.addAll(items)
+        except IntegrityError as e:
+            logger.error("Failed to save %s, error message = %s " % (modelName, e))
+
+        logger.info("[%s\t%s] count = %d\n" % (modelName, code, len(items)))
+        return items
+
+    def downloadAll(self, mode='batch', batch_size=GMConsts.GET_FUNDAMENTAL_BATCH_SIZE):
+        """
+
+        :param mode: support "batch" and "single"
+        :param batch_size:
+        :return:
+        """
+        start = time.time()
         stocks = self.stockDao.getStockList(includeB=True)
-        for i in range(int(len(stocks)/batch_size+1)):
-            codes = stocks[i*batch_size:(i+1)*batch_size]
-            result = self.downloadByCodes(codes)
-            if result is not None:
-                time.sleep(0.1)
+
+        if mode == "batch":
+            for i in range(int(len(stocks)/batch_size+1)):
+                codes = stocks[i*batch_size:(i+1)*batch_size]
+                result = self.downloadByCodes(codes)
+                if result is not None:
+                    time.sleep(0.1)
+        else:
+            for code in stocks:
+                result = self.downloadByCode(code)
+                if result is not None:
+                    time.sleep(0.05)
+
+        end = time.time()
+        logger.info("Handling {} cost {}s".format(self.getModelClassName(), end-start))
