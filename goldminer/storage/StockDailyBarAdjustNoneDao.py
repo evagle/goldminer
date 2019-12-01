@@ -1,6 +1,8 @@
 # coding: utf-8
 from datetime import date
 
+from goldminer.common.Utils import Utils
+
 from goldminer.models.models import StockDailyBarAdjustNone
 from goldminer.storage.BaseDao import BaseDao
 from typing import List
@@ -25,10 +27,11 @@ class StockDailyBarAdjustNoneDao(BaseDao):
                              .all()
         return [d[0] for d in result]
 
-    def getAll(self, code: str) -> List[StockDailyBarAdjustNone]:
-        return self.getN(code)
+    def getAll(self, code: str, adjust="prev") -> List[StockDailyBarAdjustNone]:
+        bars = self.getN(code, adjust=adjust)
+        return bars
 
-    def getN(self, code: str, limit = None) -> List[StockDailyBarAdjustNone]:
+    def getN(self, code: str, limit = None, adjust="prev") -> List[StockDailyBarAdjustNone]:
         query = self.session.query(StockDailyBarAdjustNone) \
             .filter(StockDailyBarAdjustNone.code == code) \
             .order_by(StockDailyBarAdjustNone.trade_date.asc())
@@ -36,6 +39,9 @@ class StockDailyBarAdjustNoneDao(BaseDao):
             result = query.all()
         else:
             result = query.limit(limit).all()
+
+        if adjust == "prev":
+            result = Utils.pre_adjust(result)
         return result
 
     def getByDate(self, trade_date: str) -> List[StockDailyBarAdjustNone]:
