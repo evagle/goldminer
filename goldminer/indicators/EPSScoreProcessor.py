@@ -3,6 +3,8 @@ import math
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 
+from goldminer.common.Utils import Utils
+
 from goldminer.common.logger import get_logger
 from goldminer.indicators.BaseIndicatorProcessor import BaseIndicatorProcessor
 from goldminer.indicators.StockManager import StockManager
@@ -205,8 +207,8 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
                 model.code = code
                 model.trade_date = targetDate
 
-            model.eps_score = score
-            model.eps_rank = rank
+            model.eps_score = Utils.formatFloat(score, 6)
+            model.eps_rank = Utils.formatFloat(rank, 6)
             updatedModels.append(model)
 
         logger.info("{} eps score/rank updated".format(len(updatedModels)))
