@@ -158,6 +158,10 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
         :param kwargs: args `date` for end date of finance indicator
         :return: float eps score, 0 for no score based on finance indicators
         """
+        if code not in self.derivativeFinanceIndicatorModels:
+            logger.warn("No data found for code {}, return 0".format(code))
+            return 0
+
         models = self.derivativeFinanceIndicatorModels[code]
         endDate = self.get_args(kwargs, 'date')
         quarterModels = self.getLast2Quarter(models, endDate)
