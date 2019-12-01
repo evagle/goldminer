@@ -2,10 +2,13 @@
 import math
 from datetime import datetime, timedelta
 
+from goldminer.common.Utils import Utils
+
 from goldminer.common.logger import get_logger
 from goldminer.indicators.BaseIndicatorProcessor import BaseIndicatorProcessor
 from goldminer.models.models import StockCustomIndicator
 from goldminer.storage.StockCustomIndicatorDao import StockCustomIndicatorDao
+from goldminer.storage.StockDailyBarAdjustNoneDao import StockDailyBarAdjustNoneDao
 from goldminer.storage.StockDailyBarAdjustPrevDao import StockDailyBarAdjustPrevDao
 from goldminer.storage.StockDao import StockDao
 
@@ -14,7 +17,8 @@ logger = get_logger(__name__)
 
 class NDayGainsProcessor(BaseIndicatorProcessor):
     def __init__(self):
-        self.stockBarPrevDao = StockDailyBarAdjustPrevDao()
+        # self.stockBarPrevDao = StockDailyBarAdjustPrevDao()
+        self.stockBarNoneDao = StockDailyBarAdjustNoneDao()
         self.stockDao = StockDao()
         self.customIndicatorDao = StockCustomIndicatorDao()
 
@@ -33,7 +37,9 @@ class NDayGainsProcessor(BaseIndicatorProcessor):
             modelsDict[(model.code, model.trade_date)] = model
 
         customIndicatorsChanged = {}
-        bars = self.stockBarPrevDao.getAll(code)
+        limit = (endDate - startDate).days + 300
+        
+        bars = self.stockBarNoneDao.getN(code, limit=limit, adjust="prev")
         for i in range(len(bars)):
             key = (code, bars[i].trade_date)
             if key in modelsDict:
@@ -59,6 +65,7 @@ class NDayGainsProcessor(BaseIndicatorProcessor):
                         break
 
                 gain = (bars[i].close - close) / close * 100 if close > 0 else 0
+                gain = Utils.formatFloat(gain, 6)
                 attr = "gain" + str(n)
                 oldval = getattr(model, attr)
                 if oldval is None or math.fabs(oldval - gain) > 1e-6:
