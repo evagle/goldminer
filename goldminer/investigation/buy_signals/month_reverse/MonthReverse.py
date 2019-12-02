@@ -51,7 +51,7 @@ class MonthReverse(BuyPointBase):
 
     # 一年新高图形
     def month_reverse_buy_points(self, code):
-        bars = self.stockBarAdjustPrevDao.getAll(code)
+        bars = self.stockBarNoAdjustDao.getAll(code)
         derivatives = self.stockFundamentals.getAll(code, TradingDerivativeIndicator)
         primary_finance_indicators = self.stockFundamentals.getAll(code, PrimaryFinanceIndicator)
         income_statements = self.stockFundamentals.getAll(code, IncomeStatement)

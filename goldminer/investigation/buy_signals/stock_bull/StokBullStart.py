@@ -201,12 +201,10 @@ class StockBullStart(BuyPointBase):
         :return:
         '''
 
-        # bars = self.stockBarAdjustPrevDao.getAll(code)
+        # bars = self.stockBarNoAdjustDao.getAll(code)
         spider = TSStockBarSpider()
         bars = spider.getDailyBars(code)
-        # bars = self.stockBarNoAdjustDao.getAll(code)
-        # bars = Utils.pre_adjust(bars)
-        # bars = Utils.pre_adjust(bars)
+
         if bars is None:
             return (0, 0)
 

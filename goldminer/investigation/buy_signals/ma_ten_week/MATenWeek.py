@@ -66,7 +66,7 @@ class MATenWeek(BuyPointBase):
 
     # 一年新高图形
     def ma_ten_weeks_buy_points(self, code):
-        bars = self.stockBarAdjustPrevDao.getAll(code)
+        bars = self.stockBarNoAdjustDao.getAll(code)
         # bars = Utils.pre_adjust(bars)
 
         # bars = self.tsStockBarSpider.getDailyBars(code, adj='qfq')
