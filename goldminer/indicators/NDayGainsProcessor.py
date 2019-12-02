@@ -9,7 +9,6 @@ from goldminer.indicators.BaseIndicatorProcessor import BaseIndicatorProcessor
 from goldminer.models.models import StockCustomIndicator
 from goldminer.storage.StockCustomIndicatorDao import StockCustomIndicatorDao
 from goldminer.storage.StockDailyBarAdjustNoneDao import StockDailyBarAdjustNoneDao
-from goldminer.storage.StockDailyBarAdjustPrevDao import StockDailyBarAdjustPrevDao
 from goldminer.storage.StockDao import StockDao
 
 logger = get_logger(__name__)
@@ -17,7 +16,6 @@ logger = get_logger(__name__)
 
 class NDayGainsProcessor(BaseIndicatorProcessor):
     def __init__(self):
-        # self.stockBarPrevDao = StockDailyBarAdjustPrevDao()
         self.stockBarNoneDao = StockDailyBarAdjustNoneDao()
         self.stockDao = StockDao()
         self.customIndicatorDao = StockCustomIndicatorDao()

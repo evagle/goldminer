@@ -7,6 +7,9 @@ from typing import List
 
 class StockDailyBarAdjustPrevDao(BaseDao):
 
+    def __init__(self):
+        raise Exception("StockDailyBarAdjustPrev is deprecated")
+
     def add(self, stockBar: StockDailyBarAdjustPrev):
         self.session.add(stockBar)
         self.session.commit()
