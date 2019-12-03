@@ -210,6 +210,7 @@ class StockCustomIndicator(Base):
     rps250 = Column(Float, nullable=True)
     eps_score = Column(Float, nullable=True)
     eps_rank = Column(Float, nullable=True)
+    roe_score = Column(Float, nullable=True)
     pivot_point = Column(Integer, nullable=True)
 
 
