@@ -16,7 +16,7 @@ from goldminer.storage.StockDao import StockDao
 logger = get_logger(__name__)
 
 
-class EPSScoreProcessor(BaseIndicatorProcessor):
+class EPSRankProcessor(BaseIndicatorProcessor):
     """
     Calculate eps score according to net profit cut(扣除非经常性损益后的净利润) growth ratio
     1. 最近两个季度的扣非净利润增长率得分，权重1.0
@@ -134,21 +134,24 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
         quarterScore = 0
         sumWeight = 0
         for i in range(2):
-            quarterScore += EPSScoreProcessor.QUARTER_WEIGHTS[i] * self.growth2Score(quarterModels[i].NPCUTGrowth)
-            sumWeight += EPSScoreProcessor.QUARTER_WEIGHTS[i]
+            quarterScore += EPSRankProcessor.QUARTER_WEIGHTS[i] * self.growth2Score(quarterModels[i].NPCUTGrowth)
+            sumWeight += EPSRankProcessor.QUARTER_WEIGHTS[i]
+            print("quarter", quarterModels[i].NPCUTGrowth,  quarterScore)
         quarterScore /= sumWeight
-
+        print("quarter22", quarterScore)
         # year score
         yearScore = 0
         for i in range(min(3, len(yearModels))):
-            yearScore += EPSScoreProcessor.YEAR_WEIGHTS[i] * self.growth2Score(yearModels[i].NPCUTGrowth)
-            sumWeight += EPSScoreProcessor.YEAR_WEIGHTS[i]
+            yearScore += EPSRankProcessor.YEAR_WEIGHTS[i] * self.growth2Score(yearModels[i].NPCUTGrowth)
+            sumWeight += EPSRankProcessor.YEAR_WEIGHTS[i]
+            print("year", yearModels[i].NPCUTGrowth, yearScore)
         yearScore /= sumWeight
 
-        score = (EPSScoreProcessor.OVERALL_QUARTER_SCORE_WEIGHT * quarterScore +
-                 EPSScoreProcessor.OVERALL_YEAR_SCORE_WEIGHT * yearScore) / \
-                (EPSScoreProcessor.OVERALL_QUARTER_SCORE_WEIGHT + EPSScoreProcessor.OVERALL_YEAR_SCORE_WEIGHT)
-
+        print("year22", yearScore)
+        score = (EPSRankProcessor.OVERALL_QUARTER_SCORE_WEIGHT * quarterScore +
+                 EPSRankProcessor.OVERALL_YEAR_SCORE_WEIGHT * yearScore) / \
+                (EPSRankProcessor.OVERALL_QUARTER_SCORE_WEIGHT + EPSRankProcessor.OVERALL_YEAR_SCORE_WEIGHT)
+        print(score)
         return score
 
     def process(self, code, **kwargs):
@@ -156,6 +159,7 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
         Calculate eps score for stock by the end of `date`
 
         ## 中途调用bulksave会导致getLast2Quarter运行缓慢，debug发现在执行getLast2Quarter时出现了sql相关调用
+        原因是expire_on_commit=true导致每次提交数据就expire了
         :param code:
         :param kwargs: args `date` for end date of finance indicator
         :return: float eps score, 0 for no score based on finance indicators
@@ -234,6 +238,6 @@ class EPSScoreProcessor(BaseIndicatorProcessor):
 
 
 if __name__ == "__main__":
-    processor = EPSScoreProcessor()
+    processor = EPSRankProcessor()
 
     processor.processAll()
