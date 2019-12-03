@@ -36,7 +36,9 @@ class StockSpider(TushareBase):
         从tushare下载所有股票列表，更新stock数据库
         """
         logger.info("[StockSpider] Start to update stock list")
-        data = self.ts_pro_api.stock_basic(fields='ts_code,symbol,name,area,industry,list_date,delist_date,list_status,exchange')
+        # fields = 'ts_code,symbol,name,area,industry,list_date,delist_date,list_status,exchange'
+        fields = ['ts_code', 'symbol', 'name', 'area', 'industry', 'list_date', 'delist_date', 'list_status', 'exchange']
+        data = self.ts_pro_api.stock_basic(fields=fields)
         logger.info("[StockSpider] Get {} stocks from tushare.".format(data.shape[0]))
 
         stocksInDB = self.stockDao.all()

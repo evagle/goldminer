@@ -72,7 +72,19 @@ class IndexSpider(TushareBase):
         从tushare下载所有指数列表，更新index数据库
         """
         logger.info("[IndexSpider] Start to update stock list")
-        fields = "ts_code,name,fullname,market,publisher,index_type,category,base_date,base_point,list_date,weight_rule,desc,exp_date"
+        fields = ["ts_code",
+                  "name",
+                  "fullname",
+                  "market",
+                  "publisher",
+                  "index_type",
+                  "category",
+                  "base_date",
+                  "base_point",
+                  "list_date",
+                  "weight_rule",
+                  "desc",
+                  "exp_date"]
 
         currentIndexes = self.indexDao.all()
         currentIndexesDict = {}
