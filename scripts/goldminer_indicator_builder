@@ -1,22 +1,44 @@
 #!/usr/bin/python
 # coding: utf-8
-from goldminer.indicators.EPSScoreProcessor import EPSScoreProcessor
+from time import time
+
+from goldminer.common.logger import get_logger
+from goldminer.indicators.EPSRankProcessor import EPSRankProcessor
 from goldminer.indicators.IndexPEPBGenerator import IndexPEPBGenerator
 from goldminer.indicators.NDayGainsProcessor import NDayGainsProcessor
 from goldminer.indicators.RPSProcessor import RPSProcessor
 from goldminer.investigation.buy_signals.pivot_point.PivotPoint import PivotPoint
 
-eps = EPSScoreProcessor()
-eps.processAll()
+begin = time()
+time_costs = []
 
+start = time()
+eps = EPSRankProcessor()
+eps.processAll()
+time_costs.append("EPS Rank Processor cost {}s".format(time()-start))
+
+start = time()
 processor = NDayGainsProcessor()
 processor.updateAll()
+time_costs.append("N Days Gain Processor cost {}s".format(time()-start))
 
+start = time()
 rps = RPSProcessor()
 rps.buildAll()
+time_costs.append("RPS Processor cost {}s".format(time()-start))
 
+start = time()
 processor = PivotPoint()
 processor.processAll()
+time_costs.append("Pivot Point Processor cost {}s".format(time()-start))
 
+start = time()
 pepbGenerator = IndexPEPBGenerator()
 pepbGenerator.updateAll()
+time_costs.append("Index PEPB Generator Processor cost {}s".format(time()-start))
+
+time_costs.append("All Processor cost {}s".format(time()-begin))
+
+logger = get_logger(__name__)
+for line in time_costs:
+    logger.info(line)
