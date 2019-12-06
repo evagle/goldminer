@@ -26,5 +26,20 @@ class DerivativeFinanceIndicatorDao(BaseDao):
             result.append(obj)
         return result
 
+    def getAllROEAVG(self):
+        rows = self.session.query(DerivativeFinanceIndicator.code,
+                                  DerivativeFinanceIndicator.pub_date,
+                                  DerivativeFinanceIndicator.end_date,
+                                  DerivativeFinanceIndicator.ROEAVG).all()
+        result = []
+        for item in rows:
+            obj = types.SimpleNamespace()
+            obj.code = item[0]
+            obj.pub_date = item[1]
+            obj.end_date = item[2]
+            obj.ROEAVG = item[3]
+            result.append(obj)
+        return result
+
     def getByCode(self, code) -> List[DerivativeFinanceIndicator]:
         return self.session.query(DerivativeFinanceIndicator).filter(DerivativeFinanceIndicator.code == code)

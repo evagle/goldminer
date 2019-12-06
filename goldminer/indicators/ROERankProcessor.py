@@ -15,11 +15,11 @@ logger = get_logger(__name__)
 
 class ROERankProcessor(BaseIndicatorProcessor):
     """
-    Calculate roe score according to roeavgcut(扣除非经常性损益后的平均净资产收益率)
-    ROEAVGCUT=扣非净利润/归属母公司的平均股东权益合计（期初期末平均）＊100%
+    Calculate roe score according to roeavg(扣除非经常性损益后的平均净资产收益率)
+    ROEAVG=扣非净利润/归属母公司的平均股东权益合计（期初期末平均）＊100%
     因为ROE是随着季度增长的，应该取相同季度的ROE比较才有意义
 
-    1. 最近三年年报ROEAVGCUT加权值
+    1. 最近三年年报ROEAVG加权值
         a) 最近三年年报权重依次为1.0, 0.8, 0.6
         b) 公式为(w1*x1+w2*x2+w3*x3)/(w1+w2+w3)
         特殊情况处理
@@ -33,13 +33,13 @@ class ROERankProcessor(BaseIndicatorProcessor):
         self.derivativeFinanceDao = DerivativeFinanceIndicatorDao()
         self.stockCustomIndicatorDao = StockCustomIndicatorDao()
 
-        self.derivativeFinanceIndicatorModels = self.prepareROEAVGCUT()
+        self.derivativeFinanceIndicatorModels = self.prepareROEAVG()
         self.stocks = self.stockDao.getStockList()
         self.pubDates = self.stockDao.getAllStockPublishDate()
 
-    def prepareROEAVGCUT(self):
+    def prepareROEAVG(self):
         dic = {}
-        models = self.derivativeFinanceDao.getAllROEAVGCUT()
+        models = self.derivativeFinanceDao.getAllROEAVG()
         for model in models:
             if model.code not in dic:
                 dic[model.code] = []
@@ -53,13 +53,13 @@ class ROERankProcessor(BaseIndicatorProcessor):
 
     def getLast3Year(self, models, endDate):
         """
-        Given sorted derivative finance indicators of one code, return latest 3 year indicators with NPCUTGrowth
+        Given sorted derivative finance indicators of one code, return latest 3 year indicators with ROEAVG
         :param models: derivative finance indicators of one code
-        :return: latest 3 year indicators has NPCUTGrowth
+        :return: latest 3 year indicators has ROEAVG
         """
         result = []
         for model in models:
-            if model.ROEAVGCUT is not None and model.end_date.month == 12 and \
+            if model.ROEAVG is not None and model.end_date.month == 12 and \
                     model.end_date <= endDate and model.pub_date <= endDate:
                 result.append(model)
                 if len(result) == 3:
@@ -84,9 +84,11 @@ class ROERankProcessor(BaseIndicatorProcessor):
         yearScore = 0
         sumWeight = 0
         for i in range(min(3, len(yearModels))):
-            yearScore += self.YEAR_WEIGHTS[i] * self.growth2Score(yearModels[i].ROEAVGCUT)
+            yearScore += self.YEAR_WEIGHTS[i] * self.growth2Score(yearModels[i].ROEAVG)
             sumWeight += self.YEAR_WEIGHTS[i]
+            print(yearModels[i].end_date, yearModels[i].ROEAVG,yearScore)
 
+        print(yearScore/sumWeight)
         return yearScore / sumWeight
 
     def process(self, code, **kwargs):
@@ -174,4 +176,6 @@ class ROERankProcessor(BaseIndicatorProcessor):
 if __name__ == "__main__":
     processor = ROERankProcessor()
 
-    processor.processByDate(date(2019, 10, 28))
+    # processor.processByDate(targetDate=date(2019, 10, 28))
+    processor.processAll()
+    # processor.process('300012', date=date(2019, 10, 28))
