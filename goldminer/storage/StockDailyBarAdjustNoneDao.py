@@ -32,9 +32,16 @@ class StockDailyBarAdjustNoneDao(BaseDao):
         return bars
 
     def getN(self, code: str, limit = None, adjust="prev") -> List[StockDailyBarAdjustNone]:
+        """
+        Fetch top N(N=limit) records ordered by trade_date desc
+        :param code:
+        :param limit:
+        :param adjust:
+        :return:
+        """
         query = self.session.query(StockDailyBarAdjustNone) \
             .filter(StockDailyBarAdjustNone.code == code) \
-            .order_by(StockDailyBarAdjustNone.trade_date.asc())
+            .order_by(StockDailyBarAdjustNone.trade_date.desc())
         if limit is None or limit <= 0:
             result = query.all()
         else:

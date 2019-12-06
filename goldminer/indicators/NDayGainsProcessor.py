@@ -38,6 +38,7 @@ class NDayGainsProcessor(BaseIndicatorProcessor):
         limit = (endDate - startDate).days + 300
         
         bars = self.stockBarNoneDao.getN(code, limit=limit, adjust="prev")
+        bars.reverse()
         for i in range(len(bars)):
             key = (code, bars[i].trade_date)
             if key in modelsDict:
