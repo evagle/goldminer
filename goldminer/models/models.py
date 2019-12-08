@@ -983,3 +983,23 @@ class IndexCorrelation(Base):
     codea = Column(String(32), nullable=False)
     codeb = Column(String(32), nullable=False)
     correlation = Column(Float(asdecimal=True), nullable=False)
+
+
+class PerformanceForecast(Base):
+    __tablename__ = 'PerformanceForecast'
+    __table_args__ = (
+        PrimaryKeyConstraint('code', 'end_date', 'pub_date'),
+    )
+
+    id = Column(Integer, nullable=False)
+    code = Column(String(16), nullable=False)
+    pub_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
+    forecast_type = Column(String(32), nullable=False)
+    forecast_content = Column(Text, nullable=True)
+    profit_forecast_low = Column(Float(asdecimal=True), nullable=False)
+    profit_forecast_high = Column(Float(asdecimal=True), nullable=False)
+    profit_last_year = Column(Float(asdecimal=True), nullable=False)
+    growth_rate_low = Column(Float(asdecimal=True), nullable=False)
+    growth_rate_high = Column(Float(asdecimal=True), nullable=False)
+    explanation = Column(Text, nullable=True)
