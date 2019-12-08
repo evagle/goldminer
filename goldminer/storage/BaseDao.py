@@ -62,3 +62,6 @@ class BaseDao:
     def bulkSave(self, models):
         self.session.bulk_save_objects(models)
         self.session.commit()
+
+    def rollback(self):
+        self.session.rollback()
