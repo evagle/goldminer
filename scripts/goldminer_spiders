@@ -3,6 +3,7 @@
 from time import time
 
 from goldminer.common.logger import get_logger
+from goldminer.spider.eastmoney.ForecastSpider import ForecastSpider
 from goldminer.spider.tushare.IndexSpider import IndexSpider
 from goldminer.spider.tushare.StockSpider import StockSpider
 from goldminer.spider.v3.IndexBarSpider import IndexBarSpider
@@ -103,6 +104,12 @@ start = time()
 spider = StockDerivativeFinanceIndicatorSpider()
 spider.downloadAll(mode="batch", batch_size=40)
 time_costs.append("DerivativeFinanceIndicatorSpider cost {}s".format(time()-start))
+
+
+start = time()
+spider = ForecastSpider()
+spider.run()
+time_costs.append("ForecastSpider cost {}s".format(time()-start))
 
 
 logger = get_logger(__name__)
