@@ -16,7 +16,7 @@ class TSStockBarSpider(TushareBase):
             end_date = datetime.now().strftime("%Y%m%d")
 
         ts_code = self.to_ts_code(code)
-        df = ts.pro_bar(pro_api=self.ts_pro_api, ts_code=ts_code, adj=adj, start_date=start_date, end_date=end_date)
+        df = ts.pro_bar(api=self.ts_pro_api, ts_code=ts_code, adj=adj, start_date=start_date, end_date=end_date)
 
         if df is None:
             return None
