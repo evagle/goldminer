@@ -66,14 +66,14 @@ class MATenWeek(BuyPointBase):
 
     # 一年新高图形
     def ma_ten_weeks_buy_points(self, code):
-        bars = self.stockBarNoAdjustDao.getAll(code)
+        bars = self.stockBarNoAdjustDao.getByCode(code)
         # bars = Utils.pre_adjust(bars)
 
         # bars = self.tsStockBarSpider.getDailyBars(code, adj='qfq')
 
         # derivatives = self.stockFundamentals.getAll(code, TradingDerivativeIndicator)
         # primary_finance_indicators = self.stockFundamentals.getAll(code, PrimaryFinanceIndicator)
-        income_statements = self.stockFundamentals.getAll(code, IncomeStatement)
+        income_statements = self.stockFundamentals.getByCode(code, IncomeStatement)
 
         week_bars = Utils.dailyBar2WeeklyBar(code, bars)
 

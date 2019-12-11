@@ -85,7 +85,7 @@ class PivotPoint(BuyPointBase):
         Generate pivot point signals for stock 'code'
         :return:
         """
-        bars = self.stockBarNoAdjustDao.getAll(code)
+        bars = self.stockBarNoAdjustDao.getByCode(code)
         bars = Utils.pre_adjust(bars)
         if bars is None:
             logger.warn("No bars found for stock {}".format(code))

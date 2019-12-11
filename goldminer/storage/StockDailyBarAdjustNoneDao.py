@@ -27,7 +27,7 @@ class StockDailyBarAdjustNoneDao(BaseDao):
                              .all()
         return [d[0] for d in result]
 
-    def getAll(self, code: str, adjust="prev") -> List[StockDailyBarAdjustNone]:
+    def getByCode(self, code: str, adjust="prev") -> List[StockDailyBarAdjustNone]:
         bars = self.getN(code, adjust=adjust)
         return bars
 
