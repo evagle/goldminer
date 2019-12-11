@@ -24,3 +24,11 @@ class PerformanceForecastDao(BaseDao):
                     .limit(1)
 
         return latest_pub_date
+
+    def getForecastBeforeDate(self, code, date) -> PerformanceForecast:
+        return self.session.query(PerformanceForecast) \
+            .filter(PerformanceForecast.code == code) \
+            .filter(PerformanceForecast.pub_date <= date)\
+            .order_by(PerformanceForecast.pub_date.desc()) \
+            .first()
+
