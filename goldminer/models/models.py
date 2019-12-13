@@ -1020,3 +1020,22 @@ class ProfitSurprise(Base):
     price_increase = Column(Float(asdecimal=True), nullable=False)
     profit_growth_low = Column(Float(asdecimal=True), nullable=True)
     profit_growth_high = Column(Float(asdecimal=True), nullable=True)
+
+
+class PerformancePreview(Base):
+    __tablename__ = 'PerformancePreview'
+    __table_args__ = (
+        PrimaryKeyConstraint('code', 'end_date', 'pub_date'),
+    )
+
+    id = Column(Integer, nullable=False)
+    code = Column(String(16), nullable=False)
+    pub_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
+    income = Column(Float(asdecimal=True), nullable=True)
+    income_previous = Column(Float(asdecimal=True), nullable=True)
+    income_growth = Column(Float(asdecimal=True), nullable=True)
+    profit = Column(Float(asdecimal=True), nullable=True)
+    profit_previous = Column(Float(asdecimal=True), nullable=True)
+    profit_growth = Column(Float(asdecimal=True), nullable=True)
+    roe = Column(Float(asdecimal=True), nullable=True)
