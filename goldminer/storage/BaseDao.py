@@ -33,8 +33,11 @@ class BaseDao:
         self.session.commit()
 
     def insertOrReplace(self, instances):
-        for instance in instances:
-            self.session.merge(instance)
+        if type(instances) == list:
+            for instance in instances:
+                self.session.merge(instance)
+        else:
+            self.session.merge(instances)
         self.session.commit()
 
     def getSession(self):

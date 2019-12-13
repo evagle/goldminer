@@ -38,7 +38,7 @@ Base.__str__ = to_str
 class BalanceSheet(Base):
     __tablename__ = 'BalanceSheet'
     __table_args__ = (
-        PrimaryKeyConstraint( 'code', 'pub_date', 'end_date', name='code_pub_date_end_date'),
+        PrimaryKeyConstraint('code', 'pub_date', 'end_date', name='code_pub_date_end_date'),
     )
 
     id = Column(Integer, nullable=False)
@@ -261,6 +261,7 @@ class StockDailyBarAdjustPrev(Base):
     lower_limit = Column(Float)
     adj_factor = Column(Float(asdecimal=True))
     fix_abnormal = Column(String(32), nullable=True)
+
 
 class CashflowStatement(Base):
     __tablename__ = 'CashflowStatement'
@@ -1003,3 +1004,19 @@ class PerformanceForecast(Base):
     growth_rate_low = Column(Float(asdecimal=True), nullable=False)
     growth_rate_high = Column(Float(asdecimal=True), nullable=False)
     explanation = Column(Text, nullable=True)
+
+
+class ProfitSurprise(Base):
+    __tablename__ = 'ProfitSurprise'
+    __table_args__ = (
+        PrimaryKeyConstraint('code', 'trade_date', 'pub_date'),
+    )
+
+    id = Column(Integer, nullable=False)
+    code = Column(String(16), nullable=False)
+    trade_date = Column(Date, nullable=False)
+    pub_date = Column(Date, nullable=False)
+    price_gap = Column(Integer, nullable=False)
+    price_increase = Column(Float(asdecimal=True), nullable=False)
+    profit_growth_low = Column(Float(asdecimal=True), nullable=True)
+    profit_growth_high = Column(Float(asdecimal=True), nullable=True)
