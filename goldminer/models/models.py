@@ -1016,6 +1016,7 @@ class ProfitSurprise(Base):
     code = Column(String(16), nullable=False)
     trade_date = Column(Date, nullable=False)
     pub_date = Column(Date, nullable=False)
+    type = Column(String(32), nullable=False)
     price_gap = Column(Integer, nullable=False)
     price_increase = Column(Float(asdecimal=True), nullable=False)
     profit_growth_low = Column(Float(asdecimal=True), nullable=True)

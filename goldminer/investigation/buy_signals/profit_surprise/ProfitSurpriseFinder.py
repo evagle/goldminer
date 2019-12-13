@@ -1,6 +1,8 @@
 # coding: utf-8
 import datetime
 
+from goldminer.common.Utils import Utils
+
 from goldminer.common.logger import get_logger
 from goldminer.models.models import ProfitSurprise
 from goldminer.spider.tushare.TSStockBarSpider import TSStockBarSpider
@@ -70,25 +72,19 @@ class ProfitSurpriseFinder:
 
         lastSurprise = None
         for i in range(len(bars) - 1):
-
-            #####TODO DEBUG
-            if bars[i].trade_date < datetime.datetime(2019,6,1):
-                continue
-            ###########
-
             bar = bars[i]
             next_bar = bars[i + 1]
             # 如果跳空上涨4%以上，或者未跳空上涨9%
             if (next_bar.close > bar.close * 1.04 and next_bar.low > bar.high ) or \
                 (next_bar.close > bar.close * 1.09):
                 # 业绩预告
-                performanceAnnouncement = {
-                    "forecast": self.find_forecast_before_date(code, next_bar.trade_date.date()),
+                performanceReports = {
+                    "announcement": self.find_derivative_finance_indicator_before_date(code, next_bar.trade_date.date()),
                     "preview": self.find_preview_before_date(code, next_bar.trade_date.date()),
-                    "derivative": self.find_derivative_finance_indicator_before_date(code, next_bar.trade_date.date())
+                    "forecast": self.find_forecast_before_date(code, next_bar.trade_date.date()),
                 }
 
-                for performanceType, report in performanceAnnouncement.items():
+                for type, report in performanceReports.items():
                     if report:
                         if lastSurprise is not None and lastSurprise.pub_date == report.pub_date:
                             self.logger.info("Surprise exists")
@@ -97,26 +93,29 @@ class ProfitSurpriseFinder:
                         surprise.code = code
                         surprise.trade_date = next_bar.trade_date
                         surprise.pub_date = report.pub_date
-                        if performanceType == 'forecast':
+                        surprise.type = type
+                        if type == 'forecast':
                             surprise.profit_growth_low = report.growth_rate_low
                             surprise.profit_growth_high = report.growth_rate_high
-                        elif performanceType == 'preview':
+                        elif type == 'preview':
                             surprise.profit_growth_low = report.profit_growth
                             surprise.profit_growth_high = report.profit_growth
-                        elif performanceType == 'derivative':
+                        elif type == 'announcement':
                             surprise.profit_growth_low = report.NPGRT
                             surprise.profit_growth_high = report.NPGRT
                         surprise.price_gap = 1 if next_bar.low > bar.high else 0
-                        surprise.price_increase = next_bar.close / bar.close
-                        # self.forecastDao.insertOrReplace(surprise)
-                        print(surprise.code, surprise.trade_date, surprise.pub_date)
+                        surprise.price_increase = Utils.formatFloat(next_bar.close * 100 / bar.close - 100, 3)
+                        self.forecastDao.insertOrReplace(surprise)
+
+                        self.logger.info("Find surprise code = {}, trade_date = {}, pub_date={}".format(
+                            surprise.code, surprise.trade_date, surprise.pub_date))
                         lastSurprise = surprise
 
 
     def run(self):
 
         stocks = self.stockDao.getStockList()
-        surprises = []
+        surprises = ['002791']
         for code in stocks:
             self.findSurpurise(code)
 
