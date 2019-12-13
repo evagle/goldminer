@@ -3,7 +3,8 @@
 from time import time
 
 from goldminer.common.logger import get_logger
-from goldminer.spider.eastmoney.ForecastSpider import ForecastSpider
+from goldminer.spider.eastmoney.PerformanceForecastSpider import PerformanceForecastSpider
+from goldminer.spider.eastmoney.PerformancePreviewSpider import PerformancePreviewSpider
 from goldminer.spider.tushare.IndexSpider import IndexSpider
 from goldminer.spider.tushare.StockSpider import StockSpider
 from goldminer.spider.v3.IndexBarSpider import IndexBarSpider
@@ -107,9 +108,14 @@ time_costs.append("DerivativeFinanceIndicatorSpider cost {}s".format(time()-star
 
 
 start = time()
-spider = ForecastSpider()
+spider = PerformanceForecastSpider()
 spider.run()
-time_costs.append("ForecastSpider cost {}s".format(time()-start))
+time_costs.append("PerformanceForecastSpider cost {}s".format(time()-start))
+
+start = time()
+spider = PerformancePreviewSpider()
+spider.run()
+time_costs.append("PerformancePreviewSpider cost {}s".format(time()-start))
 
 
 logger = get_logger(__name__)
