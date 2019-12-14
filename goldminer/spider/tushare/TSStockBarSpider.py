@@ -1,7 +1,7 @@
 # coding: utf-8
 from datetime import datetime
 
-from goldminer.models.models import StockDailyBarAdjustNone
+from goldminer.models.models import StockDailyBar
 from goldminer.spider.tushare.TushareBase import TushareBase
 
 import tushare as ts
@@ -23,7 +23,7 @@ class TSStockBarSpider(TushareBase):
 
         bars = []
         for row in df.itertuples(index=False):
-            bar = StockDailyBarAdjustNone()
+            bar = StockDailyBar()
             bar.code = code
             bar.trade_date = datetime.strptime(row.trade_date, "%Y%m%d")
             bar.open = row.open

@@ -10,7 +10,7 @@ from goldminer.spider.tushare.StockSpider import StockSpider
 from goldminer.spider.v3.IndexBarSpider import IndexBarSpider
 from goldminer.spider.v3.IndexWeightsSpider import IndexWeightsSpider
 from goldminer.spider.v3.StockBalanceSheetSpider import StockBalanceSheetSpider
-from goldminer.spider.v3.StockDailyBarAdjustNoneSpider import StockDailyBarAdjustNoneSpider
+from goldminer.spider.v3.StockDailyBarSpider import StockDailyBarSpider
 from goldminer.spider.v3.StockDailyBarAdjustPrevSpider import StockDailyBarAdjustPrevSpider
 from goldminer.spider.v3.StockDerivativeFinanceIndicatorSpider import StockDerivativeFinanceIndicatorSpider
 from goldminer.spider.v3.StockIncomeStatementSpider import StockIncomeStatementSpider
@@ -53,7 +53,7 @@ time_costs.append("IndexBarSpider cost {}s".format(time() - start))
 
 
 start = time()
-spider = StockDailyBarAdjustNoneSpider()
+spider = StockDailyBarSpider()
 spider.downloadAll()
 time_costs.append("DailyBarAdjustNoneSpider cost {}s".format(time() - start))
 

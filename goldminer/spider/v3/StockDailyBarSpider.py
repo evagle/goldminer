@@ -3,23 +3,23 @@ import time
 from datetime import timedelta, datetime
 
 from goldminer.common.logger import get_logger
-from goldminer.models.models import StockDailyBarAdjustNone
+from goldminer.models.models import StockDailyBar
 from goldminer.spider.v3.GMBaseSpiderV3 import GMBaseSpiderV3
-from goldminer.storage.StockDailyBarAdjustNoneDao import StockDailyBarAdjustNoneDao
+from goldminer.storage.StockDailyBarDao import StockDailyBarDao
 from goldminer.storage.StockDao import StockDao
 
 logger = get_logger(__name__)
 
 
-class StockDailyBarAdjustNoneSpider(GMBaseSpiderV3):
+class StockDailyBarSpider(GMBaseSpiderV3):
 
     def __init__(self):
-        super(StockDailyBarAdjustNoneSpider, self).__init__()
-        self.stockBarDao = StockDailyBarAdjustNoneDao()
+        super(StockDailyBarSpider, self).__init__()
+        self.stockBarDao = StockDailyBarDao()
         self.stockDao = StockDao()
 
     def rawDataToModel(self, rawBar):
-        model = self._rawDataToModel(rawBar, StockDailyBarAdjustNone)
+        model = self._rawDataToModel(rawBar, StockDailyBar)
         model.trade_date = rawBar['eob'].date()
         model.code = self.symbolToCode(rawBar['symbol'])
         for key in ['pre_close', 'amount', 'open', 'close', 'high', 'low']:
@@ -75,5 +75,5 @@ class StockDailyBarAdjustNoneSpider(GMBaseSpiderV3):
 
 
 if __name__ == "__main__":
-    spider = StockDailyBarAdjustNoneSpider()
+    spider = StockDailyBarSpider()
     spider.downloadBars('000001')

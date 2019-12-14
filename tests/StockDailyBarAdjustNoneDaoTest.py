@@ -2,13 +2,13 @@
 import unittest
 from datetime import date
 
-from goldminer.storage.StockDailyBarAdjustNoneDao import StockDailyBarAdjustNoneDao
+from goldminer.storage.StockDailyBarDao import StockDailyBarDao
 
 
 class StockDailyBarAdjustNoneDaoTest(unittest.TestCase):
 
     def setUp(self):
-        self.dao = StockDailyBarAdjustNoneDao()
+        self.dao = StockDailyBarDao()
 
     def tearDown(self):
         pass

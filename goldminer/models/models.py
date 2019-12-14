@@ -214,8 +214,8 @@ class StockCustomIndicator(Base):
     pivot_point = Column(Integer, nullable=True)
 
 
-class StockDailyBarAdjustNone(Base):
-    __tablename__ = 'StockDailyBarAdjustNone'
+class StockDailyBar(Base):
+    __tablename__ = 'StockDailyBar'
     __table_args__ = (
         Index('code_date', 'code', 'trade_date', unique=True),
     )
@@ -233,8 +233,6 @@ class StockDailyBarAdjustNone(Base):
     sec_level = Column(Integer)
     is_suspended = Column(Integer)
     pre_close = Column(Float)
-    upper_limit = Column(Float)
-    lower_limit = Column(Float)
     adj_factor = Column(Float(asdecimal=True), nullable=False)
 
 

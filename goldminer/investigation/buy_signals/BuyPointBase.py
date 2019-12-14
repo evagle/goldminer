@@ -6,13 +6,13 @@ import talib
 
 from goldminer.spider.tushare.TSStockBarSpider import TSStockBarSpider
 from goldminer.storage.IndexPrimaryIndicatorDao import IndexPrimaryIndicatorDao
-from goldminer.storage.StockDailyBarAdjustNoneDao import StockDailyBarAdjustNoneDao
+from goldminer.storage.StockDailyBarDao import StockDailyBarDao
 from goldminer.storage.StockFundamentalsDao import StockFundamentalsDao
 
 
 class BuyPointBase:
     def __init__(self):
-        self.stockBarNoAdjustDao = StockDailyBarAdjustNoneDao()
+        self.stockBarNoAdjustDao = StockDailyBarDao()
         self.stockFundamentals = StockFundamentalsDao()
         self.indexIndicatorDao = IndexPrimaryIndicatorDao()
         self.tsStockBarSpider = TSStockBarSpider()

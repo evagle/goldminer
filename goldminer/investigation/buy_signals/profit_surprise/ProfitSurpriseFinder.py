@@ -1,5 +1,4 @@
 # coding: utf-8
-import datetime
 
 from goldminer.common.Utils import Utils
 
@@ -10,7 +9,7 @@ from goldminer.storage.DerivativeFinanceIndicatorDao import DerivativeFinanceInd
 
 from goldminer.storage.PerformanceForecastDao import PerformanceForecastDao
 from goldminer.storage.PerformancePreviewDao import PerformancePreviewDao
-from goldminer.storage.StockDailyBarAdjustNoneDao import StockDailyBarAdjustNoneDao
+from goldminer.storage.StockDailyBarDao import StockDailyBarDao
 from goldminer.storage.StockDao import StockDao
 
 
@@ -18,7 +17,7 @@ class ProfitSurpriseFinder:
     def __init__(self):
         self.forecastDao = PerformanceForecastDao()
         self.previewDao = PerformancePreviewDao()
-        self.stockBarDao = StockDailyBarAdjustNoneDao()
+        self.stockBarDao = StockDailyBarDao()
         self.derivativeFinanceIndicatorDao = DerivativeFinanceIndicatorDao()
         self.stockDao = StockDao()
         self.logger = get_logger(__name__)
@@ -67,19 +66,20 @@ class ProfitSurpriseFinder:
         :return:
         """
         bars = self.stockBarDao.getByCode(code)
-        spider = TSStockBarSpider()
-        bars = spider.getDailyBars(code)
+        # spider = TSStockBarSpider()
+        # bars = spider.getDailyBars(code)
 
         lastSurprise = None
         for i in range(len(bars) - 1):
             bar = bars[i]
             next_bar = bars[i + 1]
             # 如果跳空上涨4%以上，或者未跳空上涨9%
-            if (next_bar.close > bar.close * 1.04 and next_bar.low > bar.high ) or \
-                (next_bar.close > bar.close * 1.09):
+            if (next_bar.close > bar.close * 1.04 and next_bar.low > bar.high) or \
+                    (next_bar.close > bar.close * 1.09):
                 # 业绩预告
                 performanceReports = {
-                    "announcement": self.find_derivative_finance_indicator_before_date(code, next_bar.trade_date.date()),
+                    "announcement": self.find_derivative_finance_indicator_before_date(code,
+                                                                                       next_bar.trade_date.date()),
                     "preview": self.find_preview_before_date(code, next_bar.trade_date.date()),
                     "forecast": self.find_forecast_before_date(code, next_bar.trade_date.date()),
                 }
@@ -111,14 +111,10 @@ class ProfitSurpriseFinder:
                             surprise.code, surprise.trade_date, surprise.pub_date))
                         lastSurprise = surprise
 
-
     def run(self):
-
         stocks = self.stockDao.getStockList()
-        surprises = ['002791']
         for code in stocks:
             self.findSurpurise(code)
-
 
 
 if __name__ == "__main__":
@@ -155,4 +151,3 @@ if __name__ == "__main__":
         '002124',  # 天邦股份，10.8 Y
         '002458',  # 益生股份，10.9 Y
     ]
-

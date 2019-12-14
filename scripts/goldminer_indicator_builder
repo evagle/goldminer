@@ -8,6 +8,7 @@ from goldminer.indicators.IndexPEPBGenerator import IndexPEPBGenerator
 from goldminer.indicators.NDayGainsProcessor import NDayGainsProcessor
 from goldminer.indicators.RPSProcessor import RPSProcessor
 from goldminer.investigation.buy_signals.pivot_point.PivotPoint import PivotPoint
+from goldminer.investigation.buy_signals.profit_surprise.ProfitSurpriseFinder import ProfitSurpriseFinder
 
 begin = time()
 time_costs = []
@@ -36,6 +37,12 @@ start = time()
 pepbGenerator = IndexPEPBGenerator()
 pepbGenerator.updateAll()
 time_costs.append("Index PEPB Generator Processor cost {}s".format(time()-start))
+
+start = time()
+pepbGenerator = ProfitSurpriseFinder()
+pepbGenerator.run()
+time_costs.append("ProfitSurpriseFinder cost {}s".format(time()-start))
+
 
 time_costs.append("All Processor cost {}s".format(time()-begin))
 

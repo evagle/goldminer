@@ -6,7 +6,7 @@ from goldminer.common.logger import get_logger
 
 from goldminer.investigation.buy_signals.BuyPointBase import BuyPointBase
 from goldminer.storage.StockCustomIndicatorDao import StockCustomIndicatorDao
-from goldminer.storage.StockDailyBarAdjustNoneDao import StockDailyBarAdjustNoneDao
+from goldminer.storage.StockDailyBarDao import StockDailyBarDao
 from goldminer.storage.StockDao import StockDao
 
 logger = get_logger(__name__)
@@ -17,7 +17,7 @@ class PivotPoint(BuyPointBase):
         super(BuyPointBase, self).__init__()
         self.customIndicatorDao = StockCustomIndicatorDao()
         self.stockDao = StockDao()
-        self.stockBarNoAdjustDao = StockDailyBarAdjustNoneDao()
+        self.stockBarNoAdjustDao = StockDailyBarDao()
 
 
     """

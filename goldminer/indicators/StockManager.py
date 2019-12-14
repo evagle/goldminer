@@ -4,7 +4,7 @@ from datetime import date, datetime
 
 from goldminer.common.Utils import Utils
 from goldminer.models.models import IndexDailyBar, TradingDerivativeIndicator
-from goldminer.storage.StockDailyBarAdjustNoneDao import StockDailyBarAdjustNoneDao
+from goldminer.storage.StockDailyBarDao import StockDailyBarDao
 from goldminer.storage.StockDao import StockDao
 from goldminer.storage.StockFundamentalsDao import StockFundamentalsDao
 
@@ -62,7 +62,7 @@ class StockManager:
         return StockManager.__tradeDatesCache[pos]
 
     def getSuspensionDates(self, code):
-        stockBarDao = StockDailyBarAdjustNoneDao()
+        stockBarDao = StockDailyBarDao()
         tradeDates = stockBarDao.getAllTradeDatesByCode(code)
         candidates = list(set(StockManager.__tradeDatesCache).difference(set(tradeDates)))
         startDate = self.stockDao.getStockPublishDate(code)
