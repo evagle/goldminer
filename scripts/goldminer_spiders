@@ -21,102 +21,82 @@ from goldminer.spider.v3.StockTradingDerivativeIndicatorSpider import StockTradi
 begin = time()
 time_costs = []
 
-'''
-Download newest stock list
-'''
+
 start = time()
 spider = StockSpider()
 spider.getStockFromTuShare()
-time_costs.append("StockSpider cost {}s".format(time()-start))
+time_costs.append("StockSpider cost {}s".format(time() - start))
 
-'''
-Update stock industry from goldminer
-'''
+
 start = time()
 spider = StockIndustrySpider()
 spider.updateIndustry()
-time_costs.append("StockIndustrySpider cost {}s".format(time()-start))
+time_costs.append("StockIndustrySpider cost {}s".format(time() - start))
+
 
 start = time()
 spider = IndexSpider()
 spider.updateIndexListFromTushare()
-time_costs.append("IndexSpider cost {}s".format(time()-start))
+time_costs.append("IndexSpider cost {}s".format(time() - start))
 
-'''
-Download all index weights
-'''
+
 start = time()
 spider = IndexWeightsSpider()
 spider.downloadAllIndexConstituents()
-time_costs.append("IndexWeightsSpider cost {}s".format(time()-start))
+time_costs.append("IndexWeightsSpider cost {}s".format(time() - start))
 
-'''
-Download all index bars
-'''
+
 start = time()
 spider = IndexBarSpider()
 spider.downloadAllIndexBars()
-time_costs.append("IndexBarSpider cost {}s".format(time()-start))
+time_costs.append("IndexBarSpider cost {}s".format(time() - start))
 
-'''
-Download all stock bars with no adjustment
-'''
+
 start = time()
 spider = StockDailyBarAdjustNoneSpider()
 spider.downloadAll()
-time_costs.append("DailyBarAdjustNoneSpider cost {}s".format(time()-start))
+time_costs.append("DailyBarAdjustNoneSpider cost {}s".format(time() - start))
 
-'''
-Download Balance Sheet
-'''
+
+
 start = time()
 spider = StockBalanceSheetSpider()
 spider.downloadAll(mode="batch", batch_size=40)
-time_costs.append("BalanceSheetSpider cost {}s".format(time()-start))
+time_costs.append("BalanceSheetSpider cost {}s".format(time() - start))
 
-'''
-Download Income Statement
-'''
+
 start = time()
 spider = StockIncomeStatementSpider()
 spider.downloadAll(mode="batch", batch_size=40)
-time_costs.append("IncomeStatementSpider cost {}s".format(time()-start))
+time_costs.append("IncomeStatementSpider cost {}s".format(time() - start))
 
-'''
-Download Primary Finance Indicator
-'''
+
 start = time()
 spider = StockPrimaryFinanceIndicatorSpider()
 spider.downloadAll(mode="batch", batch_size=40)
-time_costs.append("PrimaryFinanceIndicatorSpider cost {}s".format(time()-start))
+time_costs.append("PrimaryFinanceIndicatorSpider cost {}s".format(time() - start))
 
-'''
-Download Trading Derivative Indicator
-'''
+
 start = time()
 spider = StockTradingDerivativeIndicatorSpider()
 spider.downloadAll(mode="single")
-time_costs.append("TradingDerivativeIndicatorSpider cost {}s".format(time()-start))
+time_costs.append("TradingDerivativeIndicatorSpider cost {}s".format(time() - start))
 
-'''
-Download Derivative Finance Indicator
-'''
+
 start = time()
 spider = StockDerivativeFinanceIndicatorSpider()
 spider.downloadAll(mode="batch", batch_size=40)
-time_costs.append("DerivativeFinanceIndicatorSpider cost {}s".format(time()-start))
-
+time_costs.append("DerivativeFinanceIndicatorSpider cost {}s".format(time() - start))
 
 start = time()
 spider = PerformanceForecastSpider()
 spider.run()
-time_costs.append("PerformanceForecastSpider cost {}s".format(time()-start))
+time_costs.append("PerformanceForecastSpider cost {}s".format(time() - start))
 
 start = time()
 spider = PerformancePreviewSpider()
 spider.run()
-time_costs.append("PerformancePreviewSpider cost {}s".format(time()-start))
-
+time_costs.append("PerformancePreviewSpider cost {}s".format(time() - start))
 
 logger = get_logger(__name__)
 for line in time_costs:
