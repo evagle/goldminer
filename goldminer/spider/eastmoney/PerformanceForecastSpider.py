@@ -19,11 +19,6 @@ class PerformanceForecastSpider(EastMoneyBase):
 
         self.forecastDao = PerformanceForecastDao()
 
-        self.__force_scan = False
-
-    def set_force_scan(self, is_force=False):
-        self.__force_scan = is_force
-
     def run(self):
         year = datetime.datetime.now().year
         # 业绩预告的开启时间
@@ -60,27 +55,6 @@ class PerformanceForecastSpider(EastMoneyBase):
             if window['start'] <= today <= window['end'] + datetime.timedelta(days=15):
                 self.download_by_end_date(window['end_date'])
 
-    def download_by_end_date(self, end_date):
-        if (end_date.month, end_date.day) not in [(3, 31), (6, 30), (9, 30), (12, 31)]:
-            self.__logger.error("Wrong end date format: {}".format(end_date))
-            return
-
-        page = 1
-        total_pages = 1
-        self.__logger.info("Start downloading forecast for end_date: {}".format(end_date))
-        visited = {}
-
-        # 当出现3个page的全部数据都在数据库中时，停止搜索
-        break_condition = 3
-        while page <= total_pages and break_condition > 0:
-            total_pages, new_forecast_ratio = self.download_page(page, end_date, visited)
-            self.__logger.info("Download page {}/{} successfully for end_date {}".format(page, total_pages, end_date))
-            # stop if new forecast ratio is less than 5 percent in current page,
-            # which means > 95% forecasts in current page were in database already
-            if new_forecast_ratio < 0.05:
-                break_condition -= 1
-            page += 1
-
     def download_page(self, page, end_date, visited):
         enddate_str = end_date.strftime("%Y-%m-%d")
         params = {
@@ -95,7 +69,7 @@ class PerformanceForecastSpider(EastMoneyBase):
             "js": "var rsDGWjfi={\"pages\":(tp),\"data\":(x),\"font\":(font)}"
         }
 
-        return self.call_forecast_api(self._forcast_url, self._headers, params, visited)
+        return self.call_forecast_api(self._eastmoney_ajax_base_url, self._headers, params, visited)
 
     def make_forecast_model(self, item, font_mapping):
         """
@@ -145,6 +119,9 @@ class PerformanceForecastSpider(EastMoneyBase):
 
     def call_forecast_api(self, url, headers, params, visited):
         result = self.call_eastmoney_js_api(url, headers, params)
+        if result is None:
+            return None
+
         pages = result['pages']
         font_mapping = result['font']
         data = result['data']
