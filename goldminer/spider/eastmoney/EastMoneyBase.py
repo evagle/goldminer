@@ -53,7 +53,7 @@ class EastMoneyBase:
 
         font = json_content['font']
         if font is None or font['FontMapping'] is None:
-            self.__logger.info("font is null for url={}, params={}".format(url, params))
+            self.__logger.error("font is null for url={}, params={}".format(url, params))
             return None
 
         font_mapping = {}

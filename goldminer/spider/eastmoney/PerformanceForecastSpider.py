@@ -134,7 +134,7 @@ class PerformanceForecastSpider(EastMoneyBase):
                 self.__logger.warn("Skip data with forecastl = '-', data = {}".format(item))
                 continue
             if item['scode'][:1] not in ['0', '3', '6']:
-                self.__logger.warn("Skip scode {}, data = {}".format(item['scode'], item))
+                self.__logger.info("Skip scode {}, data = {}".format(item['scode'], item))
                 continue
 
             model = self.make_forecast_model(item, font_mapping)

@@ -26,27 +26,27 @@ class PerformancePreviewSpider(EastMoneyBase):
             {
                 "end_date": datetime.datetime(year - 1, 12, 31),
                 "start": datetime.datetime(year - 1, 9, 30),
-                "end": datetime.datetime(year, 1, 31)
+                "end": datetime.datetime(year, 4, 30)
             },
             {
                 "end_date": datetime.datetime(year, 3, 31),
                 "start": datetime.datetime(year, 1, 1),
-                "end": datetime.datetime(year, 4, 15)
+                "end": datetime.datetime(year, 4, 30)
             },
             {
                 "end_date": datetime.datetime(year, 6, 30),
                 "start": datetime.datetime(year, 3, 31),
-                "end": datetime.datetime(year, 7, 15)
+                "end": datetime.datetime(year, 8, 30)
             },
             {
                 "end_date": datetime.datetime(year, 9, 30),
                 "start": datetime.datetime(year, 6, 30),
-                "end": datetime.datetime(year, 10, 15)
+                "end": datetime.datetime(year, 10, 31)
             },
             {
                 "end_date": datetime.datetime(year, 12, 31),
                 "start": datetime.datetime(year, 9, 30),
-                "end": datetime.datetime(year + 1, 1, 31)
+                "end": datetime.datetime(year + 1, 4, 30)
             },
         ]
         today = datetime.datetime.today()
