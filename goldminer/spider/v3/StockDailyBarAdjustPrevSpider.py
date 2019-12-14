@@ -54,8 +54,6 @@ class StockDailyBarAdjustPrevSpider(GMBaseSpiderV3):
                     bar.sec_level = instrument['sec_level']
                     bar.is_suspended = instrument['is_suspended']
                     bar.position = instrument['position']
-                    bar.upper_limit = instrument['upper_limit']
-                    bar.lower_limit = instrument['lower_limit']
 
         self.stockBarDao.addAll(bars)
         logger.info("[Download Stock Bars][%s] count = %d\n" % (symbol, len(bars)))
