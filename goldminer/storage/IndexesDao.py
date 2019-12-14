@@ -17,15 +17,15 @@ class IndexesDao(BaseDao):
     def getIndexList(self) -> List[str]:
         excludeCategories = ["债券指数", "基金指数"]
         excludeIndexTypes = ["申万行业", "申万市场表征"]
-        result = self.session.query(Indexes.code)\
+        result = self.session.query(Indexes.code) \
             .filter(Indexes.category.notin_(excludeCategories)) \
             .filter(Indexes.index_type.notin_(excludeIndexTypes)) \
-            .filter(Indexes.end_date.is_(None))\
+            .filter(Indexes.end_date.is_(None)) \
             .all()
         return [i[0] for i in result]
 
     def getImportantIndexList(self) -> List[str]:
-        result = self.session.query(Indexes.code)\
+        result = self.session.query(Indexes.code) \
             .filter(Indexes.importance == 1) \
             .all()
         return [i[0] for i in result]

@@ -1,9 +1,10 @@
 # coding: utf-8
 from datetime import date
+from typing import List
 
 from goldminer.models.models import StockDailyBarAdjustPrev
 from goldminer.storage.BaseDao import BaseDao
-from typing import List
+
 
 class StockDailyBarAdjustPrevDao(BaseDao):
 
@@ -15,16 +16,16 @@ class StockDailyBarAdjustPrevDao(BaseDao):
         self.session.commit()
 
     def getLatestDate(self, code: str):
-        result = self.session.query(StockDailyBarAdjustPrev.trade_date)\
-                             .filter(StockDailyBarAdjustPrev.code == code)\
-                             .order_by(StockDailyBarAdjustPrev.trade_date.desc())\
-                             .first()
+        result = self.session.query(StockDailyBarAdjustPrev.trade_date) \
+            .filter(StockDailyBarAdjustPrev.code == code) \
+            .order_by(StockDailyBarAdjustPrev.trade_date.desc()) \
+            .first()
         return date(2001, 1, 1) if result is None else result[0]
 
     def getAll(self, code: str) -> List[StockDailyBarAdjustPrev]:
         return self.getN(code)
 
-    def getN(self, code: str, limit = None) -> List[StockDailyBarAdjustPrev]:
+    def getN(self, code: str, limit=None) -> List[StockDailyBarAdjustPrev]:
         query = self.session.query(StockDailyBarAdjustPrev) \
             .filter(StockDailyBarAdjustPrev.code == code) \
             .order_by(StockDailyBarAdjustPrev.trade_date.asc())

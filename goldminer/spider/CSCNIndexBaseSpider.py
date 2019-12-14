@@ -103,5 +103,3 @@ class CSCNIndexBaseSpider:
             if self.isCorrectIndexType(code):
                 self.checkAndUpdateLatestConstituents(code)
                 time.sleep(0.1)
-
-

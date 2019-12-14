@@ -1,20 +1,10 @@
 # coding: utf-8
-import decimal
-import math
-import random
-from datetime import datetime
-
-import numpy as np
-import pandas as pd
-import talib
 
 from goldminer.common import functions
 from goldminer.common.BarAttribute import BarAttribute
 from goldminer.common.Utils import Utils
 from goldminer.investigation.buy_signals.BuyPointBase import BuyPointBase
-from goldminer.models.models import TradingDerivativeIndicator, IncomeStatement, PrimaryFinanceIndicator
 from goldminer.spider.tushare.TSStockBarSpider import TSStockBarSpider
-from goldminer.storage.StockDao import StockDao
 
 
 class StockBullStart(BuyPointBase):
@@ -136,7 +126,7 @@ class StockBullStart(BuyPointBase):
         NH50_IN30 = False
         for bar in bars[-30:]:
             if bar.high >= bar.maxhigh50:
-                 NH50_IN30 += 1
+                NH50_IN30 += 1
 
         COUNT_GT250_IN30 = 0
         for bar in bars[-30:]:
@@ -166,12 +156,11 @@ class StockBullStart(BuyPointBase):
         for i in range(120, len(bars)):
             if i - last <= 10:
                 continue
-            isBull = self.check_daily_bar_bull_signal(bars[:i+1])
+            isBull = self.check_daily_bar_bull_signal(bars[:i + 1])
 
             if isBull:
                 print(bars[i].trade_date, isBull)
                 last = i
-
 
     def weekly_bar_bull(self, code):
         '''
@@ -262,7 +251,5 @@ class StockBullStart(BuyPointBase):
 
 
 if __name__ == "__main__":
-
     analyzer = StockBullStart()
     analyzer.generate_daily_bar_bull_signals('000739')
-

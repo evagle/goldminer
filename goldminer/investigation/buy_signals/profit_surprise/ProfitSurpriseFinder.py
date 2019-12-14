@@ -4,7 +4,6 @@ from goldminer.common.Utils import Utils
 
 from goldminer.common.logger import get_logger
 from goldminer.models.models import ProfitSurprise
-from goldminer.spider.tushare.TSStockBarSpider import TSStockBarSpider
 from goldminer.storage.DerivativeFinanceIndicatorDao import DerivativeFinanceIndicatorDao
 
 from goldminer.storage.PerformanceForecastDao import PerformanceForecastDao

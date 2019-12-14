@@ -31,10 +31,10 @@ class IndexDailyBarDao(BaseDao):
         return result
 
     def getLatestDate(self, code):
-        result = self.session.query(IndexDailyBar.trade_date)\
-                             .filter(IndexDailyBar.code == code)\
-                             .order_by(IndexDailyBar.trade_date.desc())\
-                             .first()
+        result = self.session.query(IndexDailyBar.trade_date) \
+            .filter(IndexDailyBar.code == code) \
+            .order_by(IndexDailyBar.trade_date.desc()) \
+            .first()
         return date(2001, 1, 1) if result is None else result[0]
 
     def getByCode(self, code):

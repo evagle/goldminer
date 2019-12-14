@@ -1,5 +1,4 @@
 # coding: utf-8
-from datetime import date
 
 from goldminer.common.Utils import Utils
 from goldminer.common.logger import get_logger
@@ -18,7 +17,6 @@ class PivotPoint(BuyPointBase):
         self.customIndicatorDao = StockCustomIndicatorDao()
         self.stockDao = StockDao()
         self.stockBarNoAdjustDao = StockDailyBarDao()
-
 
     """
     口袋支点
@@ -80,6 +78,7 @@ class PivotPoint(BuyPointBase):
 
 
     """
+
     def generate_signals(self, code):
         """
         Generate pivot point signals for stock 'code'
@@ -109,13 +108,13 @@ class PivotPoint(BuyPointBase):
 
             V_Ratio = bar.volume * 100 / bar.sma_volume50
 
-            Max_Green_V10 = 0 # 10日最大成交量
-            CNT_LT_MA_V50 = 0 # 小于50日平均成交量的bar数量
-            NH_C10 = True # close 10日内最高
-            NH_H10 = True # high 10日内最高
+            Max_Green_V10 = 0  # 10日最大成交量
+            CNT_LT_MA_V50 = 0  # 小于50日平均成交量的bar数量
+            NH_C10 = True  # close 10日内最高
+            NH_H10 = True  # high 10日内最高
 
             for j in range(1, 10):
-                prebar = bars[i-j]
+                prebar = bars[i - j]
                 if prebar.close < prebar.open:
                     Max_Green_V10 = max(prebar.volume, Max_Green_V10)
                 if prebar.volume < prebar.sma_volume50:
@@ -148,7 +147,7 @@ class PivotPoint(BuyPointBase):
         return signals
 
     def clear_pivot_point(self, code):
-        sql =  "UPDATE StockCustomIndicator set pivot_point=NULL WHERE code='{}'".format(code)
+        sql = "UPDATE StockCustomIndicator set pivot_point=NULL WHERE code='{}'".format(code)
         self.customIndicatorDao.engine.execute(sql)
 
     def save_pivot_point_signals(self, signals):

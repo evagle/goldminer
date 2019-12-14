@@ -1,8 +1,8 @@
 # coding: utf-8
 from datetime import timedelta, datetime
 
-from goldminer.indicators.StockManager import StockManager
 from goldminer.fund.FundSpider import FundSpider
+from goldminer.indicators.StockManager import StockManager
 from goldminer.models.models import SalaryFund
 from goldminer.storage.FundDailyBarDao import FundDailyBarDao
 from goldminer.storage.SalaryFundDao import SalaryFundDao
@@ -136,7 +136,7 @@ class SalaryFundManager:
                     if d.trade_type == "buy" and deal.share > 0 and d.share_left > 0:
                         share = min(deal.share, d.share_left)
                         deal.share -= share
-                        returns += share * (deal.trade_money - d.trade_money )
+                        returns += share * (deal.trade_money - d.trade_money)
 
         return returns
 
@@ -197,8 +197,6 @@ class SalaryFundManager:
         print(fund)
         self.myFundDao.add(fund)
 
-
-
     # 更新salary fund，计算所有未计算的数据并插入数据库
     def updateAllFund(self):
         date = self.myFundDao.getLatestDate() + timedelta(days=1)
@@ -217,4 +215,3 @@ if __name__ == "__main__":
 
     manager = SalaryFundManager()
     manager.updateAllFund()
-

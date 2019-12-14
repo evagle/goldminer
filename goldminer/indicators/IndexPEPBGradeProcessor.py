@@ -1,14 +1,13 @@
 # coding: utf-8
 import json
-import math
 from collections import deque
-from datetime import timedelta, datetime
 
 from goldminer.common.Utils import Utils
 from goldminer.common.logger import get_logger
 from goldminer.indicators.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor
 
 logger = get_logger(__name__)
+
 
 class IndexPEPBGradeProcessor(IndexPEPBBaseProcessor):
 
@@ -82,11 +81,12 @@ class IndexPEPBGradeProcessor(IndexPEPBBaseProcessor):
             pes = sorted(pes)
             n = len(pes)
 
-            grades = [pes[min(int(n*p), n-1)] for p in [0.1, 0.3, 0.8, 1]]
+            grades = [pes[min(int(n * p), n - 1)] for p in [0.1, 0.3, 0.8, 1]]
             grades = [Utils.formatFloat(i, 1) for i in grades]
             gradesJson = json.dumps(grades)
             setattr(current, self.fieldName, gradesJson)
-            logger.info("[%s] %s trade_date = %s, grades = %s" % (indexCode, self.fieldName, current.trade_date, gradesJson))
+            logger.info(
+                "[%s] %s trade_date = %s, grades = %s" % (indexCode, self.fieldName, current.trade_date, gradesJson))
             changed.append(current)
 
         if len(changed) > 0:
@@ -100,6 +100,3 @@ if __name__ == "__main__":
     manager = IndexPEPBGradeProcessor()
     manager.runWeightedPBGrade()
     manager.process('399319')
-
-
-

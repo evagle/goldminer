@@ -1,6 +1,7 @@
 # coding: utf-8
-import talib
 import numpy as np
+import talib
+
 
 def MAX(bars, field, periods):
     if len(bars) == 0 or len(periods) == 0:

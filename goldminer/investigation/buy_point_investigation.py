@@ -8,8 +8,6 @@ class BuyPointInvestigation:
         self.stockFundamentals = StockFundamentalsDao()
 
 
-
-
 if __name__ == "__main__":
     analyzer = BuyPointInvestigation()
     stockDao = StockDao()

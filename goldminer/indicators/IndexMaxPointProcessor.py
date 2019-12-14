@@ -46,5 +46,3 @@ class IndexMaxPointProcessor(IndexPEPBBaseProcessor):
 if __name__ == "__main__":
     manager = IndexMaxPointProcessor()
     manager.process('000001')
-
-

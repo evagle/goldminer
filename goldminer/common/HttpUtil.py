@@ -1,5 +1,4 @@
 # coding: utf-8
-import urllib
 from urllib import request
 
 
@@ -16,5 +15,3 @@ class HttpUtil:
         req = request.Request(url, headers=headers)
         response = request.urlopen(req)
         return response.read()
-
-

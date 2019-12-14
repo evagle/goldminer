@@ -1,8 +1,6 @@
 # coding: utf-8
-import time
-from datetime import date, datetime
+from datetime import datetime
 
-from goldminer.common.Utils import Utils
 from goldminer.models.models import IndexDailyBar, TradingDerivativeIndicator
 from goldminer.storage.StockDailyBarDao import StockDailyBarDao
 from goldminer.storage.StockDao import StockDao

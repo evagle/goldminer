@@ -1,6 +1,6 @@
 # coding: utf-8
-from datetime import datetime
 import json
+from datetime import datetime
 
 from goldminer.common.Utils import Utils
 from goldminer.models.models import IndexConstituent

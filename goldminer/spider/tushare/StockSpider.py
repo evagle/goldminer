@@ -1,11 +1,9 @@
 # coding: utf-8
 from datetime import datetime
 
-import tushare as ts
-from goldminer.spider.tushare.TushareBase import TushareBase
-
 from goldminer.common.logger import get_logger
 from goldminer.models.models import Stock
+from goldminer.spider.tushare.TushareBase import TushareBase
 from goldminer.storage.StockDao import StockDao
 
 logger = get_logger(__name__)
@@ -37,7 +35,8 @@ class StockSpider(TushareBase):
         """
         logger.info("[StockSpider] Start to update stock list")
         # fields = 'ts_code,symbol,name,area,industry,list_date,delist_date,list_status,exchange'
-        fields = ['ts_code', 'symbol', 'name', 'area', 'industry', 'list_date', 'delist_date', 'list_status', 'exchange']
+        fields = ['ts_code', 'symbol', 'name', 'area', 'industry', 'list_date', 'delist_date', 'list_status',
+                  'exchange']
         data = self.ts_pro_api.stock_basic(fields=fields)
         logger.info("[StockSpider] Get {} stocks from tushare.".format(data.shape[0]))
 
@@ -84,6 +83,7 @@ class StockSpider(TushareBase):
     下载地址
     http://www.sse.com.cn/assortment/stock/list/share/
     '''
+
     def importFromSH(self):
         dao = StockDao()
         for line in open("/Users/abing/Downloads/ee.txt").readlines():
@@ -106,5 +106,3 @@ class StockSpider(TushareBase):
 if __name__ == "__main__":
     spider = StockSpider()
     spider.getStockFromTuShare()
-
-

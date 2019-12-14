@@ -1,9 +1,9 @@
 # coding: utf-8
-import math
 import random
 import re
 import time
 import urllib.request
+
 
 class ProfitBeatExpectationSpider:
     def __init__(self):
@@ -21,7 +21,7 @@ class ProfitBeatExpectationSpider:
         maxPage = 0
         codes = []
         while True:
-            url = baseUrl % ("%u8D85%u9884%u671F",page)
+            url = baseUrl % ("%u8D85%u9884%u671F", page)
 
             response = urllib.request.urlopen(url)
             content = response.read().decode('utf-8')
@@ -44,7 +44,7 @@ class ProfitBeatExpectationSpider:
             if page > maxPage:
                 break
             else:
-                time.sleep(random.randint(100,2000)/1000)
+                time.sleep(random.randint(100, 2000) / 1000)
 
         print(codes)
         return codes

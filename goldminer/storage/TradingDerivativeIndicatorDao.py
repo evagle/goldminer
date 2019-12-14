@@ -16,8 +16,8 @@ class TradingDerivativeIndicatorDao(BaseDao):
         :param column:
         :return: dict {code: column_value,...}
         """
-        result = self.session.query(TradingDerivativeIndicator.code, column)\
-            .filter(TradingDerivativeIndicator.pub_date == date)\
+        result = self.session.query(TradingDerivativeIndicator.code, column) \
+            .filter(TradingDerivativeIndicator.pub_date == date) \
             .all()
         dic = {}
         for item in result:

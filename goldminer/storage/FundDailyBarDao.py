@@ -2,7 +2,7 @@
 from datetime import date
 from typing import List
 
-from goldminer.models.models import SalaryFund, FundDailyBar
+from goldminer.models.models import FundDailyBar
 from goldminer.storage.BaseDao import BaseDao
 
 
@@ -29,5 +29,3 @@ class FundDailyBarDao(BaseDao):
         if result is not None:
             return result.trade_date
         return date(2017, 1, 1)
-
-

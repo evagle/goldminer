@@ -3,8 +3,8 @@ import math
 from datetime import datetime
 from decimal import Decimal
 
-import talib
 import numpy as np
+import talib
 import xlrd
 
 from goldminer.common import GMConsts
@@ -84,7 +84,6 @@ class Utils:
                 barsGroupByWeek[week].append(bar)
             else:
                 barsGroupByWeek[week] = [bar]
-
 
         weeklyBars = []
         for week in barsGroupByWeek:
@@ -195,4 +194,3 @@ if __name__ == "__main__":
 
     lst = [1, 2, 3, 4]
     print(Utils.getMedian(lst))
-

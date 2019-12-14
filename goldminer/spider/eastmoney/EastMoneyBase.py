@@ -22,7 +22,7 @@ class EastMoneyBase:
 
         self.__logger = get_logger(__name__)
 
-    def set_force_scan(self, is_force = False):
+    def set_force_scan(self, is_force=False):
         self._force_scan = is_force
 
     def decode_numbers(self, string, font_mapping):

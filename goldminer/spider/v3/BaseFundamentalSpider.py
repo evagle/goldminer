@@ -1,18 +1,17 @@
 # coding: utf-8
-from datetime import timedelta, datetime
 import time
+from datetime import timedelta, datetime
 
-from goldminer.common import GMConsts
-
-from goldminer.common.Utils import Utils
 from sqlalchemy.exc import IntegrityError
 
+from goldminer.common import GMConsts
 from goldminer.common.logger import get_logger
 from goldminer.spider.v3.GMBaseSpiderV3 import GMBaseSpiderV3
 from goldminer.storage.StockDao import StockDao
 from goldminer.storage.StockFundamentalsDao import StockFundamentalsDao
 
 logger = get_logger(__name__)
+
 
 class BaseFundamentalSpider(GMBaseSpiderV3):
 
@@ -34,6 +33,7 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
     '''
     Override this function when have special requirements
     '''
+
     def rawDataToModel(self, rawBar):
         model = self._rawDataToModel(rawBar, self.modelClass)
         symbol = 'symbol'
@@ -76,7 +76,6 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
         logger.info("[%s] %s count = %d\n" % (modelName, codes, len(items)))
         return items
 
-
     def downloadByCode(self, code):
         startDate = self.fundamentalsDao.getLatestDate(code, self.modelClass) + timedelta(days=1)
         endDate = datetime.now() + timedelta(days=1)
@@ -89,7 +88,7 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
         logger.info("[%s\t%s] from %s to %s" % (modelName, code, startDate, endDate))
 
         results = self.getFundamentals(table=self.table, symbols=symbol, start_date=startDate, end_date=endDate,
-                                     limit=10000, fields=self.fields)
+                                       limit=10000, fields=self.fields)
 
         items = [self.rawDataToModel(item) for item in results]
         try:
@@ -111,8 +110,8 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
         stocks = self.stockDao.getStockList(includeB=True)
 
         if mode == "batch":
-            for i in range(int(len(stocks)/batch_size+1)):
-                codes = stocks[i*batch_size:(i+1)*batch_size]
+            for i in range(int(len(stocks) / batch_size + 1)):
+                codes = stocks[i * batch_size:(i + 1) * batch_size]
                 result = self.downloadByCodes(codes)
                 if result is not None:
                     time.sleep(0.1)
@@ -123,4 +122,4 @@ class BaseFundamentalSpider(GMBaseSpiderV3):
                     time.sleep(0.05)
 
         end = time.time()
-        logger.info("Handling {} cost {}s".format(self.getModelClassName(), end-start))
+        logger.info("Handling {} cost {}s".format(self.getModelClassName(), end - start))

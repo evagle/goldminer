@@ -15,8 +15,6 @@ from goldminer.storage.StockDao import StockDao
 
 class FallbackNewHigh(BuyPointBase):
 
-
-
     # 策略1 上涨后长期整理，然后突破形态
     def fallback_new_high_buy_points(self, code):
         bars = self.stockBarNoAdjustDao.getByCode(code)

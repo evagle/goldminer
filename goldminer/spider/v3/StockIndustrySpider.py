@@ -1,5 +1,4 @@
 # coding: utf-8
-import json
 
 from goldminer.common.logger import get_logger
 from goldminer.spider.v3.GMBaseSpiderV3 import GMBaseSpiderV3
@@ -52,11 +51,7 @@ class StockIndustrySpider(GMBaseSpiderV3):
             self.stockDao.bulkSave(updatedStock)
             logger.info("[StockIndustrySpider] Update industry for {} stocks.".format(len(updatedStock)))
 
+
 if __name__ == "__main__":
     spider = StockIndustrySpider()
     spider.updateIndustry()
-
-
-
-
-

@@ -7,4 +7,3 @@ class BarAttribute(Enum):
     CLOSE = "close"
     HIGH = "high"
     LOW = "low"
-

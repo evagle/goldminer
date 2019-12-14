@@ -15,6 +15,7 @@ class CnIndexSpider(CSCNIndexBaseSpider):
     """
     从cnindex下载最新的constituent数据，更新时间和更新日期不靠谱，经常出错
     """
+
     def __init__(self):
         super(CnIndexSpider, self).__init__()
         self.url = "http://www.cnindex.com.cn/docs/yb_%s.xls"

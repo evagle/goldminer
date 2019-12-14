@@ -3,7 +3,6 @@ import math
 from datetime import datetime, timedelta
 
 from goldminer.common.Utils import Utils
-
 from goldminer.common.logger import get_logger
 from goldminer.indicators.BaseIndicatorProcessor import BaseIndicatorProcessor
 from goldminer.models.models import StockCustomIndicator
@@ -36,7 +35,7 @@ class NDayGainsProcessor(BaseIndicatorProcessor):
 
         customIndicatorsChanged = {}
         limit = (endDate - startDate).days + 300
-        
+
         bars = self.stockBarNoneDao.getN(code, limit=limit, adjust="prev")
         bars.reverse()
         for i in range(len(bars)):

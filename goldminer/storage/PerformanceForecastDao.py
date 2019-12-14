@@ -19,16 +19,15 @@ class PerformanceForecastDao(BaseDao):
         self.session.commit()
 
     def getLatestPubDate(self):
-        latest_pub_date = self.session.query(PerformanceForecast.pub_date)\
-                    .order_by(PerformanceForecast.pub_date.desc())\
-                    .limit(1)
+        latest_pub_date = self.session.query(PerformanceForecast.pub_date) \
+            .order_by(PerformanceForecast.pub_date.desc()) \
+            .limit(1)
 
         return latest_pub_date
 
     def getFirstWithPubDateBefore(self, code, date) -> PerformanceForecast:
         return self.session.query(PerformanceForecast) \
             .filter(PerformanceForecast.code == code) \
-            .filter(PerformanceForecast.pub_date <= date)\
+            .filter(PerformanceForecast.pub_date <= date) \
             .order_by(PerformanceForecast.pub_date.desc()) \
             .first()
-

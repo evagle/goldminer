@@ -4,7 +4,6 @@ import time
 from datetime import timedelta, datetime
 
 from goldminer.common.Utils import Utils
-
 from goldminer.common.logger import get_logger
 from goldminer.models.models import IndexWeight
 from goldminer.spider.v3.GMBaseSpiderV3 import GMBaseSpiderV3

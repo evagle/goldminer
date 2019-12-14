@@ -13,10 +13,9 @@ class IndexCorrelationDao(BaseDao):
 
     def getByCode(self, codeA, codeB) -> IndexCorrelation:
         id = codeA + "_" + codeB
-        return self.session.query(IndexCorrelation).\
+        return self.session.query(IndexCorrelation). \
             filter(IndexCorrelation.id == id).first()
 
     def add(self, model: IndexCorrelation):
         self.session.add(model)
         self.session.commit()
-

@@ -22,7 +22,7 @@ class OneYearNewHigh(BuyPointBase):
         :return:
         '''
         for i in range(pos - 30, pos):
-            if bars[i].low > bars[i-1].high:
+            if bars[i].low > bars[i - 1].high:
                 return 1
         return 0
 
@@ -70,7 +70,7 @@ class OneYearNewHigh(BuyPointBase):
         last_new_high = 0
         for i in range(250, n):
             is_one_year_high = True
-            for j in range(i-250, i):
+            for j in range(i - 250, i):
                 if bars[j].close > bars[i].close:
                     is_one_year_high = False
                     break
@@ -104,11 +104,11 @@ class OneYearNewHigh(BuyPointBase):
             pb_height = self.calculate_pb_heigt_eight_year(bars[i].trade_date, derivatives)
 
             # 一年平均换手率 < 3% (or avg)
-            average_turn_rate = self.calculate_average_turn_rate(bars[i-250].trade_date, bars[i].trade_date,
+            average_turn_rate = self.calculate_average_turn_rate(bars[i - 250].trade_date, bars[i].trade_date,
                                                                  derivatives)
 
             # 一年内方差
-            variance = self.calculate_variance(bars[i-250:i])
+            variance = self.calculate_variance(bars[i - 250:i])
 
             # 到i日价格已经高于多少交易日
             days_with_lower_price = self.calculate_days_with_lower_price(bars, i)
@@ -129,13 +129,12 @@ class OneYearNewHigh(BuyPointBase):
             close_sma250 = bars[i].close / bars[i].sma250
             close_sma50 = bars[i].close / bars[i].sma50
 
-
             # 在i点之前已经上升的幅度，即此次调整前上升了多少,
             # 找最低点方法，最低点距离左侧跌了25%，右侧上升到i点
             increase_before_fallback = self.calculate_increase_before_fallback(bars, i)
 
             # i点的交易量/(i-30,i)的平均交易量
-            volume_ratio = self.calculate_volume_ratio(bars, i-30, i)
+            volume_ratio = self.calculate_volume_ratio(bars, i - 30, i)
 
             # 同比净利润增速
             profit_growth = self.calculate_quarter_profit_growth(income_statements, bars[i].trade_date) * 100
@@ -148,10 +147,10 @@ class OneYearNewHigh(BuyPointBase):
             eps_growth = self.calculate_eps_growth(primary_finance_indicators, bars[i].trade_date) * 100
 
             # i,j之间平均日内振幅，振幅=(high-low)/low
-            average_outer_amplitude = np.mean([bar.outer_amplitude for bar in bars[i-30:i]]) * 100
+            average_outer_amplitude = np.mean([bar.outer_amplitude for bar in bars[i - 30:i]]) * 100
 
             # i,j之间平均日内波动，波动=abs(close-open)/open
-            average_inner_amplitude = np.mean([bar.inner_amplitude for bar in bars[i-30:i]]) * 100
+            average_inner_amplitude = np.mean([bar.inner_amplitude for bar in bars[i - 30:i]]) * 100
 
             finance_indicator = self.get_primary_finance_indicator_by_date(bars[i].trade_date,
                                                                            primary_finance_indicators)
@@ -238,7 +237,6 @@ class OneYearNewHigh(BuyPointBase):
                 buy_point["gain"] = gain
                 buy_point["target"] = 1 if target else 0
                 buy_points.append(buy_point)
-
 
         return pd.DataFrame.from_records(buy_points)
 

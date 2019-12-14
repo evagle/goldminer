@@ -15,9 +15,9 @@ class IndexPrimaryIndicatorDao(BaseDao):
 
     def getByCode(self, code: str) -> List[IndexPrimaryIndicator]:
         return self.session.query(IndexPrimaryIndicator) \
-                            .filter(IndexPrimaryIndicator.code == code) \
-                            .order_by(IndexPrimaryIndicator.trade_date.asc())\
-                            .all()
+            .filter(IndexPrimaryIndicator.code == code) \
+            .order_by(IndexPrimaryIndicator.trade_date.asc()) \
+            .all()
 
     def getByCodeDict(self, code: str) -> Dict[tuple, IndexPrimaryIndicator]:
         """
@@ -35,11 +35,11 @@ class IndexPrimaryIndicatorDao(BaseDao):
         return dic
 
     def getLatestDate(self, code: str, columnName):
-        result = self.session.query(IndexPrimaryIndicator.trade_date)\
-                             .filter(IndexPrimaryIndicator.code == code)\
-                             .filter(Column(columnName).isnot(None))\
-                             .order_by(IndexPrimaryIndicator.trade_date.desc())\
-                             .first()
+        result = self.session.query(IndexPrimaryIndicator.trade_date) \
+            .filter(IndexPrimaryIndicator.code == code) \
+            .filter(Column(columnName).isnot(None)) \
+            .order_by(IndexPrimaryIndicator.trade_date.desc()) \
+            .first()
 
         return None if result is None else result[0]
 
@@ -50,21 +50,22 @@ class IndexPrimaryIndicatorDao(BaseDao):
             return val
         self.deleteCache(clazzName)
 
-        results = self.session.query(IndexPrimaryIndicator)\
-                              .filter(IndexPrimaryIndicator.code == code)\
-                              .filter(IndexPrimaryIndicator.trade_date >= tradeDate, IndexPrimaryIndicator.trade_date <= tradeDate + timedelta(days=60))\
-                              .all()
+        results = self.session.query(IndexPrimaryIndicator) \
+            .filter(IndexPrimaryIndicator.code == code) \
+            .filter(IndexPrimaryIndicator.trade_date >= tradeDate,
+                    IndexPrimaryIndicator.trade_date <= tradeDate + timedelta(days=60)) \
+            .all()
 
         self.addToCache(code, clazzName, results)
         return self.getFromCache(code, tradeDate, clazzName)
 
     def getAfterDate(self, code, tradeDate: date) -> List[IndexPrimaryIndicator]:
-        return self.session.query(IndexPrimaryIndicator)\
-                            .filter(IndexPrimaryIndicator.code == code)\
-                            .filter(IndexPrimaryIndicator.trade_date >= tradeDate) \
-                            .order_by(IndexPrimaryIndicator.trade_date.asc())\
-                            .all()
+        return self.session.query(IndexPrimaryIndicator) \
+            .filter(IndexPrimaryIndicator.code == code) \
+            .filter(IndexPrimaryIndicator.trade_date >= tradeDate) \
+            .order_by(IndexPrimaryIndicator.trade_date.asc()) \
+            .all()
 
-    def bulkUpdateMappings(self, clazz, mappings: List [dict]):
+    def bulkUpdateMappings(self, clazz, mappings: List[dict]):
         self.session.bulk_update_mappings(clazz, mappings)
         self.session.commit()

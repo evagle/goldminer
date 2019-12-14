@@ -28,19 +28,13 @@
 6. 如果是放量大跌>7%甚至跌停跌穿50日线，先走为妙，可以少赚，保住利润。
 '''
 
-import decimal
-import math
-import random
 from datetime import datetime
 
-import numpy as np
 import pandas as pd
-import talib
-import tushare as ts
 
 from goldminer.common.Utils import Utils
 from goldminer.investigation.buy_signals.BuyPointBase import BuyPointBase
-from goldminer.models.models import TradingDerivativeIndicator, IncomeStatement, PrimaryFinanceIndicator
+from goldminer.models.models import IncomeStatement
 from goldminer.storage.StockDao import StockDao
 
 
@@ -53,16 +47,16 @@ class MATenWeek(BuyPointBase):
         for i in range(len(bars)):
             if bars[i].trade_date == trade_date:
                 base = bars[i].close
-                for j in range(i+1, min(i+n+1, len(bars))):
+                for j in range(i + 1, min(i + n + 1, len(bars))):
                     if bars[j].close < minimum:
                         minimum = bars[j].close
                     if bars[j].close > maximum:
                         maximum = bars[j].close
                     # 到达止损线停止
-                    if minimum/base < stop_ratio:
+                    if minimum / base < stop_ratio:
                         break
 
-        return [minimum/base, maximum/base]
+        return [minimum / base, maximum / base]
 
     # 一年新高图形
     def ma_ten_weeks_buy_points(self, code):
@@ -87,13 +81,12 @@ class MATenWeek(BuyPointBase):
         self.calculate_amplitude(bars)
         self.calculate_amplitude(week_bars)
 
-
         buy_points = []
         a = 0
         b = 0
         for i in range(50, len(week_bars)):
             bar = week_bars[i]
-            pre_bar = week_bars[i-1]
+            pre_bar = week_bars[i - 1]
 
             '''
             1. 周k线上穿10周线，需满足前一周低于10周线，本周大于十周线
@@ -102,7 +95,7 @@ class MATenWeek(BuyPointBase):
             '''
             # 前30周到前5周的最低点10周线数值
             min_in_5_30 = 1e6
-            for j in range(i-20, i-2):
+            for j in range(i - 20, i - 2):
                 if min_in_5_30 > week_bars[j].sma10:
                     min_in_5_30 = week_bars[j].sma10
 
@@ -115,15 +108,14 @@ class MATenWeek(BuyPointBase):
             profit_growth = self.calculate_quarter_profit_growth(income_statements, bar.end_date) * 100
 
             if pre_bar.sma10 <= bar.sma10 and \
-                bar.close > bar.sma10 and pre_bar.close < pre_bar.sma10 and \
-                bar.close / bar.sma50 < 1.45 and \
-                bar.rps50 > 85 and \
-                profit_growth > 20 \
-                :
+                    bar.close > bar.sma10 and pre_bar.close < pre_bar.sma10 and \
+                    bar.close / bar.sma50 < 1.45 and \
+                    bar.rps50 > 85 and \
+                    profit_growth > 20 \
+                    :
 
                 minimum, maximum = self.find_high_low(bars, bar.end_date, 120, 0.93)
                 # 获取rps数据
-
 
                 if maximum < 1.1:
                     print(code, bar.end_date, bar.close, [minimum, maximum], "*****")
@@ -171,7 +163,5 @@ if __name__ == "__main__":
         else:
             training_data = pd.concat([training_data, df])
 
-
     output_filename = "ma_ten_week_%d_%s.tsv" % (num, datetime.now().strftime("%Y-%m-%d"))
     training_data.to_csv(output_filename, sep="\t", index=False)
-

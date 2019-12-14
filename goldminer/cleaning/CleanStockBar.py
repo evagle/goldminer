@@ -35,4 +35,3 @@ if __name__ == "__main__":
     stocks = stockDao.getStockList()
     for code in stocks:
         CleanStockBar.checkAndTagAbnormalBar(code)
-

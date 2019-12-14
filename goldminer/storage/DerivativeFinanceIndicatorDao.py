@@ -47,6 +47,6 @@ class DerivativeFinanceIndicatorDao(BaseDao):
     def getFirstWithPubDateBefore(self, code, pub_date) -> DerivativeFinanceIndicator:
         return self.session.query(DerivativeFinanceIndicator) \
             .filter(DerivativeFinanceIndicator.code == code) \
-            .filter(DerivativeFinanceIndicator.pub_date <= pub_date)\
+            .filter(DerivativeFinanceIndicator.pub_date <= pub_date) \
             .order_by(DerivativeFinanceIndicator.pub_date.desc()) \
             .first()

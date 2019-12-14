@@ -1,5 +1,5 @@
 # coding: utf-8
-from datetime import date, datetime
+from datetime import date
 
 from goldminer.models.models import IndexConstituent
 from goldminer.storage.BaseDao import BaseDao
@@ -32,18 +32,19 @@ class IndexConstituentDao(BaseDao):
     def getConstituentUpdateDates(self, code):
         return self.session.query(IndexConstituent.trade_date) \
             .filter(IndexConstituent.code == code) \
-            .order_by(IndexConstituent.trade_date.asc())\
+            .order_by(IndexConstituent.trade_date.asc()) \
             .all()
 
     '''
     1. Find first record with trade_date <= date
     2. If date < all trade_date, return first one
     '''
+
     def getConstituents(self, code, tradeDate) -> IndexConstituent:
         result = self.session.query(IndexConstituent) \
-                             .filter(IndexConstituent.code == code, IndexConstituent.trade_date <= tradeDate) \
-                             .order_by(IndexConstituent.trade_date.desc()) \
-                             .first()
+            .filter(IndexConstituent.code == code, IndexConstituent.trade_date <= tradeDate) \
+            .order_by(IndexConstituent.trade_date.desc()) \
+            .first()
         if result is not None and (tradeDate - result.trade_date).days < 200:
             return result
 
@@ -59,9 +60,9 @@ class IndexConstituentDao(BaseDao):
 
     def getConstituentsBeforeDate(self, code, tradeDate) -> IndexConstituent:
         return self.session.query(IndexConstituent) \
-                             .filter(IndexConstituent.code == code, IndexConstituent.trade_date <= tradeDate) \
-                             .order_by(IndexConstituent.trade_date.desc()) \
-                             .first()
+            .filter(IndexConstituent.code == code, IndexConstituent.trade_date <= tradeDate) \
+            .order_by(IndexConstituent.trade_date.desc()) \
+            .first()
 
 
 if __name__ == "__main__":

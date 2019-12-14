@@ -1,8 +1,8 @@
 # coding: utf-8
-import decimal
 from datetime import datetime, timedelta
 from decimal import Decimal
 from math import fabs
+
 import pandas as pd
 
 from goldminer.common.logger import get_logger

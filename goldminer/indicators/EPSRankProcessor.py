@@ -4,7 +4,6 @@ from datetime import date, datetime, timedelta
 from decimal import Decimal
 
 from goldminer.common.Utils import Utils
-
 from goldminer.common.logger import get_logger
 from goldminer.indicators.BaseIndicatorProcessor import BaseIndicatorProcessor
 from goldminer.indicators.StockManager import StockManager
@@ -70,7 +69,8 @@ class EPSRankProcessor(BaseIndicatorProcessor):
                 current.NPCUTGrowth = None
                 for j in range(i + 1, n):
                     if self.isDiffOneYear(current.end_date, models[j].end_date):
-                        current.NPCUTGrowth = float((current.NPCUT - models[j].NPCUT) / Decimal(math.fabs(models[j].NPCUT)))
+                        current.NPCUTGrowth = float(
+                            (current.NPCUT - models[j].NPCUT) / Decimal(math.fabs(models[j].NPCUT)))
                         if abs(current.NPCUTGrowth) > 10:
                             logger.warn("Imposible growth {}".format(current.NPCUTGrowth))
                             current.NPCUTGrowth = 10 if current.NPCUTGrowth > 0 else -10
@@ -136,7 +136,7 @@ class EPSRankProcessor(BaseIndicatorProcessor):
         for i in range(2):
             quarterScore += EPSRankProcessor.QUARTER_WEIGHTS[i] * self.growth2Score(quarterModels[i].NPCUTGrowth)
             sumWeight += EPSRankProcessor.QUARTER_WEIGHTS[i]
-            print("quarter", quarterModels[i].NPCUTGrowth,  quarterScore)
+            print("quarter", quarterModels[i].NPCUTGrowth, quarterScore)
         quarterScore /= sumWeight
         print("quarter22", quarterScore)
         # year score

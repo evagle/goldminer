@@ -14,20 +14,20 @@ class StockFundamentalsDao(BaseDao):
         self.session.commit()
 
     def getLatestDate(self, code: str, modelClazz):
-        result = self.session.query(modelClazz.pub_date)\
-                             .filter(modelClazz.code == code)\
-                             .order_by(modelClazz.pub_date.desc())\
-                             .first()
+        result = self.session.query(modelClazz.pub_date) \
+            .filter(modelClazz.code == code) \
+            .order_by(modelClazz.pub_date.desc()) \
+            .first()
         return date(2001, 1, 1) if result is None else result[0]
 
     def getLatestDateByCodes(self, codes: list, modelClazz):
         tableA = aliased(modelClazz, name="a")
         tableB = aliased(modelClazz, name="b")
-        result = self.session.query(tableA.pub_date)\
-                             .filter(tableA.code.in_(codes), tableA.pub_date == self.session.query(sqlalchemy.func.max(tableB.pub_date))\
-                                                            .filter(tableB.code == tableA.code))\
-                             .order_by(tableA.pub_date.asc())\
-                             .first()
+        result = self.session.query(tableA.pub_date) \
+            .filter(tableA.code.in_(codes), tableA.pub_date == self.session.query(sqlalchemy.func.max(tableB.pub_date)) \
+                    .filter(tableB.code == tableA.code)) \
+            .order_by(tableA.pub_date.asc()) \
+            .first()
         return date(2001, 1, 1) if result is None else result[0]
 
     def getAll(self, code: str, modelClazz):

@@ -57,6 +57,7 @@ class IndexBarSpider(GMBaseSpiderV3):
     '''
     检查每个index，如果有漏掉的bar就重新补齐
     '''
+
     def checkAllIndexBars(self):
         stockManager = StockManager()
         tradeDates = stockManager.getTradeDates()
@@ -70,6 +71,7 @@ class IndexBarSpider(GMBaseSpiderV3):
                 bar = self.indexBarDao.getByDate(code, d)
                 if bar is None:
                     self.downloadBarsByDateRange(code, d, d)
+
 
 if __name__ == "__main__":
     spider = IndexBarSpider()

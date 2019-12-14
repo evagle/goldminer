@@ -16,7 +16,7 @@ class IndexWeightedPBProcessor(IndexPEPBProcessor):
         self.fieldName = "weighted_pb"
         self.tradingDerivativeDao = TradingDerivativeIndicatorDao()
 
-    def calculatePEPBIndicator(self,  pepbList, **params):
+    def calculatePEPBIndicator(self, pepbList, **params):
         indexCode = params['indexCode']
         d = params['date']
         constituents = params['constituents']

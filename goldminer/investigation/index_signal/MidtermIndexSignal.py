@@ -4,8 +4,8 @@
 发现指数中期信号
 '''
 
-import talib
 import numpy as np
+import talib
 
 from goldminer.common.Utils import Utils
 from goldminer.storage.IndexDailyBarDao import IndexDailyBarDao
@@ -114,13 +114,13 @@ class MidtermIndexSignal:
 
 
 if __name__ == "__main__":
-    codes = ["000001",            # 上证指数
+    codes = ["000001",  # 上证指数
              "399001", "399106",  # 深证成指，深证综指
              "399006", "399102",  # 创业板指，创业板综
              "399005", "399101",  # 中小板指，中小板综
              "000016", "000300",  # 上证50, 沪深300
              "000905", "000852",  # 中证500，中证1000
-             "399311",            # 国政1000
+             "399311",  # 国政1000
              "399678", "000011",  # 深次新股，
              "399108", "399318",  # 深证B指，国政B指
              "399003", "000003",  # 成份B指，B股指数

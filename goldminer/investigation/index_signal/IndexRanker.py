@@ -50,10 +50,12 @@ class IndexRanker:
 
             for n in [30, 50, 120, 250]:
                 attr = "gain" + str(n)
-                sortedBars = sorted(bars, key=lambda bar: getattr(bar, attr) if hasattr(bar, attr) else GMConsts.MIN_GAIN, reverse=True)
+                sortedBars = sorted(bars,
+                                    key=lambda bar: getattr(bar, attr) if hasattr(bar, attr) else GMConsts.MIN_GAIN,
+                                    reverse=True)
                 rankattr = "rank" + str(n)
                 for i in range(len(sortedBars)):
-                    setattr(sortedBars[i], rankattr, i+1)
+                    setattr(sortedBars[i], rankattr, i + 1)
 
         return sorted(barsGroupByTradeDate.items(), key=lambda d: d, reverse=False)
 
@@ -97,10 +99,10 @@ if __name__ == "__main__":
     attr = "gain" + str(n)
     for tradeDate, bars in barsGroup:
         s = tradeDate
-        bars = sorted(bars, key=lambda bar: getattr(bar, attr) if hasattr(bar, attr) else GMConsts.MIN_GAIN, reverse=True)
+        bars = sorted(bars, key=lambda bar: getattr(bar, attr) if hasattr(bar, attr) else GMConsts.MIN_GAIN,
+                      reverse=True)
         for b in bars:
             if hasattr(b, attr):
                 # print(tradeDate, b.code, indexes[b.code].name, b.gain50)
                 s += "\t" + indexes[b.code].name + "\t" + str(getattr(b, attr))
         print(s)
-

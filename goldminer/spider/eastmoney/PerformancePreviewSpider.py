@@ -1,10 +1,7 @@
 # coding: utf-8
 import datetime
-import json
 import random
 import time
-
-import requests
 
 from goldminer.common.logger import get_logger
 from goldminer.models.models import PerformancePreview
@@ -17,7 +14,6 @@ class PerformancePreviewSpider(EastMoneyBase):
         super().__init__()
         self.__logger = get_logger(__name__)
         self.previewDao = PerformancePreviewDao()
-
 
     def run(self):
         year = datetime.datetime.now().year

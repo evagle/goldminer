@@ -57,7 +57,7 @@ class IndexCorrelationAnalyser:
                 model = self.correlationDao.getByCode(codeA, codeB)
                 if not model:
                     model = IndexCorrelation()
-                model.id = codeA+"_"+codeB
+                model.id = codeA + "_" + codeB
                 model.codea = codeA
                 model.codeb = codeB
                 model.correlation = correlation
@@ -74,6 +74,3 @@ if __name__ == "__main__":
                    "000932", "000990", "000912", "000827", "399812", "000993", "399967", "399971",
                    "000992"
                    ])
-
-
-

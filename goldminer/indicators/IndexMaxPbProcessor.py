@@ -42,5 +42,3 @@ class IndexMaxPBProcessor(IndexPEPBBaseProcessor):
 if __name__ == "__main__":
     manager = IndexMaxPBProcessor()
     manager.process('000001')
-
-

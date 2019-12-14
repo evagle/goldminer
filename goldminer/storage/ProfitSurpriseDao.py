@@ -17,5 +17,3 @@ class ProfitSurpriseDao(BaseDao):
     def add(self, model: ProfitSurprise):
         self.session.add(model)
         self.session.commit()
-
-

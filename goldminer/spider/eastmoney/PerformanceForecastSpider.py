@@ -1,10 +1,7 @@
 # coding: utf-8
 import datetime
-import json
 import random
 import time
-
-import requests
 
 from goldminer.common.logger import get_logger
 from goldminer.models.models import PerformanceForecast

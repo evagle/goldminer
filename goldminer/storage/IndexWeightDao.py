@@ -28,11 +28,12 @@ class IndexWeightDao(BaseDao):
     1. Find first record with trade_date <= date
     2. If date < all trade_date, return first one
     '''
+
     def getByDate(self, code, tradeDate) -> IndexWeight:
         result = self.session.query(IndexWeight) \
-                             .filter(IndexWeight.code == code, IndexWeight.trade_date <= tradeDate) \
-                             .order_by(IndexWeight.trade_date.desc()) \
-                             .first()
+            .filter(IndexWeight.code == code, IndexWeight.trade_date <= tradeDate) \
+            .order_by(IndexWeight.trade_date.desc()) \
+            .first()
         if result is not None:
             return result
 

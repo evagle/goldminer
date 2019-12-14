@@ -1,8 +1,6 @@
 # coding: utf-8
 from collections import deque
-from datetime import timedelta, datetime
 from decimal import Decimal
-from profile import Profile
 
 from goldminer.common.logger import get_logger
 from goldminer.indicators.IndexPEPBBaseProcessor import IndexPEPBBaseProcessor

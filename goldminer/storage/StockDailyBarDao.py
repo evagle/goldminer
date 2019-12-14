@@ -1,11 +1,10 @@
 # coding: utf-8
 from datetime import date
+from typing import List
 
 from goldminer.common.Utils import Utils
-
 from goldminer.models.models import StockDailyBar
 from goldminer.storage.BaseDao import BaseDao
-from typing import List
 
 
 class StockDailyBarDao(BaseDao):

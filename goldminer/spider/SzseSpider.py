@@ -34,7 +34,7 @@ class SzseSpider:
             if content is None or content == "":
                 return None
             else:
-                workbook = xlrd.open_workbook(file_contents = content)
+                workbook = xlrd.open_workbook(file_contents=content)
                 # sheet_names = workbook
                 sheet = workbook.sheet_by_index(0)
                 cols = sheet.col_values(0)

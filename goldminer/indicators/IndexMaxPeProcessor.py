@@ -42,5 +42,3 @@ class IndexMaxPEProcessor(IndexPEPBBaseProcessor):
 if __name__ == "__main__":
     peManager = IndexMaxPEProcessor()
     peManager.process('000001')
-
-

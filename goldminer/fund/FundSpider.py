@@ -38,7 +38,7 @@ class FundSpider:
         self.fundDailyBarDao.addAll(models)
         print("Fund %s has %d data updated!" % (code, len(models)))
         time.sleep(1)
-    
+
     ## Download fund net value from eastmoney and update into sql
     def updateAllFund(self):
         codes = self.dealDao.getAllFundCodes()
@@ -52,6 +52,3 @@ if __name__ == "__main__":
     spider = FundSpider()
     spider.updateAllFund()
     # fund.downloadFundData('000478', date(2018, 5, 4))
-
-    
-
