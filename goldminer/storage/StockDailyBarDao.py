@@ -57,3 +57,11 @@ class StockDailyBarDao(BaseDao):
             .order_by(StockDailyBar.code.asc()) \
             .all()
         return result
+
+    def getAdjFactor(self, code) :
+        result = self.session.query(StockDailyBar.code, StockDailyBar.trade_date, StockDailyBar.adj_factor) \
+            .filter(StockDailyBar.code == code) \
+            .all()
+        return result
+
+
