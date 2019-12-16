@@ -217,10 +217,10 @@ class StockCustomIndicator(Base):
 class StockDailyBar(Base):
     __tablename__ = 'StockDailyBar'
     __table_args__ = (
-        Index('code_date', 'code', 'trade_date', unique=True),
+        PrimaryKeyConstraint('code', 'trade_date'),
     )
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, nullable=False)
     code = Column(String(16), nullable=False)
     trade_date = Column(Date, nullable=False)
     open = Column(Float, nullable=False)
@@ -229,8 +229,6 @@ class StockDailyBar(Base):
     low = Column(Float, nullable=False)
     amount = Column(Float(asdecimal=True), nullable=False)
     volume = Column(BigInteger, nullable=False)
-    position = Column(Float)
-    sec_level = Column(Integer)
     is_suspended = Column(Integer)
     pre_close = Column(Float)
     adj_factor = Column(Float(asdecimal=True), nullable=False)
