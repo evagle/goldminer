@@ -1,5 +1,4 @@
 # coding=utf-8
-import time
 from datetime import timedelta, datetime
 
 from goldminer.common.logger import get_logger
@@ -66,10 +65,8 @@ class StockDailyBarSpider(GMBaseSpiderV3):
             bars = self.downloadBars(code)
             temp.extend(bars)
             if len(temp) > 200:
-                self.stockDao.bulkSave(temp)
+                self.stockBarDao.bulkSave(temp)
                 temp = []
-            if len(bars):
-                time.sleep(0.05)
 
 
 if __name__ == "__main__":
