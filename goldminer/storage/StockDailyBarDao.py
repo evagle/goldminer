@@ -47,7 +47,7 @@ class StockDailyBarDao(BaseDao):
         else:
             result = query.limit(limit).all()
 
-        if adjust == "prev":
+        if adjust is not None and adjust == "prev":
             result = Utils.pre_adjust(result)
         return result
 
