@@ -41,7 +41,7 @@ class StockDailyBarDao(BaseDao):
         """
         query = self.session.query(StockDailyBar) \
             .filter(StockDailyBar.code == code) \
-            .order_by(StockDailyBar.trade_date.desc())
+            .order_by(StockDailyBar.trade_date.asc())
         if limit is None or limit <= 0:
             result = query.all()
         else:
