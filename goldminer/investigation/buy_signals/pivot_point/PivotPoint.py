@@ -16,7 +16,7 @@ class PivotPoint(BuyPointBase):
         super(BuyPointBase, self).__init__()
         self.customIndicatorDao = StockCustomIndicatorDao()
         self.stockDao = StockDao()
-        self.stockBarNoAdjustDao = StockDailyBarDao()
+        self.stockBarDao = StockDailyBarDao()
 
     """
     口袋支点
@@ -84,8 +84,7 @@ class PivotPoint(BuyPointBase):
         Generate pivot point signals for stock 'code'
         :return:
         """
-        bars = self.stockBarNoAdjustDao.getByCode(code)
-        bars = Utils.pre_adjust(bars)
+        bars = self.stockBarDao.getByCode(code)
         if bars is None:
             logger.warn("No bars found for stock {}".format(code))
             return None

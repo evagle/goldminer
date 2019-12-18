@@ -145,8 +145,7 @@ class StockBullStart(BuyPointBase):
 
     def generate_daily_bar_bull_signals(self, code):
 
-        bars = self.stockBarNoAdjustDao.getByCode(code)
-        bars = Utils.pre_adjust(bars)
+        bars = self.stockBarDao.getByCode(code)
         bars = Utils.sma(bars, [5, 10, 20, 30, 50, 120, 250])
         bars = functions.MAX(bars, BarAttribute.HIGH.value, [50, 120])
 

@@ -17,7 +17,7 @@ class FallbackNewHigh(BuyPointBase):
 
     # 策略1 上涨后长期整理，然后突破形态
     def fallback_new_high_buy_points(self, code):
-        bars = self.stockBarNoAdjustDao.getByCode(code)
+        bars = self.stockBarDao.getByCode(code)
         derivatives = self.stockFundamentals.getByCode(code, TradingDerivativeIndicator)
         primary_finance_indicators = self.stockFundamentals.getByCode(code, PrimaryFinanceIndicator)
         income_statements = self.stockFundamentals.getByCode(code, IncomeStatement)
