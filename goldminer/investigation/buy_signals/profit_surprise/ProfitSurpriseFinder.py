@@ -1,4 +1,8 @@
 # coding: utf-8
+import math
+from datetime import datetime
+
+from goldminer.spider.tushare.TSStockBarSpider import TSStockBarSpider
 
 from goldminer.common.Utils import Utils
 
@@ -58,7 +62,7 @@ class ProfitSurpriseFinder:
 
         return model
 
-    def findSurpurise(self, code):
+    def find_surprise(self, code):
         """
         找出因为业绩预告或者业绩快报或财报发布而产生的净利润断层
         :param code:
@@ -66,9 +70,10 @@ class ProfitSurpriseFinder:
         """
         bars = self.stockBarDao.getByCode(code)
         # spider = TSStockBarSpider()
-        # bars = spider.getDailyBars(code)
+        # bars = spider.download_bars_from_tushare(code)
 
-        lastSurprise = None
+        last_surprise = None
+        surprises = []
         for i in range(len(bars) - 1):
             bar = bars[i]
             next_bar = bars[i + 1]
@@ -78,14 +83,14 @@ class ProfitSurpriseFinder:
                 # 业绩预告
                 performanceReports = {
                     "announcement": self.find_derivative_finance_indicator_before_date(code,
-                                                                                       next_bar.trade_date.date()),
-                    "preview": self.find_preview_before_date(code, next_bar.trade_date.date()),
-                    "forecast": self.find_forecast_before_date(code, next_bar.trade_date.date()),
+                                                                                       next_bar.trade_date),
+                    "preview": self.find_preview_before_date(code, next_bar.trade_date),
+                    "forecast": self.find_forecast_before_date(code, next_bar.trade_date),
                 }
 
                 for type, report in performanceReports.items():
                     if report:
-                        if lastSurprise is not None and lastSurprise.pub_date == report.pub_date:
+                        if last_surprise is not None and last_surprise.pub_date == report.pub_date:
                             self.logger.info("Surprise exists")
                             continue
                         surprise = ProfitSurprise()
@@ -108,45 +113,58 @@ class ProfitSurpriseFinder:
 
                         self.logger.info("Find surprise code = {}, trade_date = {}, pub_date={}".format(
                             surprise.code, surprise.trade_date, surprise.pub_date))
-                        lastSurprise = surprise
+                        last_surprise = surprise
+                        surprises.append(surprise)
+        return surprises
 
     def run(self):
         stocks = self.stockDao.getStockList()
         for code in stocks:
-            self.findSurpurise(code)
+            self.find_surprise(code)
 
 
 if __name__ == "__main__":
     profit = ProfitSurpriseFinder()
-    profit.run()
+    # profit.run()
 
     # For debugging
-    surprises = [
-        '002791',  # 坚郎五金，8.28 断层当天收绿，且只上涨0.78% 不考虑了 N
+    expected_surprises = {
+        # '002791',  # 坚郎五金，8.28 断层当天收绿，且只上涨0.78% 不考虑了 N
 
-        '300319',  # 麦捷科技，10.14 Y
-        '600183',  # 生益科技7月25 业绩快报 Y
-        '000049',  # 德赛电池，724 业绩快报 Y
-        '002045',  # 国光电器，715 Y
-        '603008',  # 喜临门，724 断层当天收绿，业绩快报 Y
-        '300413',  # 芒果超媒，8.30 断层当天收绿，且只上涨4% Y
-        '300702',  # 天宇股份，8.22 断层当天收绿 Y
-        '603936',  # 博敏电子，7.24 Y
-        '002605',  # 姚记科技，10.15 Y
-        '002850',  # 科达利，715 Y
-        '600745',  # 闻泰科技，830 Y
-        '002396',  # 星网锐捷，711 Y
-        '002351',  # 漫步者，8.8 Y
-        '603129',  # 春风动力，823 Y
-        '002463',  # 沪电股份，626  Y
-        '002705',  # 新宝股份，8.28 Y
-        '300014',  # 亿纬锂能，10.8 Y
-        '300558',  # 贝达药业，10.11 Y
-        '300632',  # 光蒲股份，7.12 Y
-        '300661',  # 圣邦股份，7.9 Y
-        '603882',  # 金域医学，8.2 Y
-        '603658',  # 安图生物，8.9 Y
-        '300363',  # 博腾股份，7.31 Y
-        '002124',  # 天邦股份，10.8 Y
-        '002458',  # 益生股份，10.9 Y
-    ]
+        '300319': datetime(2019, 10, 14).date(),  # 麦捷科技，10.14 Y
+        '600183': datetime(2019, 7, 25).date(),  # 生益科技7月25 业绩快报 Y
+        '000049': datetime(2019, 7, 24).date(),  # 德赛电池，724 业绩快报 Y
+        '002045': datetime(2019, 7, 15).date(),  # 国光电器，715 Y
+        '603008': datetime(2019, 7, 24).date(),  # 喜临门，724 断层当天收绿，业绩快报 Y
+        '300413': datetime(2019, 8, 30).date(),  # 芒果超媒，8.30 断层当天收绿，且只上涨4% Y
+        '300702': datetime(2019, 8, 22).date(),  # 天宇股份，8.22 断层当天收绿 Y
+        '603936': datetime(2019, 7, 23).date(),  # 博敏电子，7.23 Y
+        '002605': datetime(2019, 10, 15).date(),  # 姚记科技，10.15 Y
+        '002850': datetime(2019, 7, 15).date(),  # 科达利，715 Y
+        '600745': datetime(2019, 8, 30).date(),  # 闻泰科技，830 Y
+        '002396': datetime(2019, 7, 11).date(),  # 星网锐捷，711 Y
+        '002351': datetime(2019, 8, 8).date(),  # 漫步者，8.8 Y
+        '603129': datetime(2019, 8, 23).date(),  # 春风动力，823 Y
+        '002463': datetime(2019, 6, 26).date(),  # 沪电股份，626  Y
+        '002705': datetime(2019, 8, 28).date(),  # 新宝股份，8.28 Y
+        '300014': datetime(2019, 10, 8).date(),  # 亿纬锂能，10.8 Y
+        '300558': datetime(2019, 10, 11).date(),  # 贝达药业，10.11 Y
+        '300632': datetime(2019, 7, 12).date(),  # 光蒲股份，7.12 Y
+        '300661': datetime(2019, 7, 9).date(),  # 圣邦股份，7.9 Y
+        '603882': datetime(2019, 8, 2).date(),  # 金域医学，8.2 Y
+        '603658': datetime(2019, 8, 9).date(),  # 安图生物，8.9 Y
+        '300363': datetime(2019, 7, 31).date(),  # 博腾股份，7.31 Y
+        '002124': datetime(2019, 10, 8).date(),  # 天邦股份，10.8 Y
+        '002458': datetime(2019, 10, 9).date(),  # 益生股份，10.9 Y
+    }
+
+    for code in expected_surprises:
+        surprises = profit.find_surprise(code)
+        expected_date = expected_surprises[code]
+        hit = False
+        for surprise in surprises:
+            if math.fabs((expected_date-surprise.trade_date).days) < 4:
+                print("Hit code {} trade_date {}".format(code, expected_date))
+                hit = True
+        if not hit:
+            print("Miss code {} trade_date {}".format(code, expected_date))
