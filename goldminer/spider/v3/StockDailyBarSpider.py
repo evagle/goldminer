@@ -55,7 +55,8 @@ class StockDailyBarSpider(GMBaseSpiderV3):
                     bar.is_suspended = instrument['is_suspended']
                     bar.position = instrument['position']
 
-        # self.stockBarDao.addAll(bars)
+        bars = list(filter(lambda bar: bar.adj_factor is not None, bars))
+
         logger.info("[Download Stock Bars][%s] count = %d\n" % (symbol, len(bars)))
         return bars
 
@@ -91,6 +92,6 @@ class StockDailyBarSpider(GMBaseSpiderV3):
 
 if __name__ == "__main__":
     spider = StockDailyBarSpider()
-    codes_to_fix = ["002705", "002791", "002850", "603936", "603658", "603129", "603008"]
+    codes_to_fix = ["000043", "001914"]
     for code in codes_to_fix:
         spider.fix_bars(code)
