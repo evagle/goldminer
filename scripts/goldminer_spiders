@@ -54,7 +54,7 @@ time_costs.append("IndexBarSpider cost {}s".format(time() - start))
 
 start = time()
 spider = StockDailyBarSpider()
-spider.downloadAll()
+spider.download_all()
 time_costs.append("DailyBarAdjustNoneSpider cost {}s".format(time() - start))
 
 

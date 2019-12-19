@@ -1,6 +1,7 @@
 # coding=utf-8
 from datetime import timedelta, datetime
 
+from goldminer.common.Utils import Utils
 from goldminer.common.logger import get_logger
 from goldminer.models.models import StockDailyBar
 from goldminer.spider.v3.GMBaseSpiderV3 import GMBaseSpiderV3
@@ -17,22 +18,22 @@ class StockDailyBarSpider(GMBaseSpiderV3):
         self.stockBarDao = StockDailyBarDao()
         self.stockDao = StockDao()
 
-    def rawDataToModel(self, rawBar):
-        model = self._rawDataToModel(rawBar, StockDailyBar)
-        model.trade_date = rawBar['eob'].date()
-        model.code = self.symbolToCode(rawBar['symbol'])
+    def raw_data_to_model(self, raw_bar):
+        model = self._rawDataToModel(raw_bar, StockDailyBar)
+        model.trade_date = raw_bar['eob'].date()
+        model.code = self.symbolToCode(raw_bar['symbol'])
         for key in ['pre_close', 'amount', 'open', 'close', 'high', 'low']:
             if getattr(model, key) is None:
                 setattr(model, key, 0)
         return model
 
-    def downloadBars(self, code):
+    def download_bars(self, code):
         startDate = self.stockBarDao.getLatestDate(code) + timedelta(days=1)
         endDate = datetime.now() + timedelta(days=1)
 
-        return self.downloadBarsByDateRange(code, startDate, endDate)
+        return self.download_bars_by_date_range(code, startDate, endDate)
 
-    def downloadBarsByDateRange(self, code, startDate, endDate):
+    def download_bars_by_date_range(self, code, startDate, endDate):
         if startDate > datetime.now().date():
             logger.info("[%s] is up to date" % code)
             return []
@@ -45,7 +46,7 @@ class StockDailyBarSpider(GMBaseSpiderV3):
         '''
         stock bar does not contains adj_factor, get it from instruments
         '''
-        bars = [self.rawDataToModel(bar) for bar in bars]
+        bars = [self.raw_data_to_model(bar) for bar in bars]
         for instrument in instruments:
             for bar in bars:
                 if instrument['trade_date'].date() == bar.trade_date:
@@ -58,17 +59,38 @@ class StockDailyBarSpider(GMBaseSpiderV3):
         logger.info("[Download Stock Bars][%s] count = %d\n" % (symbol, len(bars)))
         return bars
 
-    def downloadAll(self):
+    def download_all(self):
         stocks = self.stockDao.getStockList()
         temp = []
         for code in stocks:
-            bars = self.downloadBars(code)
+            bars = self.download_bars(code)
             temp.extend(bars)
             if len(temp) > 200:
                 self.stockBarDao.bulkSave(temp)
                 temp = []
 
+    def fix_bars(self, code):
+        start_date = Utils.maxDate(self.stockDao.getStockPublishDate(code), datetime(2005, 1, 1).date())
+        end_date = datetime.now() + timedelta(days=1)
+
+        bars = self.download_bars_by_date_range(code, start_date, end_date)
+
+        adj_factor = self.stockBarDao.getAdjFactor(code)
+        adj_factor_dict = {}
+        for row in adj_factor:
+            adj_factor_dict[(row[0], row[1])] = row[2]
+
+        for bar in bars:
+            if bar.adj_factor is None:
+                if code != "001872" and bar.trade_date != datetime(2019, 2, 14).date():
+                    bar.adj_factor = adj_factor_dict[(bar.code, bar.trade_date)]
+
+        self.stockBarDao.insertOrReplace(bars)
+        logger.info("Save {} bars for code {}\n".format(len(bars), code))
+
 
 if __name__ == "__main__":
     spider = StockDailyBarSpider()
-    spider.downloadBars('000001')
+    codes_to_fix = ["002705", "002791", "002850", "603936", "603658", "603129", "603008"]
+    for code in codes_to_fix:
+        spider.fix_bars(code)
