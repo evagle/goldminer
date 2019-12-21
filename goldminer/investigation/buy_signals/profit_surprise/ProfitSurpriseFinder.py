@@ -58,13 +58,17 @@ class ProfitSurpriseFinder:
 
         return model
 
-    def find_surprise(self, code):
+    def find_surprise(self, code, full=False):
         """
         找出因为业绩预告或者业绩快报或财报发布而产生的净利润断层
+        :param full: 是否全量计算，如果是False则只计算半年内的数据
         :param code:
         :return:
         """
-        bars = self.stockBarDao.getByCode(code)
+        if full:
+            bars = self.stockBarDao.getByCode(code)
+        else:
+            bars = self.stockBarDao.getN(code, 120)
         # spider = TSStockBarSpider()
         # bars = spider.download_bars_from_tushare(code)
 
@@ -116,7 +120,7 @@ class ProfitSurpriseFinder:
     def run(self):
         stocks = self.stockDao.getStockList()
         for code in stocks:
-            self.find_surprise(code)
+            self.find_surprise(code, full=False)
 
 
 def gold_test():
