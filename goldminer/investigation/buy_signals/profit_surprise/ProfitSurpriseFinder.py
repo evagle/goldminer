@@ -2,14 +2,10 @@
 import math
 from datetime import datetime
 
-from goldminer.spider.tushare.TSStockBarSpider import TSStockBarSpider
-
 from goldminer.common.Utils import Utils
-
 from goldminer.common.logger import get_logger
 from goldminer.models.models import ProfitSurprise
 from goldminer.storage.DerivativeFinanceIndicatorDao import DerivativeFinanceIndicatorDao
-
 from goldminer.storage.PerformanceForecastDao import PerformanceForecastDao
 from goldminer.storage.PerformancePreviewDao import PerformancePreviewDao
 from goldminer.storage.StockDailyBarDao import StockDailyBarDao
@@ -123,10 +119,7 @@ class ProfitSurpriseFinder:
             self.find_surprise(code)
 
 
-if __name__ == "__main__":
-    profit = ProfitSurpriseFinder()
-    # profit.run()
-
+def gold_test():
     # For debugging
     expected_surprises = {
         # '002791',  # 坚郎五金，8.28 断层当天收绿，且只上涨0.78% 不考虑了 N
@@ -163,8 +156,13 @@ if __name__ == "__main__":
         expected_date = expected_surprises[code]
         hit = False
         for surprise in surprises:
-            if math.fabs((expected_date-surprise.trade_date).days) < 4:
+            if math.fabs((expected_date - surprise.trade_date).days) < 4:
                 print("Hit code {} trade_date {}".format(code, expected_date))
                 hit = True
         if not hit:
             print("Miss code {} trade_date {}".format(code, expected_date))
+
+
+if __name__ == "__main__":
+    profit = ProfitSurpriseFinder()
+    profit.run()
