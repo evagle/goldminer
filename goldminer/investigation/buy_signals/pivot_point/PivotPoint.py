@@ -79,12 +79,17 @@ class PivotPoint(BuyPointBase):
 
     """
 
-    def generate_signals(self, code):
+    def generate_signals(self, code, full=False):
         """
-        Generate pivot point signals for stock 'code'
+        Support full and incremental calculation of pivot point signals
+        :param code:
+        :param full: run all if full is true, else only calculate for latest 50 days
         :return:
         """
-        bars = self.stockBarDao.getByCode(code)
+        if full:
+            bars = self.stockBarDao.getByCode(code)
+        else:
+            bars = self.stockBarDao.getN(code, 250)
         if bars is None:
             logger.warn("No bars found for stock {}".format(code))
             return None
@@ -168,7 +173,7 @@ class PivotPoint(BuyPointBase):
         for code in stocks:
             self.clear_pivot_point(code)
 
-    def processAll(self):
+    def run(self):
         stocks = self.stockDao.getStockList()
         for code in stocks:
             signals = self.generate_signals(code)

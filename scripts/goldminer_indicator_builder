@@ -30,7 +30,7 @@ time_costs.append("RPS Processor cost {}s".format(time()-start))
 
 start = time()
 processor = PivotPoint()
-processor.processAll()
+processor.run()
 time_costs.append("Pivot Point Processor cost {}s".format(time()-start))
 
 start = time()
