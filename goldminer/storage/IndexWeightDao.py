@@ -1,6 +1,7 @@
 # coding: utf-8
 from datetime import date
 
+from goldminer.common import GMConsts
 from goldminer.models.models import IndexWeight
 from goldminer.storage.BaseDao import BaseDao
 
@@ -22,7 +23,7 @@ class IndexWeightDao(BaseDao):
             .filter(IndexWeight.code == code) \
             .order_by(IndexWeight.trade_date.desc()) \
             .first()
-        return date(2001, 1, 1) if result is None else result[0]
+        return GMConsts.TRADE_INIT_DATE if result is None else result[0]
 
     '''
     1. Find first record with trade_date <= date
