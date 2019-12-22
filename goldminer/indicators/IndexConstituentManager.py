@@ -32,7 +32,13 @@ class IndexConstituentManager:
         return weights
 
     def __formatConstituents(self, model: IndexConstituent):
-        constituents = json.loads(model.constituents)
+        constituents = []
+        for symbol in json.loads(model.constituents):
+            if len(symbol) == 11:
+                constituents.append(symbol[5:])
+            else:
+                constituents.append(symbol)
+
         return [model.code, model.trade_date, constituents]
 
     # 获取指数成份股，如果能获取到weights则直接返回
