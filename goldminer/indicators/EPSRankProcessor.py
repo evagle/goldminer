@@ -177,47 +177,47 @@ class EPSRankProcessor(BaseIndicatorProcessor):
             return score
         return 0
 
-    def processByDate(self, targetDate: date = None):
+    def process_by_date(self, target_date: date = None):
         stocks = self.stocks
         scores = []
-        if targetDate is None:
-            targetDate = datetime.today().date()
+        if target_date is None:
+            target_date = datetime.today().date()
 
-        logger.info("Start to process eps score/rank for date {}".format(targetDate))
+        logger.info("Start to process eps score/rank for date {}".format(target_date))
         for code in stocks:
             if code not in self.pubDates:
                 continue
 
             pubDate = self.pubDates[code]
-            if pubDate > targetDate:
+            if pubDate > target_date:
                 continue
 
-            score = self.process(code, date=targetDate)
+            score = self.process(code, date=target_date)
             scores.append((code, score))
 
         scores = sorted(scores, key=lambda x: x[1], reverse=True)
 
-        modelsInDB = self.stockCustomIndicatorDao.getAllAtDate(targetDate)
+        modelsInDB = self.stockCustomIndicatorDao.getAllAtDate(target_date)
 
         updatedModels = []
         for i in range(len(scores)):
             code, score = scores[i]
             rank = 100 - i * 100 / len(scores)
-            key = (code, targetDate)
+            key = (code, target_date)
             if key in modelsInDB:
                 model = modelsInDB[key]
             else:
                 model = StockCustomIndicator()
                 model.code = code
-                model.trade_date = targetDate
+                model.trade_date = target_date
 
             model.eps_score = Utils.formatFloat(score, 6)
             model.eps_rank = Utils.formatFloat(rank, 6)
             updatedModels.append(model)
 
-        logger.info("{} eps score/rank updated".format(len(updatedModels)))
+        logger.info("{} eps score/rank updated for date {}".format(len(updatedModels), target_date))
         self.stockCustomIndicatorDao.bulkSave(updatedModels)
-        logger.info("End of eps score/rank for date {}".format(targetDate))
+        logger.info("End of eps score/rank for date {}".format(target_date))
         return updatedModels
 
     def processByDateRange(self, startDate, endDate):
@@ -226,7 +226,7 @@ class EPSRankProcessor(BaseIndicatorProcessor):
         date = startDate
         while date <= endDate:
             if stockManager.isTradeDate(date):
-                self.processByDate(date)
+                self.process_by_date(date)
             date += timedelta(days=1)
         logger.info("End range {} to {}".format(startDate, endDate))
 
