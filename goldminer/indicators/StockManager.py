@@ -34,7 +34,7 @@ class StockManager:
 
         session = self.fundamentalsDao.getSession()
         dates = session.query(IndexDailyBar.trade_date) \
-            .filter(IndexDailyBar.code == '000001')
+            .filter(IndexDailyBar.code == '000300')
         for d in dates:
             StockManager.__tradeDatesCache.append(d[0])
             StockManager.__tradeDatesDict[d[0]] = True
