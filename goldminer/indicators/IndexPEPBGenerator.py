@@ -1,4 +1,5 @@
 # coding: utf-8
+from time import time
 
 from goldminer.indicators.IndexEqualWeightPBProcessor import IndexEqualWeightPBProcessor
 from goldminer.indicators.IndexEqualWeightPEProcessor import IndexEqualWeightPEProcessor
@@ -25,20 +26,38 @@ class IndexPEPBGenerator:
         self.medianPBProcessor = IndexMedianPBProcessor()
         self.heightProcessor = IndexPEPBHeightProcessor()
         self.gradeProcessor = IndexPEPBGradeProcessor()
+        self.__ticks = []
+
+    def _tick(self, string):
+        self.__ticks.append([time(), string])
+
+    def _print_ticks(self):
+        for i in range(1, len(self.__ticks)):
+            tick = self.__ticks[i]
+            print(tick[i][1], tick[i][0] - tick[i - 1][0])
 
     def execOneIndex(self, code):
         indexPrimaryIndicatorDict = self.indexPrimaryIndicatorDao.getByCodeDict(code)
 
+        self._tick("start")
         self.equalWeightPEProcessor.process(code, indexPrimaryIndicatorDict)
+        self._tick("equalWeightPEProcessor cost(s) = ")
         self.weightedPEProcessor.process(code, indexPrimaryIndicatorDict)
+        self._tick("weightedPEProcessor cost(s) = ")
         self.medianPEProcessor.process(code, indexPrimaryIndicatorDict)
+        self._tick("medianPEProcessor cost(s) = ")
         self.equalWeightPBProcessor.process(code, indexPrimaryIndicatorDict)
+        self._tick("equalWeightPBProcessor cost(s) = ")
         self.weightedPBProcessor.process(code, indexPrimaryIndicatorDict)
+        self._tick("weightedPBProcessor cost(s) = ")
         self.medianPBProcessor.process(code, indexPrimaryIndicatorDict)
+        self._tick("medianPBProcessor cost(s) = ")
 
         self.heightProcessor.buildAllHeightIndicators(code)
+        self._tick("heightProcessor cost(s) = ")
 
         self.gradeProcessor.buildAllGradeIndicators(code)
+        self._tick("gradeProcessor cost(s) = ")
 
     def updateAll(self):
         indexes = self.indexDao.getImportantIndexList()
