@@ -1,10 +1,12 @@
 # coding: utf-8
+from goldminer.common.logger import get_logger
 from goldminer.storage.ProfitSurpriseDao import ProfitSurpriseDao
 
 
 class ExportProfitSurprise:
     def __init__(self):
         self.profit_surprise_dao = ProfitSurpriseDao()
+        self._logger = get_logger(__name__)
 
     def get_surprises(self):
         surprises = self.profit_surprise_dao.all()
@@ -25,6 +27,7 @@ class ExportProfitSurprise:
             for row in data:
                 lines.append("|".join(row) + "\n")
             writer.writelines(lines)
+            self._logger.info("Save {} surprises to {}".format(len(data), out_path))
 
 
 if __name__ == "__main__":
