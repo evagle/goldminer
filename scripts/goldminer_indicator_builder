@@ -29,6 +29,12 @@ rps.buildAll()
 time_costs.append("RPS Processor cost {}s".format(time()-start))
 
 start = time()
+pepbGenerator = ProfitSurpriseFinder()
+pepbGenerator.run()
+time_costs.append("ProfitSurpriseFinder cost {}s".format(time() - start))
+
+
+start = time()
 processor = PivotPoint()
 processor.run()
 time_costs.append("Pivot Point Processor cost {}s".format(time()-start))
@@ -37,12 +43,6 @@ start = time()
 pepbGenerator = IndexPEPBGenerator()
 pepbGenerator.updateAll()
 time_costs.append("Index PEPB Generator Processor cost {}s".format(time()-start))
-
-start = time()
-pepbGenerator = ProfitSurpriseFinder()
-pepbGenerator.run()
-time_costs.append("ProfitSurpriseFinder cost {}s".format(time()-start))
-
 
 time_costs.append("All Processor cost {}s".format(time()-begin))
 
