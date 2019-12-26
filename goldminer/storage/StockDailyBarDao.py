@@ -41,11 +41,12 @@ class StockDailyBarDao(BaseDao):
         """
         query = self.session.query(StockDailyBar) \
             .filter(StockDailyBar.code == code) \
-            .order_by(StockDailyBar.trade_date.asc())
+            .order_by(StockDailyBar.trade_date.desc())
         if limit is None or limit <= 0:
             result = query.all()
         else:
             result = query.limit(limit).all()
+        result = sorted(result, key=lambda x: x.trade_date, reverse=False)
 
         if adjust is not None and adjust == "prev":
             result = Utils.pre_adjust(result)
