@@ -86,9 +86,7 @@ class ROERankProcessor(BaseIndicatorProcessor):
         for i in range(min(3, len(yearModels))):
             yearScore += self.YEAR_WEIGHTS[i] * self.growth2Score(yearModels[i].ROEAVG)
             sumWeight += self.YEAR_WEIGHTS[i]
-            print(yearModels[i].end_date, yearModels[i].ROEAVG, yearScore)
 
-        print(yearScore / sumWeight)
         return yearScore / sumWeight
 
     def process(self, code, **kwargs):
