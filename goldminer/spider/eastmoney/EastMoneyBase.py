@@ -3,6 +3,7 @@ import json
 from abc import abstractmethod
 
 import requests
+from requests.adapters import HTTPAdapter
 
 from goldminer.common.logger import get_logger
 
@@ -43,7 +44,11 @@ class EastMoneyBase:
             new forecast ratio(=new count/total count)
         )
         """
-        response = requests.get(url, params, headers=headers)
+        session = requests.Session()
+        session.mount('http://', HTTPAdapter(max_retries=3))
+        session.mount('https://', HTTPAdapter(max_retries=3))
+
+        response = session.get(url, params=params, headers=headers)
         if not response or not response.text:
             self.__logger.error("Failed to download data from url={}, params={}".format(url, params))
             return None
