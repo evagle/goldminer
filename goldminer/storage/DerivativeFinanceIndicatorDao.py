@@ -42,7 +42,10 @@ class DerivativeFinanceIndicatorDao(BaseDao):
         return result
 
     def getByCode(self, code) -> List[DerivativeFinanceIndicator]:
-        return self.session.query(DerivativeFinanceIndicator).filter(DerivativeFinanceIndicator.code == code)
+        return self.session.query(DerivativeFinanceIndicator) \
+            .filter(DerivativeFinanceIndicator.code == code) \
+            .order_by(DerivativeFinanceIndicator.end_date.desc()) \
+            .all()
 
     def getFirstWithPubDateBefore(self, code, pub_date) -> DerivativeFinanceIndicator:
         return self.session.query(DerivativeFinanceIndicator) \
