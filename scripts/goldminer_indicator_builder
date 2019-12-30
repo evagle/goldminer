@@ -6,6 +6,7 @@ from goldminer.common.logger import get_logger
 from goldminer.indicators.EPSRankProcessor import EPSRankProcessor
 from goldminer.indicators.IndexPEPBGenerator import IndexPEPBGenerator
 from goldminer.indicators.NDayGainsProcessor import NDayGainsProcessor
+from goldminer.indicators.ROERankProcessor import ROERankProcessor
 from goldminer.indicators.RPSProcessor import RPSProcessor
 from goldminer.investigation.buy_signals.pivot_point.PivotPoint import PivotPoint
 from goldminer.investigation.buy_signals.profit_surprise.ProfitSurpriseFinder import ProfitSurpriseFinder
@@ -16,7 +17,12 @@ time_costs = []
 start = time()
 eps = EPSRankProcessor()
 eps.processAll()
-time_costs.append("EPS Rank Processor cost {}s".format(time()-start))
+time_costs.append("EPS Rank Processor cost {}s".format(time() - start))
+
+start = time()
+eps = ROERankProcessor()
+eps.processAll()
+time_costs.append("ROE Score Processor cost {}s".format(time() - start))
 
 start = time()
 processor = NDayGainsProcessor()

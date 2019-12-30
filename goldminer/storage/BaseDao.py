@@ -68,3 +68,6 @@ class BaseDao:
 
     def rollback(self):
         self.session.rollback()
+
+    def exec_query(self, query):
+        return self.engine.execute(query)
