@@ -10,8 +10,8 @@ from goldminer.spider.tushare.StockSpider import StockSpider
 from goldminer.spider.v3.IndexBarSpider import IndexBarSpider
 from goldminer.spider.v3.IndexWeightsSpider import IndexWeightsSpider
 from goldminer.spider.v3.StockBalanceSheetSpider import StockBalanceSheetSpider
+from goldminer.spider.v3.StockCashflowStatementSpider import StockCashflowStatementSpider
 from goldminer.spider.v3.StockDailyBarSpider import StockDailyBarSpider
-from goldminer.spider.v3.StockDailyBarAdjustPrevSpider import StockDailyBarAdjustPrevSpider
 from goldminer.spider.v3.StockDerivativeFinanceIndicatorSpider import StockDerivativeFinanceIndicatorSpider
 from goldminer.spider.v3.StockIncomeStatementSpider import StockIncomeStatementSpider
 from goldminer.spider.v3.StockIndustrySpider import StockIndustrySpider
@@ -26,7 +26,6 @@ start = time()
 spider = StockSpider()
 spider.getStockFromTuShare()
 time_costs.append("StockSpider cost {}s".format(time() - start))
-
 
 start = time()
 spider = StockIndustrySpider()
@@ -64,12 +63,15 @@ spider = StockBalanceSheetSpider()
 spider.downloadAll(mode="batch", batch_size=40)
 time_costs.append("BalanceSheetSpider cost {}s".format(time() - start))
 
-
 start = time()
 spider = StockIncomeStatementSpider()
 spider.downloadAll(mode="batch", batch_size=40)
 time_costs.append("IncomeStatementSpider cost {}s".format(time() - start))
 
+start = time()
+spider = StockCashflowStatementSpider()
+spider.downloadAll(mode="batch", batch_size=40)
+time_costs.append("StockCashflowStatementSpider cost {}s".format(time() - start))
 
 start = time()
 spider = StockPrimaryFinanceIndicatorSpider()
