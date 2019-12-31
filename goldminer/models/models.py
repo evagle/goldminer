@@ -261,8 +261,11 @@ class StockDailyBarAdjustPrev(Base):
 
 class CashflowStatement(Base):
     __tablename__ = 'CashflowStatement'
+    __table_args__ = (
+        PrimaryKeyConstraint('code', 'pub_date', 'end_date', name='code_pub_date_end_date'),
+    )
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, nullable=False)
     code = Column(String(16), nullable=False)
     pub_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
