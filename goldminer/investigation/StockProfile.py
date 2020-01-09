@@ -145,8 +145,9 @@ class StockProfile:
         models = self.derivative_dao.getByCode(code)
         models = self._calc_npcut_growth(models)
         selected = []
-        selected.append(models[0])
-        models.pop(0)
+        while len(models) > 0 and models[0].end_date.month != 12:
+            selected.append(models[0])
+            models.pop(0)
         for model in models:
             if model.end_date.month == 12:
                 selected.append(model)
@@ -181,15 +182,16 @@ class StockProfile:
 
         models = self.income_dao.getByCode(code)
         selected = []
-        selected.append(models[0])
-        models.pop(0)
+        while len(models) > 0 and models[0].end_date.month != 12:
+            selected.append(models[0])
+            models.pop(0)
         for model in models:
             if model.end_date.month == 12:
                 selected.append(model)
 
         for model in selected:
             ratio = (model.FINEXPE + model.MANAEXPE + model.SALESEXPE) / model.BIZINCO
-            gross_profit_margin = (model.BIZINCO - model.BIZCOST) / model.BIZINCO
+            gross_profit_margin = (model.BIZINCO - model.BIZCOST) / model.BIZINCO * 100
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.ThreeFeeRatio,
                                         Utils.formatFloat(ratio, 2))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.GrossProfitMargin,
@@ -242,5 +244,5 @@ class StockProfile:
 
 if __name__ == "__main__":
     stock_profile = StockProfile()
-    profile = stock_profile.make_profile('600177')
+    profile = stock_profile.make_profile('002801')
     stock_profile.display_profile(profile)
