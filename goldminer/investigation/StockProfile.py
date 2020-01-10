@@ -12,7 +12,10 @@ from goldminer.storage.IncomeStatementDao import IncomeStatementDao
 class ProfileMetric(Enum):
     GrossProfitMargin = "GPM"  # 毛利率
     NetProfitMargin = "NPM"  # 净利率
-    ThreeFeeRatio = "TreeFeeRate"  # 三费占比
+    ThreeFeeRatio = "TreeFeeRatio"  # 三费占比
+    SalesRatio = "SalesRatio"
+    ManagementRatio = "ManagementRatio"
+    FinanceRatio = "FinanceRatio"
     ROIC = "ROIC"  # 投入资本回报率
     ROE = "ROE"  # 净资产回报率
     ROA = "ROA"  # 总资产回报率
@@ -27,6 +30,7 @@ class ProfileMetric(Enum):
     AssetLiabilityRatio = "ASSLIABRT"  # 资产负债率
     CurrentRatio = "CRT"  # 流动比率
     QuickRatio = "QRT"  # 速动比率
+    EquityMultiplier = "EM"  # 权益乘数=总资产/股东权益(净资产)
 
 
 class StockProfile:
@@ -179,6 +183,8 @@ class StockProfile:
                                         Utils.formatFloat(model.QUICKRT, 2))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.FreeCashFlow,
                                         Utils.formatFloat(model.FCFF / 10000, 2))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.EquityMultiplier,
+                                        Utils.formatFloat(model.EM, 2))
 
         models = self.income_dao.getByCode(code)
         selected = []
@@ -190,10 +196,20 @@ class StockProfile:
                 selected.append(model)
 
         for model in selected:
-            ratio = (model.FINEXPE + model.MANAEXPE + model.SALESEXPE) / model.BIZINCO
+            finance_ratio = model.FINEXPE / model.BIZINCO * 100
+            management_ratio = model.MANAEXPE / model.BIZINCO * 100
+            sales_ratio = model.SALESEXPE / model.BIZINCO * 100
+            three_fee_ratio = finance_ratio + management_ratio + sales_ratio
+
             gross_profit_margin = (model.BIZINCO - model.BIZCOST) / model.BIZINCO * 100
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.ThreeFeeRatio,
-                                        Utils.formatFloat(ratio, 2))
+                                        Utils.formatFloat(three_fee_ratio, 2))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.FinanceRatio,
+                                        Utils.formatFloat(finance_ratio, 2))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.ManagementRatio,
+                                        Utils.formatFloat(management_ratio, 2))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.SalesRatio,
+                                        Utils.formatFloat(sales_ratio, 2))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.GrossProfitMargin,
                                         Utils.formatFloat(gross_profit_margin, 2))
 
@@ -230,16 +246,69 @@ class StockProfile:
         pd.set_option('display.max_rows', None)
         pd.set_option('expand_frame_repr', False)
 
-        sorted_columns = [
-            "GPM", "TreeFeeRate", "ROIC",  # 护城河
-            "GPM", "NPM", "ROE", "ROA",  # 盈利能力
-            "IG", "NPG", "NCPG", "FCF",  # 成长能力
-            "INVTURNRT", "TATURNRT", "ARTR",  # 运营能力
-            "ASSLIABRT", "CRT", "QRT"  # 偿债能力
+        # 护城河
+        competence_columns = [
+            ProfileMetric.GrossProfitMargin,
+            ProfileMetric.ROIC,
+            ProfileMetric.ThreeFeeRatio,
+            ProfileMetric.SalesRatio,
+            ProfileMetric.ManagementRatio,
+            ProfileMetric.FinanceRatio
+        ]
+        # 盈利能力
+        profit_ability_columns = [
+            ProfileMetric.GrossProfitMargin,
+            ProfileMetric.NetProfitCutGrowth,
+            ProfileMetric.ROE,
+            ProfileMetric.ROA,
+        ]
+        # 成长能力
+        growth_ability_columns = [
+            ProfileMetric.IncomeGrowth,
+            ProfileMetric.NetProfitGrowth,
+            ProfileMetric.NetProfitCutGrowth,
+            ProfileMetric.FreeCashFlow,
+        ]
+        # 运营能力
+        operation_ability_columns = [
+            ProfileMetric.InventoryTurnoverRate,
+            ProfileMetric.TotalAssetTurnoverRate,
+            ProfileMetric.AccountReceivableTurnoverRate,
+        ]
+        # 偿债能力
+        solvency_ability_columns = [
+            ProfileMetric.AssetLiabilityRatio,
+            ProfileMetric.CurrentRatio,
+            ProfileMetric.QuickRatio,
+        ]
+
+        # 杜邦分析
+        dupont_analysis_columns = [
+            ProfileMetric.ROE,
+            ProfileMetric.NetProfitMargin,
+            ProfileMetric.TotalAssetTurnoverRate,
+            ProfileMetric.EquityMultiplier,  # 注意这个指标数据来自掘金=期末总资产/归属母公司的期末股东权益，采用的不是平均总资产
         ]
 
         df = pd.DataFrame.from_dict(profile, orient='index', columns=columns)
-        print(df[sorted_columns])
+        print("\n============护城河============")
+        print(df[[c.value for c in competence_columns]])
+
+        print("\n============盈利能力============")
+        print(df[[c.value for c in profit_ability_columns]])
+
+        print("\n============成长能力============")
+        print(df[[c.value for c in growth_ability_columns]])
+
+        print("\n============运营能力============")
+        print(df[[c.value for c in operation_ability_columns]])
+
+        print("\n============偿债能力============")
+        print(df[[c.value for c in solvency_ability_columns]])
+
+        print("\n============杜邦分析============")
+        print(df[[c.value for c in dupont_analysis_columns]])
+
 
 
 if __name__ == "__main__":
