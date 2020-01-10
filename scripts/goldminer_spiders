@@ -21,6 +21,15 @@ from goldminer.spider.v3.StockTradingDerivativeIndicatorSpider import StockTradi
 begin = time()
 time_costs = []
 
+start = time()
+spider = PerformanceForecastSpider()
+spider.run()
+time_costs.append("PerformanceForecastSpider cost {}s".format(time() - start))
+
+start = time()
+spider = PerformancePreviewSpider()
+spider.run()
+time_costs.append("PerformancePreviewSpider cost {}s".format(time() - start))
 
 start = time()
 spider = StockSpider()
@@ -56,8 +65,6 @@ spider = StockDailyBarSpider()
 spider.download_all()
 time_costs.append("DailyBarAdjustNoneSpider cost {}s".format(time() - start))
 
-
-
 start = time()
 spider = StockBalanceSheetSpider()
 spider.downloadAll(mode="batch", batch_size=40)
@@ -89,16 +96,6 @@ start = time()
 spider = StockDerivativeFinanceIndicatorSpider()
 spider.downloadAll(mode="batch", batch_size=40)
 time_costs.append("DerivativeFinanceIndicatorSpider cost {}s".format(time() - start))
-
-start = time()
-spider = PerformanceForecastSpider()
-spider.run()
-time_costs.append("PerformanceForecastSpider cost {}s".format(time() - start))
-
-start = time()
-spider = PerformancePreviewSpider()
-spider.run()
-time_costs.append("PerformancePreviewSpider cost {}s".format(time() - start))
 
 logger = get_logger(__name__)
 for line in time_costs:
