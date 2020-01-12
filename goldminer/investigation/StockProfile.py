@@ -258,7 +258,7 @@ class StockProfile:
         # 盈利能力
         profit_ability_columns = [
             ProfileMetric.GrossProfitMargin,
-            ProfileMetric.NetProfitCutGrowth,
+            ProfileMetric.NetProfitMargin,
             ProfileMetric.ROE,
             ProfileMetric.ROA,
         ]
