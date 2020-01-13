@@ -153,6 +153,8 @@ class FinancialReportCrawler:
         announcements = self.download_announcements(self._base_url, self.get_headers(), params)
         self.__logger.info("Download {} announcements for code {}".format(len(announcements), code))
         for announcement in announcements:
+            if announcement['announcementTitle'].find("摘要") >= 0:
+                continue
             self.download_announcement(code, announcement, "/Users/abing/Downloads/2016年度报告/")
 
     def download_and_update_org_ids(self):
@@ -182,5 +184,5 @@ class FinancialReportCrawler:
 
 if __name__ == "__main__":
     crawler = FinancialReportCrawler()
-    crawler.get_announcements_by_code('000002', datetime(2018, 1, 1).date(), datetime(2020, 1, 1).date())
+    crawler.get_announcements_by_code('300357', datetime(2018, 1, 1).date(), datetime(2020, 1, 1).date())
     # crawler.download_and_update_org_ids()
