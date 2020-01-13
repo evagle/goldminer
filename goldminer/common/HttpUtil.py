@@ -1,6 +1,8 @@
 # coding: utf-8
 from urllib import request
 
+from fake_useragent import UserAgent
+
 
 class HttpUtil:
 
@@ -15,3 +17,7 @@ class HttpUtil:
         req = request.Request(url, headers=headers)
         response = request.urlopen(req)
         return response.read()
+
+    @staticmethod
+    def random_user_agent():
+        return UserAgent(use_cache_server=False).random
