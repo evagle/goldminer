@@ -30,6 +30,7 @@ setup(name='GoldMinder',
           'TA-Lib',
           'lxml',
           'requests',
+          'fake-useragent',
           'gm'
       ],
       classifiers=[

@@ -1039,3 +1039,13 @@ class PerformancePreview(Base):
     profit_previous = Column(Float(asdecimal=True), nullable=True)
     profit_growth = Column(Float(asdecimal=True), nullable=True)
     roe = Column(Float(asdecimal=True), nullable=True)
+
+
+class CnInfoOrgId(Base):
+    __tablename__ = 'CnInfoOrgId'
+    __table_args__ = (
+        PrimaryKeyConstraint('code'),
+    )
+
+    code = Column(String(16), nullable=False)
+    org_id = Column(String(32), nullable=False)
