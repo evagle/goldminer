@@ -31,6 +31,7 @@ setup(name='GoldMinder',
           'lxml',
           'requests',
           'fake-useragent',
+          'pdfplumber',
           'gm'
       ],
       classifiers=[

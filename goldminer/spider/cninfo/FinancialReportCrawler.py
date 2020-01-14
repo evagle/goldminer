@@ -4,6 +4,7 @@ from datetime import date, datetime
 import requests
 from requests.adapters import HTTPAdapter
 
+from goldminer.common import GMConsts
 from goldminer.common.FinancialReportType import FinancialReportType
 from goldminer.common.HttpUtil import HttpUtil
 from goldminer.common.logger import get_logger
@@ -38,7 +39,6 @@ class FinancialReportCrawler:
         self.cnInfoOrgIdDao = CnInfoOrgIdDao()
         self.__logger = get_logger(__name__)
 
-        self.output_path = "/Users/abing/Documents/财报/"
 
     def get_headers(self):
         headers = self._headers
@@ -174,7 +174,7 @@ class FinancialReportCrawler:
                 continue
             if announcement['announcementTitle'].find("取消") >= 0:
                 continue
-            self.download_announcement(code, announcement, self.output_path)
+            self.download_announcement(code, announcement, GMConsts.FINANCIAL_REPORT_ROOT)
 
     def download_and_update_org_ids(self):
         """
