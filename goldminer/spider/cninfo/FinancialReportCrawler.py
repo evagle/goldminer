@@ -4,6 +4,7 @@ from datetime import date, datetime
 import requests
 from requests.adapters import HTTPAdapter
 
+from goldminer.common.FinancialReportType import FinancialReportType
 from goldminer.common.HttpUtil import HttpUtil
 from goldminer.common.logger import get_logger
 from goldminer.models.models import CnInfoOrgId
@@ -36,6 +37,8 @@ class FinancialReportCrawler:
 
         self.cnInfoOrgIdDao = CnInfoOrgIdDao()
         self.__logger = get_logger(__name__)
+
+        self.output_path = "/Users/abing/Documents/财报/"
 
     def get_headers(self):
         headers = self._headers
@@ -85,6 +88,20 @@ class FinancialReportCrawler:
 
         return result
 
+    def parse_title(self, title):
+        year = title[:4]
+        if title.find("一季度") >= 0:
+            type = FinancialReportType.FirstQuarter
+        elif title.find("半年度") >= 0:
+            type = FinancialReportType.SemiAnnual
+        elif title.find("三季度") >= 0:
+            type = FinancialReportType.ThirdQuarter
+        elif title.find("年度") >= 0:
+            type = FinancialReportType.Annual
+        else:
+            raise Exception("Failed to extract report type from title {}".format(title))
+        return year, type
+
     def download_announcement(self, code, announcement, output_path):
         """
 
@@ -93,13 +110,13 @@ class FinancialReportCrawler:
         :param output_path:
         :return:
         """
-        year = announcement['announcementTitle'][:4]
+        year, type = self.parse_title(announcement['announcementTitle'])
 
         folder = os.path.join(output_path, announcement['secCode'], year)
         if not os.path.exists(folder):
             os.makedirs(folder)
 
-        output_file = folder + os.path.sep + announcement['announcementTitle'] + ".pdf"
+        output_file = folder + os.path.sep + str(type.value) + ".pdf"
         url = self._pdf_base_url + announcement['adjunctUrl']
 
         self.download_file(url, output_file)
@@ -155,7 +172,9 @@ class FinancialReportCrawler:
         for announcement in announcements:
             if announcement['announcementTitle'].find("摘要") >= 0:
                 continue
-            self.download_announcement(code, announcement, "/Users/abing/Downloads/2016年度报告/")
+            if announcement['announcementTitle'].find("取消") >= 0:
+                continue
+            self.download_announcement(code, announcement, self.output_path)
 
     def download_and_update_org_ids(self):
         """
