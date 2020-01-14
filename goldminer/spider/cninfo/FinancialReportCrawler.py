@@ -70,7 +70,7 @@ class FinancialReportCrawler:
             return None
         return response
 
-    def download_announcements(self, url, headers, params, max_page=3):
+    def download_announcements(self, url, headers, params, max_page=5):
         result = []
         while max_page > 0:
             response = self.call_cninfo_js_api(url, headers, params)
@@ -112,11 +112,11 @@ class FinancialReportCrawler:
         """
         year, type = self.parse_title(announcement['announcementTitle'])
 
-        folder = os.path.join(output_path, announcement['secCode'], year)
+        folder = os.path.join(output_path, announcement['secCode'])
         if not os.path.exists(folder):
             os.makedirs(folder)
 
-        output_file = folder + os.path.sep + str(type.value) + ".pdf"
+        output_file = folder + os.path.sep + year + "Q" + str(type.value) + ".pdf"
         url = self._pdf_base_url + announcement['adjunctUrl']
 
         self.download_file(url, output_file)
@@ -169,12 +169,20 @@ class FinancialReportCrawler:
         }
         announcements = self.download_announcements(self._base_url, self.get_headers(), params)
         self.__logger.info("Download {} announcements for code {}".format(len(announcements), code))
+        visited = {}
         for announcement in announcements:
-            if announcement['announcementTitle'].find("摘要") >= 0:
+            title = announcement['announcementTitle']
+            if title.find("摘要") >= 0:
                 continue
-            if announcement['announcementTitle'].find("取消") >= 0:
+            if title.find("取消") >= 0:
+                continue
+            if title.find("正文") >= 0:
+                continue
+            if title in visited:
                 continue
             self.download_announcement(code, announcement, GMConsts.FINANCIAL_REPORT_ROOT)
+            visited[title] = 1
+
 
     def download_and_update_org_ids(self):
         """
@@ -203,5 +211,5 @@ class FinancialReportCrawler:
 
 if __name__ == "__main__":
     crawler = FinancialReportCrawler()
-    crawler.get_announcements_by_code('300357', datetime(2018, 1, 1).date(), datetime(2020, 1, 1).date())
+    crawler.get_announcements_by_code('002801', datetime(2005, 1, 1).date(), datetime(2020, 1, 1).date())
     # crawler.download_and_update_org_ids()
