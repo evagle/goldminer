@@ -5,38 +5,47 @@ from enum import Enum
 import pandas as pd
 
 from goldminer.common.Utils import Utils
+from goldminer.storage.BalanceSheetDao import BalanceSheetDao
 from goldminer.storage.DerivativeFinanceIndicatorDao import DerivativeFinanceIndicatorDao
 from goldminer.storage.IncomeStatementDao import IncomeStatementDao
 
 
 class ProfileMetric(Enum):
-    GrossProfitMargin = "GPM"  # 毛利率
-    NetProfitMargin = "NPM"  # 净利率
-    ThreeFeeRatio = "TreeFeeRatio"  # 三费占比
-    SalesRatio = "SalesRatio"
-    ManagementRatio = "ManagementRatio"
-    FinanceRatio = "FinanceRatio"
+    GrossProfitMargin = "毛利率"  # 毛利率
+    NetProfitMargin = "净利率"  # 净利率
+    ThreeFeeRatio = "三费"  # 三费占比
+    SalesRatio = "销售"
+    ManagementRatio = "管理"
+    FinanceRatio = "财务"
     ROIC = "ROIC"  # 投入资本回报率
     ROE = "ROE"  # 净资产回报率
     ROA = "ROA"  # 总资产回报率
-    IncomeGrowth = "IG"  # 营收增速
-    NetProfitGrowth = "NPG"  # 净利润增速
-    NetProfitCutGrowth = "NCPG"  # 扣非净利润增速
-    BIZCashFlow = "BIZCF"  # 经营活动产生现金流量净额 BIZNETCFLOW
-    FreeCashFlow = "FCF"  # 自由现金现金流
-    InventoryTurnoverRate = "INVTURNRT"  # 存货周转率/次
-    TotalAssetTurnoverRate = "TATURNRT"  # 总资产周转率/次
-    AccountReceivableTurnoverRate = "ARTR"  # 应收账款周转率/次
-    AssetLiabilityRatio = "ASSLIABRT"  # 资产负债率
-    CurrentRatio = "CRT"  # 流动比率
-    QuickRatio = "QRT"  # 速动比率
-    EquityMultiplier = "EM"  # 权益乘数=总资产/股东权益(净资产)
+    IncomeGrowth = "营收增速"  # 营收增速
+    NetProfitGrowth = "净利润增速"  # 净利润增速
+    NetProfitCutGrowth = "扣非增速"  # 扣非净利润增速
+    BIZCashFlow = "经营现金流"  # 经营活动产生现金流量净额 BIZNETCFLOW
+    FreeCashFlow = "自由现金流"  # 自由现金流
+    InventoryTurnoverRate = "存货周转率"  # 存货周转率/次
+    TotalAssetTurnoverRate = "总资产周转率"  # 总资产周转率/次
+    AccountReceivableTurnoverRate = "应收周转率"  # 应收账款周转率/次
+    AssetLiabilityRatio = "资产负债率"  # 资产负债率
+    CurrentRatio = "流动比率"  # 流动比率
+    QuickRatio = "速动比率"  # 速动比率
+    EquityMultiplier = "权益乘数"  # 权益乘数=总资产/股东权益(净资产)
+    AccountPayable = "应付"
+    AccountReceivable = "应收"
+    AdvancePayment = "预收"
+    Prepaid = "预付"
+    Upstream = "上游"
+    Downstream = "下游"
+
 
 
 class StockProfile:
     def __init__(self):
         self.derivative_dao = DerivativeFinanceIndicatorDao()
         self.income_dao = IncomeStatementDao()
+        self.balance_sheet_dao = BalanceSheetDao()
 
     def _add_metric_to_profile(self, profile: dict, end_date: date, metric: ProfileMetric, value):
         if end_date not in profile:
@@ -186,6 +195,7 @@ class StockProfile:
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.EquityMultiplier,
                                         Utils.formatFloat(model.EM, 2))
 
+        # 利润表数据
         models = self.income_dao.getByCode(code)
         selected = []
         while len(models) > 0 and models[0].end_date.month != 12:
@@ -213,7 +223,35 @@ class StockProfile:
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.GrossProfitMargin,
                                         Utils.formatFloat(gross_profit_margin, 2))
 
-        # 经营活动产生的现金流量净额
+        # 资产负债表数据
+        models = self.balance_sheet_dao.getByCode(code)
+        selected = []
+        while len(models) > 0 and models[0].end_date.month != 12:
+            selected.append(models[0])
+            models.pop(0)
+        for model in models:
+            if model.end_date.month == 12:
+                selected.append(model)
+
+        for model in selected:
+            account_payable = model.ACCOPAYA + model.COPEPOUN + model.COPEWITHREINRECE + \
+                              model.INTEPAYA + model.NOTESPAYA + model.OTHERPAY
+            account_receivable = model.ACCORECE + model.DIVIDRECE + model.EXPOTAXREBARECE + model.INTERECE + \
+                                 model.NOTESRECE + model.OTHERRECE + model.PREMRECE + model.REINCONTRESE + model.REINRECE
+            advance_payment = model.ADVAPAYM
+            prepaid = model.PREP
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AccountPayable,
+                                        Utils.formatFloat(account_payable / 10000, 2))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AccountReceivable,
+                                        Utils.formatFloat(account_receivable / 10000, 2))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AdvancePayment,
+                                        Utils.formatFloat(advance_payment / 10000, 2))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.Prepaid,
+                                        Utils.formatFloat(prepaid / 10000, 2))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.Upstream,
+                                        Utils.formatFloat((account_payable - prepaid) / 10000, 2))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.Downstream,
+                                        Utils.formatFloat((advance_payment - account_receivable) / 10000, 2))
 
         return profile
 
@@ -290,6 +328,17 @@ class StockProfile:
             ProfileMetric.EquityMultiplier,  # 注意这个指标数据来自掘金=期末总资产/归属母公司的期末股东权益，采用的不是平均总资产
         ]
 
+        # 上下游分析
+        upstream_downstream_columns = [
+            ProfileMetric.AccountPayable,
+            ProfileMetric.Prepaid,
+            ProfileMetric.Upstream,
+            ProfileMetric.AccountReceivable,
+            ProfileMetric.AdvancePayment,
+            ProfileMetric.Downstream,
+
+        ]
+
         df = pd.DataFrame.from_dict(profile, orient='index', columns=columns)
         print("\n============护城河============")
         print(df[[c.value for c in competence_columns]])
@@ -308,6 +357,9 @@ class StockProfile:
 
         print("\n============杜邦分析============")
         print(df[[c.value for c in dupont_analysis_columns]])
+
+        print("\n============上下游分析============")
+        print(df[[c.value for c in upstream_downstream_columns]])
 
 
 
