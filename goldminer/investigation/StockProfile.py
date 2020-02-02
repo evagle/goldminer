@@ -6,6 +6,7 @@ import pandas as pd
 
 from goldminer.common.Utils import Utils
 from goldminer.storage.BalanceSheetDao import BalanceSheetDao
+from goldminer.storage.CashflowStatementDao import CashflowStatementDao
 from goldminer.storage.DerivativeFinanceIndicatorDao import DerivativeFinanceIndicatorDao
 from goldminer.storage.IncomeStatementDao import IncomeStatementDao
 
@@ -38,6 +39,8 @@ class ProfileMetric(Enum):
     Prepaid = "预付"
     Upstream = "上游"
     Downstream = "下游"
+    ProfitCashRatio = "净现比"
+    NetProfit = "净利润"
 
 
 
@@ -46,6 +49,7 @@ class StockProfile:
         self.derivative_dao = DerivativeFinanceIndicatorDao()
         self.income_dao = IncomeStatementDao()
         self.balance_sheet_dao = BalanceSheetDao()
+        self.cashflow_dao = CashflowStatementDao()
 
     def _add_metric_to_profile(self, profile: dict, end_date: date, metric: ProfileMetric, value):
         if end_date not in profile:
@@ -222,6 +226,8 @@ class StockProfile:
                                         Utils.formatFloat(sales_ratio, 2))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.GrossProfitMargin,
                                         Utils.formatFloat(gross_profit_margin, 2))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.NetProfit,
+                                        model.NETPROFIT)
 
         # 资产负债表数据
         models = self.balance_sheet_dao.getByCode(code)
@@ -252,6 +258,23 @@ class StockProfile:
                                         Utils.formatFloat((account_payable - prepaid) / 10000, 2))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.Downstream,
                                         Utils.formatFloat((advance_payment - account_receivable) / 10000, 2))
+
+        # 现金流量表数据
+        models = self.cashflow_dao.getByCode(code)
+        selected = []
+        while len(models) > 0 and models[0].end_date.month != 12:
+            selected.append(models[0])
+            models.pop(0)
+        for model in models:
+            if model.end_date.month == 12:
+                selected.append(model)
+        for model in selected:
+            biz_net_cashflow = model.BIZNETCFLOW
+            profit_cash_ratio = biz_net_cashflow / profile[model.end_date][ProfileMetric.NetProfit.value]
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BIZCashFlow,
+                                        Utils.formatFloat(biz_net_cashflow / 10000, 2))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.ProfitCashRatio,
+                                        Utils.formatFloat(profit_cash_ratio, 2))
 
         return profile
 
@@ -299,12 +322,14 @@ class StockProfile:
             ProfileMetric.NetProfitMargin,
             ProfileMetric.ROE,
             ProfileMetric.ROA,
+            ProfileMetric.ProfitCashRatio,
         ]
         # 成长能力
         growth_ability_columns = [
             ProfileMetric.IncomeGrowth,
             ProfileMetric.NetProfitGrowth,
             ProfileMetric.NetProfitCutGrowth,
+            ProfileMetric.BIZCashFlow,
             ProfileMetric.FreeCashFlow,
         ]
         # 运营能力
@@ -362,8 +387,7 @@ class StockProfile:
         print(df[[c.value for c in upstream_downstream_columns]])
 
 
-
 if __name__ == "__main__":
     stock_profile = StockProfile()
-    profile = stock_profile.make_profile('002801')
+    profile = stock_profile.make_profile('002304')
     stock_profile.display_profile(profile)
