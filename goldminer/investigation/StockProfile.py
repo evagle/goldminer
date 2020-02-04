@@ -161,13 +161,7 @@ class StockProfile:
 
         models = self.derivative_dao.getByCode(code)
         models = self._calc_npcut_growth(models)
-        selected = []
-        while len(models) > 0 and models[0].end_date.month != 12:
-            selected.append(models[0])
-            models.pop(0)
-        for model in models:
-            if model.end_date.month == 12:
-                selected.append(model)
+        selected = self._filter_annual_and_latest(models)
 
         for model in selected:
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.ROIC, Utils.formatFloat(model.ROIC, 2))
@@ -201,13 +195,7 @@ class StockProfile:
 
         # 利润表数据
         models = self.income_dao.getByCode(code)
-        selected = []
-        while len(models) > 0 and models[0].end_date.month != 12:
-            selected.append(models[0])
-            models.pop(0)
-        for model in models:
-            if model.end_date.month == 12:
-                selected.append(model)
+        selected = self._filter_annual_and_latest(models)
 
         for model in selected:
             finance_ratio = model.FINEXPE / model.BIZINCO * 100
@@ -231,13 +219,7 @@ class StockProfile:
 
         # 资产负债表数据
         models = self.balance_sheet_dao.getByCode(code)
-        selected = []
-        while len(models) > 0 and models[0].end_date.month != 12:
-            selected.append(models[0])
-            models.pop(0)
-        for model in models:
-            if model.end_date.month == 12:
-                selected.append(model)
+        selected = self._filter_annual_and_latest(models)
 
         for model in selected:
             account_payable = model.ACCOPAYA + model.COPEPOUN + model.COPEWITHREINRECE + \
@@ -261,13 +243,7 @@ class StockProfile:
 
         # 现金流量表数据
         models = self.cashflow_dao.getByCode(code)
-        selected = []
-        while len(models) > 0 and models[0].end_date.month != 12:
-            selected.append(models[0])
-            models.pop(0)
-        for model in models:
-            if model.end_date.month == 12:
-                selected.append(model)
+        selected = self._filter_annual_and_latest(models)
         for model in selected:
             biz_net_cashflow = model.BIZNETCFLOW
             profit_cash_ratio = biz_net_cashflow / profile[model.end_date][ProfileMetric.NetProfit.value]
@@ -278,25 +254,15 @@ class StockProfile:
 
         return profile
 
-    def profitability(self, code, profile):
-        """
-
-        :param code:
-        :return:
-        """
-
-        models = self.derivative_dao.getByCode(code)
+    def _filter_annual_and_latest(self, models):
         selected = []
-        selected.append(models[0])
-        models.pop(0)
+        while len(models) > 0 and models[0].end_date.month != 12:
+            selected.append(models[0])
+            models.pop(0)
         for model in models:
-            if model.end_date.month == 12:
+            if model.end_date.month == 12 and model.end_date.year >= 2005:
                 selected.append(model)
-
-        for model in selected:
-            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.ROE, model.ROEAVGCUT)
-            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.ROA, model.ROA)
-            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.NetProfitMargin, model.SNPMARGINCONMS)
+        return selected
 
     def display_profile(self, profile):
         columns = list(profile.values())[0].keys()
