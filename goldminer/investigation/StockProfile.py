@@ -39,6 +39,7 @@ class ProfileMetric(Enum):
     Prepaid = "预付"
     Upstream = "上游"
     Downstream = "下游"
+    Occupation = "总占款"
     ProfitCashRatio = "净现比"
     NetProfit = "净利润"
 
@@ -189,7 +190,7 @@ class StockProfile:
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.QuickRatio,
                                         Utils.formatFloat(model.QUICKRT, 2))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.FreeCashFlow,
-                                        Utils.formatFloat(model.FCFF / 10000, 2))
+                                        int(model.FCFF / 1000000))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.EquityMultiplier,
                                         Utils.formatFloat(model.EM, 2))
 
@@ -228,18 +229,21 @@ class StockProfile:
                                  model.NOTESRECE + model.OTHERRECE + model.PREMRECE + model.REINCONTRESE + model.REINRECE
             advance_payment = model.ADVAPAYM
             prepaid = model.PREP
+            occupation = account_payable - prepaid + advance_payment - account_receivable
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AccountPayable,
-                                        Utils.formatFloat(account_payable / 10000, 2))
+                                        int(account_payable / 1000000))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AccountReceivable,
-                                        Utils.formatFloat(account_receivable / 10000, 2))
+                                        int(account_receivable / 1000000))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AdvancePayment,
-                                        Utils.formatFloat(advance_payment / 10000, 2))
+                                        int(advance_payment / 1000000))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.Prepaid,
-                                        Utils.formatFloat(prepaid / 10000, 2))
+                                        int(prepaid / 1000000))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.Upstream,
-                                        Utils.formatFloat((account_payable - prepaid) / 10000, 2))
+                                        int((account_payable - prepaid) / 1000000))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.Downstream,
-                                        Utils.formatFloat((advance_payment - account_receivable) / 10000, 2))
+                                        int((advance_payment - account_receivable) / 1000000))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.Occupation,
+                                        int(occupation / 1000000))
 
         # 现金流量表数据
         models = self.cashflow_dao.getByCode(code)
@@ -248,7 +252,7 @@ class StockProfile:
             biz_net_cashflow = model.BIZNETCFLOW
             profit_cash_ratio = biz_net_cashflow / profile[model.end_date][ProfileMetric.NetProfit.value]
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BIZCashFlow,
-                                        Utils.formatFloat(biz_net_cashflow / 10000, 2))
+                                        int(biz_net_cashflow / 1000000))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.ProfitCashRatio,
                                         Utils.formatFloat(profit_cash_ratio, 2))
 
@@ -327,7 +331,7 @@ class StockProfile:
             ProfileMetric.AccountReceivable,
             ProfileMetric.AdvancePayment,
             ProfileMetric.Downstream,
-
+            ProfileMetric.Occupation,
         ]
 
         df = pd.DataFrame.from_dict(profile, orient='index', columns=columns)
