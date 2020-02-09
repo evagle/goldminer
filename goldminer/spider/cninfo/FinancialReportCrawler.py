@@ -82,8 +82,7 @@ class FinancialReportCrawler:
             result.extend(response['announcements'])
             if not response['hasMore']:
                 break
-
-            response['pageNum'] += 1
+            params['pageNum'] += 1
             max_page -= 1
 
         return result
@@ -211,5 +210,5 @@ class FinancialReportCrawler:
 
 if __name__ == "__main__":
     crawler = FinancialReportCrawler()
-    crawler.get_announcements_by_code('002801', datetime(2005, 1, 1).date(), datetime(2020, 1, 1).date())
+    crawler.get_announcements_by_code('002304', datetime(2005, 1, 1).date(), datetime(2020, 1, 1).date())
     # crawler.download_and_update_org_ids()
