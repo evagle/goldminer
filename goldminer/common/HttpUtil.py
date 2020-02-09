@@ -1,4 +1,5 @@
 # coding: utf-8
+import os
 from urllib import request
 
 from fake_useragent import UserAgent
@@ -20,4 +21,6 @@ class HttpUtil:
 
     @staticmethod
     def random_user_agent():
-        return UserAgent(use_cache_server=False).random
+        return UserAgent(cache=True,
+                         use_cache_server=False,
+                         path=os.getcwd() + "/fake-useragent.json").random
