@@ -1,48 +1,15 @@
 # coding: utf-8
 from datetime import date
-from enum import Enum
 
 import pandas as pd
 
 from goldminer.common.Utils import Utils
+from goldminer.models.ProfileMetric import ProfileMetric
+from goldminer.models.StockProfileModel import StockProfileModel
 from goldminer.storage.BalanceSheetDao import BalanceSheetDao
 from goldminer.storage.CashflowStatementDao import CashflowStatementDao
 from goldminer.storage.DerivativeFinanceIndicatorDao import DerivativeFinanceIndicatorDao
 from goldminer.storage.IncomeStatementDao import IncomeStatementDao
-
-
-class ProfileMetric(Enum):
-    GrossProfitMargin = "毛利率"  # 毛利率
-    NetProfitMargin = "净利率"  # 净利率
-    ThreeFeeRatio = "三费"  # 三费占比
-    SalesRatio = "销售"
-    ManagementRatio = "管理"
-    FinanceRatio = "财务"
-    ROIC = "ROIC"  # 投入资本回报率
-    ROE = "ROE"  # 净资产回报率
-    ROA = "ROA"  # 总资产回报率
-    IncomeGrowth = "营收增速"  # 营收增速
-    NetProfitGrowth = "净利润增速"  # 净利润增速
-    NetProfitCutGrowth = "扣非增速"  # 扣非净利润增速
-    BIZCashFlow = "经营现金流"  # 经营活动产生现金流量净额 BIZNETCFLOW
-    FreeCashFlow = "自由现金流"  # 自由现金流
-    InventoryTurnoverRate = "存货周转率"  # 存货周转率/次
-    TotalAssetTurnoverRate = "总资产周转率"  # 总资产周转率/次
-    AccountReceivableTurnoverRate = "应收周转率"  # 应收账款周转率/次
-    AssetLiabilityRatio = "资产负债率"  # 资产负债率
-    CurrentRatio = "流动比率"  # 流动比率
-    QuickRatio = "速动比率"  # 速动比率
-    EquityMultiplier = "权益乘数"  # 权益乘数=总资产/股东权益(净资产)
-    AccountPayable = "应付"
-    AccountReceivable = "应收"
-    AdvancePayment = "预收"
-    Prepaid = "预付"
-    Upstream = "上游"
-    Downstream = "下游"
-    Occupation = "总占款"
-    ProfitCashRatio = "净现比"
-    NetProfit = "净利润"
-
 
 
 class StockProfile:
@@ -52,11 +19,11 @@ class StockProfile:
         self.balance_sheet_dao = BalanceSheetDao()
         self.cashflow_dao = CashflowStatementDao()
 
-    def _add_metric_to_profile(self, profile: dict, end_date: date, metric: ProfileMetric, value):
-        if end_date not in profile:
-            profile[end_date] = {}
-        profile[end_date][metric.value] = value
-        return profile
+        self.code = None
+        self._stockBars = None
+
+    def _add_metric_to_profile(self, profile: StockProfileModel, end_date: date, metric: ProfileMetric, value):
+        profile.add_metric(end_date, metric, value)
 
     def _calc_npcut_growth(self, derivative_models):
         dic = {}
@@ -158,7 +125,7 @@ class StockProfile:
 
         :return: 个股Profile最新季度的数据加上所有年度数据按时间降序
         """
-        profile = {}
+        profile = StockProfileModel(code)
 
         models = self.derivative_dao.getByCode(code)
         models = self._calc_npcut_growth(models)
@@ -226,7 +193,8 @@ class StockProfile:
             account_payable = model.ACCOPAYA + model.COPEPOUN + model.COPEWITHREINRECE + \
                               model.INTEPAYA + model.NOTESPAYA + model.OTHERPAY
             account_receivable = model.ACCORECE + model.DIVIDRECE + model.EXPOTAXREBARECE + model.INTERECE + \
-                                 model.NOTESRECE + model.OTHERRECE + model.PREMRECE + model.REINCONTRESE + model.REINRECE
+                                 model.NOTESRECE + model.OTHERRECE + model.PREMRECE + model.REINCONTRESE + \
+                                 model.REINRECE
             advance_payment = model.ADVAPAYM
             prepaid = model.PREP
             occupation = account_payable - prepaid + advance_payment - account_receivable
@@ -250,7 +218,7 @@ class StockProfile:
         selected = self._filter_annual_and_latest(models)
         for model in selected:
             biz_net_cashflow = model.BIZNETCFLOW
-            profit_cash_ratio = biz_net_cashflow / profile[model.end_date][ProfileMetric.NetProfit.value]
+            profit_cash_ratio = biz_net_cashflow / profile.get_metric(model.end_date, ProfileMetric.NetProfit)
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BIZCashFlow,
                                         int(biz_net_cashflow / 1000000))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.ProfitCashRatio,
@@ -263,12 +231,17 @@ class StockProfile:
         while len(models) > 0 and models[0].end_date.month != 12:
             selected.append(models[0])
             models.pop(0)
+        count = 0
         for model in models:
             if model.end_date.month == 12 and model.end_date.year >= 2005:
                 selected.append(model)
+                count += 1
+            if count >= 10:
+                break
         return selected
 
     def display_profile(self, profile):
+        profile = profile.as_dict()
         columns = list(profile.values())[0].keys()
         for k in profile:
             profile[k] = list(profile[k].values())
@@ -335,6 +308,7 @@ class StockProfile:
         ]
 
         df = pd.DataFrame.from_dict(profile, orient='index', columns=columns)
+        df.columns = df.columns.map(lambda x: x.value)
         print("\n============护城河============")
         print(df[[c.value for c in competence_columns]])
 
@@ -359,5 +333,5 @@ class StockProfile:
 
 if __name__ == "__main__":
     stock_profile = StockProfile()
-    profile = stock_profile.make_profile('002304')
+    profile = stock_profile.make_profile('300639')
     stock_profile.display_profile(profile)
