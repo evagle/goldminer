@@ -12,7 +12,7 @@ from goldminer.storage.DerivativeFinanceIndicatorDao import DerivativeFinanceInd
 from goldminer.storage.IncomeStatementDao import IncomeStatementDao
 
 
-class StockProfile:
+class StockProfileFactory:
     def __init__(self):
         self.derivative_dao = DerivativeFinanceIndicatorDao()
         self.income_dao = IncomeStatementDao()
@@ -332,6 +332,6 @@ class StockProfile:
 
 
 if __name__ == "__main__":
-    stock_profile = StockProfile()
+    stock_profile = StockProfileFactory()
     profile = stock_profile.make_profile('300639')
     stock_profile.display_profile(profile)
