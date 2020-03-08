@@ -1,4 +1,5 @@
 import os
+import re
 from datetime import date, datetime
 
 import requests
@@ -10,6 +11,7 @@ from goldminer.common.HttpUtil import HttpUtil
 from goldminer.common.logger import get_logger
 from goldminer.models.models import CnInfoOrgId
 from goldminer.storage.CnInfoOrgIdDao import CnInfoOrgIdDao
+from goldminer.storage.StockDao import StockDao
 
 
 class FinancialReportCrawler:
@@ -37,6 +39,7 @@ class FinancialReportCrawler:
         self._stock_list_url = "http://www.cninfo.com.cn/new/data/szse_stock.json"
 
         self.cnInfoOrgIdDao = CnInfoOrgIdDao()
+        self.stockDao = StockDao()
         self.__logger = get_logger(__name__)
 
 
@@ -88,10 +91,13 @@ class FinancialReportCrawler:
         return result
 
     def parse_title(self, title):
-        year = title[:4]
+        match = re.search(r"\d{4}", title)
+        if not match:
+            raise Exception("Failed to extract year from title {}".format(title))
+        year = match.group()
         if title.find("一季度") >= 0:
             type = FinancialReportType.FirstQuarter
-        elif title.find("半年度") >= 0:
+        elif title.find("半年度") >= 0 or title.find("中期") >= 0:
             type = FinancialReportType.SemiAnnual
         elif title.find("三季度") >= 0:
             type = FinancialReportType.ThirdQuarter
@@ -99,23 +105,26 @@ class FinancialReportCrawler:
             type = FinancialReportType.Annual
         else:
             raise Exception("Failed to extract report type from title {}".format(title))
-        return year, type
+        is_update = title.find("修订版") >= 0
+        return year, type, is_update
 
-    def download_announcement(self, code, announcement, output_path):
+    def download_announcement(self, stock_model, announcement, output_path):
         """
 
-        :param code:
+        :param stock_model: Stock instance
         :param announcement: {"id":null,"secCode":"000001","secName":"平安银行","orgId":"gssz0000001","announcementId":"1206997843","announcementTitle":"2019年第三季度报告全文","announcementTime":1571673600000,"adjunctUrl":"finalpage/2019-10-22/1206997843.PDF","adjunctSize":849,"adjunctType":"PDF","storageTime":null,"columnId":null,"pageColumn":null,"announcementType":"01010503||010112||01030701","associateAnnouncement":null,"important":null,"batchNum":null,"announcementContent":null,"orgName":null,"announcementTypeName":null}
         :param output_path:
         :return:
         """
-        year, type = self.parse_title(announcement['announcementTitle'])
-
-        folder = os.path.join(output_path, announcement['secCode'])
+        year, type, is_update = self.parse_title(announcement['announcementTitle'])
+        folder = os.path.join(output_path, stock_model.name)
         if not os.path.exists(folder):
             os.makedirs(folder)
 
-        output_file = folder + os.path.sep + year + "Q" + str(type.value) + ".pdf"
+        if is_update:
+            output_file = folder + os.path.sep + year + "Q" + str(type.value) + "Update.pdf"
+        else:
+            output_file = folder + os.path.sep + year + "Q" + str(type.value) + ".pdf"
         url = self._pdf_base_url + announcement['adjunctUrl']
 
         self.download_file(url, output_file)
@@ -166,6 +175,7 @@ class FinancialReportCrawler:
             'sortName': '',
             'sortTyp': '',
         }
+        stock_model = self.stockDao.getByCode(code)
         announcements = self.download_announcements(self._base_url, self.get_headers(), params)
         self.__logger.info("Download {} announcements for code {}".format(len(announcements), code))
         visited = {}
@@ -177,9 +187,11 @@ class FinancialReportCrawler:
                 continue
             if title.find("正文") >= 0:
                 continue
+            if title.find("更正") >= 0:
+                continue
             if title in visited:
                 continue
-            self.download_announcement(code, announcement, GMConsts.FINANCIAL_REPORT_ROOT)
+            self.download_announcement(stock_model, announcement, GMConsts.FINANCIAL_REPORT_ROOT)
             visited[title] = 1
 
 
@@ -210,5 +222,5 @@ class FinancialReportCrawler:
 
 if __name__ == "__main__":
     crawler = FinancialReportCrawler()
-    crawler.get_announcements_by_code('002304', datetime(2005, 1, 1).date(), datetime(2020, 1, 1).date())
+    crawler.get_announcements_by_code('002714', datetime(2005, 1, 1).date(), datetime(2020, 1, 1).date())
     # crawler.download_and_update_org_ids()
