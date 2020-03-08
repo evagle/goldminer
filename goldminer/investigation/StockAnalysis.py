@@ -34,7 +34,7 @@ class StockAnalysis:
             ProfileMetric.NetProfitMargin,
             ProfileMetric.ROE,
             ProfileMetric.ROA,
-            ProfileMetric.ProfitCashRatio,
+            ProfileMetric.ProfitCashRate,
         ]
         # 成长能力
         self.__growth_ability_columns = [
@@ -52,7 +52,7 @@ class StockAnalysis:
         ]
         # 偿债能力
         self.__solvency_ability_columns = [
-            ProfileMetric.AssetLiabilityRatio,
+            ProfileMetric.AssetLiabilityRate,
             ProfileMetric.CurrentRatio,
             ProfileMetric.QuickRatio,
         ]
