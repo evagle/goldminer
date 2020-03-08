@@ -22,7 +22,7 @@ class ProfileMetric(Enum):
     InventoryTurnoverRate = "存货周转率"  # 存货周转率/次
     TotalAssetTurnoverRate = "总资产周转率"  # 总资产周转率/次
     AccountReceivableTurnoverRate = "应收周转率"  # 应收账款周转率/次
-    AssetLiabilityRatio = "资产负债率"  # 资产负债率
+    AssetLiabilityRate = "资产负债率"  # 资产负债率
     CurrentRatio = "流动比率"  # 流动比率
     QuickRatio = "速动比率"  # 速动比率
     EquityMultiplier = "权益乘数"  # 权益乘数=总资产/股东权益(净资产)
@@ -33,11 +33,11 @@ class ProfileMetric(Enum):
     Upstream = "上游"
     Downstream = "下游"
     Occupation = "总占款"
-    ProfitCashRatio = "净现比"
+    ProfitCashRate = "净现比"
     NetProfit = "净利润"
     NetProfitCut = "扣非净利润"
     CoreProfit = "核心利润"  # 核心利润=
-    CoreProfitRatio = "核心利润比"  # 核心利润/营业利润，越大说明运营利润的贡献占比越高
+    CoreProfitRate = "核心利润比"  # 核心利润/营业利润，越大说明运营利润的贡献占比越高
     CapitalExp = "资本开支"  # Capital Expenditures = 购建固定资产、无形资产和其他长期资产所支付的现金
     SalesRevenueRate = "销售收现率"  # = 销售商品提供劳务收到的现金/营业收入
     GoodwillRate = "商誉占比"  # = 商誉/净资产
