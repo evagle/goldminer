@@ -150,7 +150,7 @@ class StockProfileFactory:
                                         Utils.formatFloat(model.TATURNRT, 2))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AccountReceivableTurnoverRate,
                                         Utils.formatFloat(model.ACCRECGTURNRT, 2))
-            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AssetLiabilityRatio,
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AssetLiabilityRate,
                                         Utils.formatFloat(model.ASSLIABRT, 2))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.CurrentRatio,
                                         Utils.formatFloat(model.CURRENTRT, 2))
@@ -160,6 +160,13 @@ class StockProfileFactory:
                                         int(model.FCFF / 1000000))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.EquityMultiplier,
                                         Utils.formatFloat(model.EM, 2))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.NetProfitCut,
+                                        model.NPCUT)
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.ProfitCashRate,
+                                        Utils.formatFloat(model.OPNCFTONPCONMS, 2))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.SalesRevenueRate,
+                                        Utils.formatFloat(model.SCASHREVTOOPIRT, 2))
+
 
         # 利润表数据
         models = self.income_dao.getByCode(code)
@@ -170,7 +177,7 @@ class StockProfileFactory:
             management_ratio = model.MANAEXPE / model.BIZINCO * 100
             sales_ratio = model.SALESEXPE / model.BIZINCO * 100
             three_fee_ratio = finance_ratio + management_ratio + sales_ratio
-
+            core_profit = model.BIZINCO - model.BIZCOST - model.BIZTAX - model.FINEXPE - model.MANAEXPE - model.SALESEXPE
             gross_profit_margin = (model.BIZINCO - model.BIZCOST) / model.BIZINCO * 100
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.ThreeFeeRatio,
                                         Utils.formatFloat(three_fee_ratio, 2))
@@ -183,7 +190,11 @@ class StockProfileFactory:
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.GrossProfitMargin,
                                         Utils.formatFloat(gross_profit_margin, 2))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.NetProfit,
-                                        model.NETPROFIT)
+                                        round(model.NETPROFIT / 1000000))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.CoreProfit,
+                                        core_profit)
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.CoreProfitRate,
+                                        Utils.formatFloat(core_profit / model.PERPROFIT, 2))
 
         # 资产负债表数据
         models = self.balance_sheet_dao.getByCode(code)
@@ -198,31 +209,38 @@ class StockProfileFactory:
             advance_payment = model.ADVAPAYM
             prepaid = model.PREP
             occupation = account_payable - prepaid + advance_payment - account_receivable
+            goodwill_rate = model.GOODWILL / model.RIGHAGGR
+
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AccountPayable,
-                                        int(account_payable / 1000000))
+                                        round(account_payable / 1000000))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AccountReceivable,
-                                        int(account_receivable / 1000000))
+                                        round(account_receivable / 1000000))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AdvancePayment,
-                                        int(advance_payment / 1000000))
+                                        round(advance_payment / 1000000))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.Prepaid,
-                                        int(prepaid / 1000000))
+                                        round(prepaid / 1000000))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.Upstream,
-                                        int((account_payable - prepaid) / 1000000))
+                                        round((account_payable - prepaid) / 1000000))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.Downstream,
-                                        int((advance_payment - account_receivable) / 1000000))
+                                        round((advance_payment - account_receivable) / 1000000))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.Occupation,
-                                        int(occupation / 1000000))
+                                        round(occupation / 1000000))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.GoodwillRate,
+                                        round(goodwill_rate / 1000000))
 
         # 现金流量表数据
         models = self.cashflow_dao.getByCode(code)
         selected = self._filter_annual_and_latest(models)
         for model in selected:
             biz_net_cashflow = model.BIZNETCFLOW
-            profit_cash_ratio = biz_net_cashflow / profile.get_metric(model.end_date, ProfileMetric.NetProfit)
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BIZCashFlow,
-                                        int(biz_net_cashflow / 1000000))
-            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.ProfitCashRatio,
-                                        Utils.formatFloat(profit_cash_ratio, 2))
+                                        round(biz_net_cashflow / 1000000))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.InvestCashFlow,
+                                        round(model.INVNETCASHFLOW / 1000000))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.FinancialCashFlow,
+                                        round(model.FINNETCFLOW / 1000000))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.CapitalExp,
+                                        round(model.ACQUASSETCASH / 1000000))
 
         return profile
 
@@ -239,6 +257,27 @@ class StockProfileFactory:
             if count >= 10:
                 break
         return selected
+
+    def _filter_annual_df(self, df: pd.DataFrame):
+        indexes = df.index.values.tolist()
+        filtered_indexes = []
+        for d in indexes:
+            if d.month == 12:
+                filtered_indexes.append(d)
+        return df.loc[pd.Index(filtered_indexes)]
+
+    def _sum_df(self, df: pd.DataFrame):
+        df = self._filter_annual_df(df)
+        df.loc["SUM"] = df.sum()
+        return df
+
+    def _mean_df(self, df: pd.DataFrame, precision=None):
+        df = self._filter_annual_df(df)
+        if precision:
+            df.loc["MEAN"] = df.mean().apply(lambda x: Utils.formatFloat(x, 2))
+        else:
+            df.loc["MEAN"] = df.mean()
+        return df
 
     def display_profile(self, profile):
         profile = profile.as_dict()
@@ -265,15 +304,14 @@ class StockProfileFactory:
             ProfileMetric.NetProfitMargin,
             ProfileMetric.ROE,
             ProfileMetric.ROA,
-            ProfileMetric.ProfitCashRatio,
+            ProfileMetric.ProfitCashRate,
+            ProfileMetric.CoreProfitRate,
         ]
         # 成长能力
         growth_ability_columns = [
             ProfileMetric.IncomeGrowth,
             ProfileMetric.NetProfitGrowth,
             ProfileMetric.NetProfitCutGrowth,
-            ProfileMetric.BIZCashFlow,
-            ProfileMetric.FreeCashFlow,
         ]
         # 运营能力
         operation_ability_columns = [
@@ -283,7 +321,7 @@ class StockProfileFactory:
         ]
         # 偿债能力
         solvency_ability_columns = [
-            ProfileMetric.AssetLiabilityRatio,
+            ProfileMetric.AssetLiabilityRate,
             ProfileMetric.CurrentRatio,
             ProfileMetric.QuickRatio,
         ]
@@ -307,31 +345,72 @@ class StockProfileFactory:
             ProfileMetric.Occupation,
         ]
 
+        # 现金流
+        cash_flow_columns = [
+            ProfileMetric.NetProfit,
+            ProfileMetric.BIZCashFlow,
+            ProfileMetric.InvestCashFlow,
+            ProfileMetric.FinancialCashFlow,
+            ProfileMetric.FreeCashFlow,
+            ProfileMetric.CapitalExp,
+        ]
+
+        # 排雷指标
+        risk_signal_columns = [
+            ProfileMetric.InventoryTurnoverRate,
+            ProfileMetric.AccountReceivableTurnoverRate,
+            ProfileMetric.SalesRevenueRate,
+            ProfileMetric.GoodwillRate,
+            ProfileMetric.AssetLiabilityRate,
+        ]
+
         df = pd.DataFrame.from_dict(profile, orient='index', columns=columns)
         df.columns = df.columns.map(lambda x: x.value)
         print("\n============护城河============")
-        print(df[[c.value for c in competence_columns]])
+        competence_df = df[[c.value for c in competence_columns]].copy()
+        competence_df.loc["MEAN"] = competence_df.mean().apply(lambda x: Utils.formatFloat(x, 2))
+        print(competence_df)
 
         print("\n============盈利能力============")
-        print(df[[c.value for c in profit_ability_columns]])
+        profit_ability_df = df[[c.value for c in profit_ability_columns]].copy()
+        profit_ability_df.loc["MEAN"] = profit_ability_df.mean().apply(lambda x: Utils.formatFloat(x, 2))
+        print(profit_ability_df)
 
         print("\n============成长能力============")
-        print(df[[c.value for c in growth_ability_columns]])
+        growth_ability_df = df[[c.value for c in growth_ability_columns]].copy()
+        growth_ability_df.loc["MEAN"] = growth_ability_df.mean().apply(lambda x: Utils.formatFloat(x, 2))
+        print(growth_ability_df)
 
         print("\n============运营能力============")
-        print(df[[c.value for c in operation_ability_columns]])
+        operation_ability_df = df[[c.value for c in operation_ability_columns]].copy()
+        operation_ability_df.loc["MEAN"] = operation_ability_df.mean().apply(lambda x: Utils.formatFloat(x, 2))
+        print(operation_ability_df)
 
         print("\n============偿债能力============")
-        print(df[[c.value for c in solvency_ability_columns]])
+        solvency_ability_df = df[[c.value for c in solvency_ability_columns]].copy()
+        solvency_ability_df = self._mean_df(solvency_ability_df, 2)
+        print(solvency_ability_df)
 
         print("\n============杜邦分析============")
-        print(df[[c.value for c in dupont_analysis_columns]])
+        dupond_df = df[[c.value for c in dupont_analysis_columns]]
+        dupond_df = self._mean_df(dupond_df, 2)
+        print(dupond_df)
 
         print("\n============上下游分析============")
         print(df[[c.value for c in upstream_downstream_columns]])
 
+        print("\n============现金流============")
+        cash_flow_df = df[[c.value for c in cash_flow_columns]]
+        cash_flow_df = self._sum_df(cash_flow_df)
+        print(cash_flow_df)
+
+        print("\n============排雷指标============")
+        risk_df = df[[c.value for c in risk_signal_columns]]
+        risk_df = self._mean_df(risk_df, 2)
+        print(risk_df)
+
 
 if __name__ == "__main__":
     stock_profile = StockProfileFactory()
-    profile = stock_profile.make_profile('300639')
+    profile = stock_profile.make_profile('002714')
     stock_profile.display_profile(profile)
