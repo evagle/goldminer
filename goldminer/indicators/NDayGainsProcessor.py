@@ -62,6 +62,9 @@ class NDayGainsProcessor(BaseIndicatorProcessor):
                         break
 
                 gain = (bars[i].close - close) / close * 100 if close > 0 else 0
+                # 涨幅1000倍，抛异常
+                if gain > 100000:
+                    raise Exception("Abnormal gain detected: {}, bar {}".format(gain, bars[i]))
                 gain = Utils.formatFloat(gain, 6)
                 attr = "gain" + str(n)
                 oldval = getattr(model, attr)
@@ -83,4 +86,4 @@ if __name__ == "__main__":
     stockDao = StockDao()
     stocks = stockDao.getStockList()
     processor = NDayGainsProcessor()
-    processor.process('000002')
+    processor.updateAll()
