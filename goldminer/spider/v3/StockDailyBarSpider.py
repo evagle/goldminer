@@ -54,6 +54,8 @@ class StockDailyBarSpider(GMBaseSpiderV3):
                     bar.sec_level = instrument['sec_level']
                     bar.is_suspended = instrument['is_suspended']
                     bar.position = instrument['position']
+                    if bar.close < 0.1:
+                        raise Exception("Found invalid close value", bar)
 
         bars = list(filter(lambda bar: bar.adj_factor is not None, bars))
 
@@ -92,6 +94,5 @@ class StockDailyBarSpider(GMBaseSpiderV3):
 
 if __name__ == "__main__":
     spider = StockDailyBarSpider()
-    codes_to_fix = ["000043", "001914"]
-    for code in codes_to_fix:
-        spider.fix_bars(code)
+
+    spider.download_all()
