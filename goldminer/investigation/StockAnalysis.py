@@ -3,6 +3,7 @@ from typing import List
 
 import pandas as pd
 
+from goldminer.common.Utils import Utils
 from goldminer.investigation.StockProfileFactory import StockProfileFactory
 from goldminer.models.ProfileMetric import ProfileMetric
 from goldminer.models.StockProfileModel import StockProfileModel
@@ -76,7 +77,7 @@ class StockAnalysis:
             ProfileMetric.Occupation,
         ]
 
-    def __average_n(self, data, n):
+    def _mean(self, data, n):
         i = 0
         sum = 0
         for end_date in data:
@@ -85,7 +86,7 @@ class StockAnalysis:
             if end_date.month == 12:
                 sum += data[end_date]
                 i += 1
-        return sum / i
+        return Utils.formatFloat(sum / i, 2)
 
     def __get_stock(self, code):
         if code not in self.__stocks:
@@ -114,26 +115,20 @@ class StockAnalysis:
         # Calculate 10 year average, 5 year average
         for metric in report:
             for stock_model in report[metric]:
-                ave5 = self.__average_n(report[metric][stock_model], 5)
-                ave10 = self.__average_n(report[metric][stock_model], 10)
-                report[metric][stock_model]['ave5'] = ave5
-                report[metric][stock_model]['ave10'] = ave10
+                mean5 = self._mean(report[metric][stock_model], 5)
+                mean10 = self._mean(report[metric][stock_model], 10)
+                report[metric][stock_model]['MEAN5'] = mean5
+                report[metric][stock_model]['MEAN10'] = mean10
 
         return report
-        # pd.set_option('display.max_columns', None)
-        # pd.set_option('display.max_rows', None)
-        # pd.set_option('expand_frame_repr', False)
-        #
-        # df = pd.DataFrame.from_dict(report[ProfileMetric.ROIC], orient='index')
-        # print(df)
-        # return df
+
 
     def display_report(self, report):
         print("\n============护城河============")
         for metric in self.__competence_columns:
             df = pd.DataFrame.from_dict(report[metric], orient='index')
             df = df.rename(lambda x: x.name, axis=0)
-            df = df.sort_values(by='ave10', axis=0, ascending=False)
+            df = df.sort_values(by='MEAN5', axis=0, ascending=False)
             print("\n---------" + metric.value + "---------")
             print(df)
 
@@ -141,7 +136,7 @@ class StockAnalysis:
         for metric in self.__profit_ability_columns:
             df = pd.DataFrame.from_dict(report[metric], orient='index')
             df = df.rename(lambda x: x.name, axis=0)
-            df = df.sort_values(by='ave10', axis=0, ascending=False)
+            df = df.sort_values(by='MEAN5', axis=0, ascending=False)
             print("\n---------" + metric.value + "---------")
             print(df)
 
@@ -149,7 +144,7 @@ class StockAnalysis:
         for metric in self.__growth_ability_columns:
             df = pd.DataFrame.from_dict(report[metric], orient='index')
             df = df.rename(lambda x: x.name, axis=0)
-            df = df.sort_values(by='ave10', axis=0, ascending=False)
+            df = df.sort_values(by='MEAN5', axis=0, ascending=False)
             print("\n---------" + metric.value + "---------")
             print(df)
 
@@ -157,7 +152,7 @@ class StockAnalysis:
         for metric in self.__operation_ability_columns:
             df = pd.DataFrame.from_dict(report[metric], orient='index')
             df = df.rename(lambda x: x.name, axis=0)
-            df = df.sort_values(by='ave10', axis=0, ascending=False)
+            df = df.sort_values(by='MEAN5', axis=0, ascending=False)
             print("\n---------" + metric.value + "---------")
             print(df)
 
@@ -165,7 +160,7 @@ class StockAnalysis:
         for metric in self.__solvency_ability_columns:
             df = pd.DataFrame.from_dict(report[metric], orient='index')
             df = df.rename(lambda x: x.name, axis=0)
-            df = df.sort_values(by='ave10', axis=0, ascending=False)
+            df = df.sort_values(by='MEAN5', axis=0, ascending=False)
             print("\n---------" + metric.value + "---------")
             print(df)
 
@@ -173,7 +168,7 @@ class StockAnalysis:
         for metric in self.__dupont_analysis_columns:
             df = pd.DataFrame.from_dict(report[metric], orient='index')
             df = df.rename(lambda x: x.name, axis=0)
-            df = df.sort_values(by='ave10', axis=0, ascending=False)
+            df = df.sort_values(by='MEAN5', axis=0, ascending=False)
             print("\n---------" + metric.value + "---------")
             print(df)
 
@@ -182,7 +177,8 @@ if __name__ == "__main__":
     analysis = StockAnalysis()
     profile_factory = StockProfileFactory()
     profiles = []
-    codes = ['603288', '603027']
+
+    codes = ['600580', '002249', '002176', '300660', '603728', '000922', '603489', '603583', '002801']
     for code in codes:
         profiles.append(profile_factory.make_profile(code))
 
