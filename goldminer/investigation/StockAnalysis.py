@@ -1,4 +1,5 @@
 # coding: utf-8
+import math
 from typing import List
 
 import pandas as pd
@@ -81,12 +82,30 @@ class StockAnalysis:
         i = 0
         sum = 0
         for end_date in data:
-            if i >= n:
+            if i > n:
                 break
             if end_date.month == 12:
                 sum += data[end_date]
                 i += 1
         return Utils.formatFloat(sum / i, 2)
+
+    # 计算增长率的复合增速
+    def _compound_mean(self, data, n):
+        growths = []
+        i = 0
+        total = 1
+        for end_date in data:
+            if i > n:
+                break
+            if end_date.month == 12:
+                growths.append(data[end_date])
+                i += 1
+        if len(growths) == 0:
+            return 0
+
+        for g in growths:
+            total = math.fabs(total) * (1 + g / 100)
+        return Utils.formatFloat(math.pow(total, 1 / len(growths)) * 100 - 100, 2)
 
     def __get_stock(self, code):
         if code not in self.__stocks:
@@ -115,13 +134,23 @@ class StockAnalysis:
         # Calculate 10 year average, 5 year average
         for metric in report:
             for stock_model in report[metric]:
-                mean5 = self._mean(report[metric][stock_model], 5)
-                mean10 = self._mean(report[metric][stock_model], 10)
+                if metric in [ProfileMetric.IncomeGrowth, ProfileMetric.NetProfitCutGrowth]:
+                    mean5 = self._compound_mean(report[metric][stock_model], 5)
+                    mean10 = self._compound_mean(report[metric][stock_model], 10)
+                else:
+                    mean5 = self._mean(report[metric][stock_model], 5)
+                    mean10 = self._mean(report[metric][stock_model], 10)
+
                 report[metric][stock_model]['MEAN5'] = mean5
                 report[metric][stock_model]['MEAN10'] = mean10
 
         return report
 
+    def move_column_to_head(self, df, column):
+        column_data = df[column]
+        df = df.drop(column, axis=1)
+        df.insert(0, column, column_data)
+        return df
 
     def display_report(self, report):
         print("\n============护城河============")
@@ -129,6 +158,8 @@ class StockAnalysis:
             df = pd.DataFrame.from_dict(report[metric], orient='index')
             df = df.rename(lambda x: x.name, axis=0)
             df = df.sort_values(by='MEAN5', axis=0, ascending=False)
+            df = self.move_column_to_head(df, "MEAN10")
+            df = self.move_column_to_head(df, "MEAN5")
             print("\n---------" + metric.value + "---------")
             print(df)
 
@@ -137,6 +168,8 @@ class StockAnalysis:
             df = pd.DataFrame.from_dict(report[metric], orient='index')
             df = df.rename(lambda x: x.name, axis=0)
             df = df.sort_values(by='MEAN5', axis=0, ascending=False)
+            df = self.move_column_to_head(df, "MEAN10")
+            df = self.move_column_to_head(df, "MEAN5")
             print("\n---------" + metric.value + "---------")
             print(df)
 
@@ -145,6 +178,8 @@ class StockAnalysis:
             df = pd.DataFrame.from_dict(report[metric], orient='index')
             df = df.rename(lambda x: x.name, axis=0)
             df = df.sort_values(by='MEAN5', axis=0, ascending=False)
+            df = self.move_column_to_head(df, "MEAN10")
+            df = self.move_column_to_head(df, "MEAN5")
             print("\n---------" + metric.value + "---------")
             print(df)
 
@@ -153,6 +188,8 @@ class StockAnalysis:
             df = pd.DataFrame.from_dict(report[metric], orient='index')
             df = df.rename(lambda x: x.name, axis=0)
             df = df.sort_values(by='MEAN5', axis=0, ascending=False)
+            df = self.move_column_to_head(df, "MEAN10")
+            df = self.move_column_to_head(df, "MEAN5")
             print("\n---------" + metric.value + "---------")
             print(df)
 
@@ -161,6 +198,8 @@ class StockAnalysis:
             df = pd.DataFrame.from_dict(report[metric], orient='index')
             df = df.rename(lambda x: x.name, axis=0)
             df = df.sort_values(by='MEAN5', axis=0, ascending=False)
+            df = self.move_column_to_head(df, "MEAN10")
+            df = self.move_column_to_head(df, "MEAN5")
             print("\n---------" + metric.value + "---------")
             print(df)
 
@@ -169,6 +208,8 @@ class StockAnalysis:
             df = pd.DataFrame.from_dict(report[metric], orient='index')
             df = df.rename(lambda x: x.name, axis=0)
             df = df.sort_values(by='MEAN5', axis=0, ascending=False)
+            df = self.move_column_to_head(df, "MEAN10")
+            df = self.move_column_to_head(df, "MEAN5")
             print("\n---------" + metric.value + "---------")
             print(df)
 
@@ -178,7 +219,7 @@ if __name__ == "__main__":
     profile_factory = StockProfileFactory()
     profiles = []
 
-    codes = ['600580', '002249', '002176', '300660', '603728', '000922', '603489', '603583', '002801']
+    codes = ['600580', '002249', '002176', '300660', '603728', '000922', '603583', '002801']
     for code in codes:
         profiles.append(profile_factory.make_profile(code))
 
