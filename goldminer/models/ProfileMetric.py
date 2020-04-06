@@ -36,8 +36,13 @@ class ProfileMetric(Enum):
     ProfitCashRate = "净现比"
     NetProfit = "净利润"
     NetProfitCut = "扣非净利润"
-    CoreProfit = "核心利润"  # 核心利润=
-    CoreProfitRate = "核心利润比"  # 核心利润/营业利润，越大说明运营利润的贡献占比越高
+    CoreProfit = "核心利润"  # 核心利润 = 毛利润-三费-税金及附加=（主营）营业收入-营业成本-三费-税金及附加
+    CoreProfitMargin = "核心利润率"  # 核心利润率 = 核心利润/营业收入
+
+    # 核心利润比 = 核心利润/营业利润，越大说明运营利润的贡献占比越高。
+    # 营业利润 = 营业总收入-营业总支出+公允价值变动收益+投资收益+汇兑收益+资产处置收益+其他收益
+    # 与核心利润相比，营业利润多了后面几项与经营无关的收益即：公允价值变动收益+投资收益+汇兑收益+资产处置收益+其他收益
+    CoreProfitRate = "核心利润比"
     CapitalExp = "资本开支"  # Capital Expenditures = 购建固定资产、无形资产和其他长期资产所支付的现金
     SalesRevenueRate = "销售收现率"  # = 销售商品提供劳务收到的现金/营业收入
     GoodwillRate = "商誉占比"  # = 商誉/净资产
