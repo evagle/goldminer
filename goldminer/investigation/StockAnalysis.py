@@ -16,6 +16,7 @@ class StockAnalysis:
         pd.set_option('display.max_columns', None)
         pd.set_option('display.max_rows', None)
         pd.set_option('expand_frame_repr', False)
+        pd.set_option('colheader_justify', 'left')
 
         self.__stock_dao = StockDao()
         self.__stocks = {}

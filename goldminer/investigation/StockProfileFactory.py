@@ -178,6 +178,7 @@ class StockProfileFactory:
             sales_ratio = model.SALESEXPE / model.BIZINCO * 100
             three_fee_ratio = finance_ratio + management_ratio + sales_ratio
             core_profit = model.BIZINCO - model.BIZCOST - model.BIZTAX - model.FINEXPE - model.MANAEXPE - model.SALESEXPE
+            core_profit_margin = core_profit / model.BIZINCO * 100
             gross_profit_margin = (model.BIZINCO - model.BIZCOST) / model.BIZINCO * 100
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.ThreeFeeRatio,
                                         Utils.formatFloat(three_fee_ratio, 2))
@@ -193,6 +194,8 @@ class StockProfileFactory:
                                         round(model.NETPROFIT / 1000000))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.CoreProfit,
                                         core_profit)
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.CoreProfitMargin,
+                                        Utils.formatFloat(core_profit_margin, 2))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.CoreProfitRate,
                                         Utils.formatFloat(core_profit / model.PERPROFIT, 2))
 
@@ -288,6 +291,10 @@ class StockProfileFactory:
         pd.set_option('display.max_columns', None)
         pd.set_option('display.max_rows', None)
         pd.set_option('expand_frame_repr', False)
+        pd.set_option('display.unicode.ambiguous_as_wide', True)
+        pd.set_option('display.unicode.east_asian_width', True)
+        pd.set_option('colheader_justify', 'left')
+        pd.set_option('display.width', 200)
 
         # 护城河
         competence_columns = [
@@ -301,6 +308,7 @@ class StockProfileFactory:
         # 盈利能力
         profit_ability_columns = [
             ProfileMetric.GrossProfitMargin,
+            ProfileMetric.CoreProfitMargin,
             ProfileMetric.NetProfitMargin,
             ProfileMetric.ROE,
             ProfileMetric.ROA,
@@ -412,5 +420,5 @@ class StockProfileFactory:
 
 if __name__ == "__main__":
     stock_profile = StockProfileFactory()
-    profile = stock_profile.make_profile('002714')
+    profile = stock_profile.make_profile('600519')
     stock_profile.display_profile(profile)
