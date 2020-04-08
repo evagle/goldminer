@@ -1,3 +1,4 @@
+import argparse
 import os
 import re
 from datetime import date, datetime
@@ -127,9 +128,9 @@ class FinancialReportCrawler:
             output_file = folder + os.path.sep + year + "Q" + str(type.value) + ".pdf"
         url = self._pdf_base_url + announcement['adjunctUrl']
 
-        self.download_file(url, output_file)
+        self._download_file(url, output_file)
 
-    def download_file(self, url, output_file):
+    def _download_file(self, url, output_file):
         response = requests.get(url, stream=True, verify=False)
         total_size = int(response.headers['Content-Length'])
 
@@ -138,8 +139,11 @@ class FinancialReportCrawler:
         else:
             temp_size = 0
 
-        if temp_size >= total_size:
-            self.__logger.info("{} is already downloaded.".format(output_file))
+        if temp_size >= total_size * 0.5:
+            if temp_size != total_size:
+                self.__logger.warn("{} is downloaded but file size different with remote.".format(output_file))
+            else:
+                self.__logger.info("{} is already downloaded.".format(output_file))
             return
 
         self.__logger.info(
@@ -219,8 +223,17 @@ class FinancialReportCrawler:
                             "please run FinancialReportDownloader.download_and_update_org_ids to update it".format(
                 code))
 
+    def parse_args(self):
+        parser = argparse.ArgumentParser(description='Process some integers.')
+        parser.add_argument('--code',
+                            required=False,
+                            type=str,
+                            help='stock code to download')
+
+        return parser.parse_args()
 
 if __name__ == "__main__":
     crawler = FinancialReportCrawler()
-    crawler.get_announcements_by_code('002714', datetime(2005, 1, 1).date(), datetime(2020, 1, 1).date())
-    # crawler.download_and_update_org_ids()
+    args = crawler.parse_args()
+    if args.code:
+        crawler.get_announcements_by_code(args.code, datetime(2005, 1, 1).date(), datetime(2020, 1, 1).date())
