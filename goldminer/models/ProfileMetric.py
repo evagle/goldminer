@@ -22,9 +22,11 @@ class ProfileMetric(Enum):
     InventoryTurnoverRate = "存货周转率"  # 存货周转率/次
     TotalAssetTurnoverRate = "总资产周转率"  # 总资产周转率/次
     AccountReceivableTurnoverRate = "应收周转率"  # 应收账款周转率/次
-    AssetLiabilityRate = "资产负债率"  # 资产负债率
+    AssetLiabilityRatio = "资产负债率"  # 资产负债率=总负债/总资产
+    InterestLiabilityRatio = "有息负债率"  # 有息负债率=有息负债/总资产
     CurrentRatio = "流动比率"  # 流动比率
     QuickRatio = "速动比率"  # 速动比率
+    InterestLiabilityCoverage = "有息覆盖率"  # 有息负债覆盖率=（货币资金+交易性金融资产+可供出售金融资产+买入返售金融资产+持有至到期投资）/ 有息负债
     EquityMultiplier = "权益乘数"  # 权益乘数=总资产/股东权益(净资产)
     AccountPayable = "应付"
     AccountReceivable = "应收"

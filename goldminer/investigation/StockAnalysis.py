@@ -55,7 +55,7 @@ class StockAnalysis:
         ]
         # 偿债能力
         self.__solvency_ability_columns = [
-            ProfileMetric.AssetLiabilityRate,
+            ProfileMetric.AssetLiabilityRatio,
             ProfileMetric.CurrentRatio,
             ProfileMetric.QuickRatio,
         ]

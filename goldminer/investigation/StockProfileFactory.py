@@ -1,4 +1,5 @@
 # coding: utf-8
+import math
 from datetime import date
 
 import pandas as pd
@@ -40,6 +41,46 @@ class StockProfileFactory:
                     model.NPCUTGRT = (model.NPCUT - pre_model.NPCUT) / pre_model.NPCUT * 100
 
         return derivative_models
+
+    def _interest_bearing_liabilities(self, balance_sheet_model):
+        """
+        来自理杏仁：https://www.lixinger.com/wiki/lwi/
+        有息负债 = 负债合计 - 无息流动负债 - 无息非流动负债
+
+        【无息流动负债】 = 【应付票据和应付账款 + 预收款项 + 合同负债 + 应付职工薪酬 + 应交税费 + 其他应付款 + 应付股利 + 应付利息 + 其他流动负债】，该公式也源于神奇网站，其核心思想是这部分是无息的，而除此之外的是有息的，比如应付票据、短期借款、一年内到期的非流动负债等等。
+        【无息非流动负债】 = 【非流动负债合计 - 长期借款 - 应付债券】，该公式源于神奇网站，其核心思想是，非流动负债中，除长期借款和应付债券是有息的外，其他全部是无息的。
+        对于房地产企业，用户还需要注意其【长期股权投资】、【少数股东权益】以及【对外担保金额变化】等方面的数据。
+        自2018年Q3起，大部分公司开始采用新版的会计准则，合同负债从预收账款里分离出来，应付票据和应付账款合并成一个，所以我们也做了相应调整，具体而言就是在无息流动负债里增加了【应付票据】以及【合同负债】。
+
+        :param balance_sheet_model: 资产负债表
+        :return:
+        """
+        model = balance_sheet_model
+        interest_free_current_liabilities = model.NOTESPAYA + model.ACCOPAYA + model.ADVAPAYM + model.COPEWORKERSAL + \
+                                            model.TAXESPAYA + model.OTHERPAY + model.DIVIPAYA + model.INTEPAYA + \
+                                            model.OTHERCURRELIABI
+
+        interest_free_non_current_liabilities = model.TOTALNONCLIAB - model.LONGBORR - model.BDSPAYA
+        return model.TOTLIAB - interest_free_current_liabilities - interest_free_non_current_liabilities
+
+    def _interest_liability_coverage(self, interest_bearing_liabilities, balance_sheet_model):
+        # 有息利润小于1万当做是0处理，有息负债覆盖率返回最大值1000%
+        if math.fabs(interest_bearing_liabilities) < 10000:
+            return 1000
+
+        model = balance_sheet_model
+        interest_liability_coverage = (model.CURFDS + model.AVAISELLASSE + model.TRADFINASSET + model.PURCRESAASSET +
+                                       model.HOLDINVEDUE) / interest_bearing_liabilities * 100
+        interest_liability_coverage = min(interest_liability_coverage, 1000)
+        interest_liability_coverage = max(interest_liability_coverage, -1000)
+
+        return interest_liability_coverage
+
+    def _interest_liability_ratio(self, interest_bearing_liabilities, balance_sheet_model):
+        # 有息利润小于1万当做是0处理，有息负债率返回0
+        if math.fabs(interest_bearing_liabilities) < 10000:
+            return 0
+        return (interest_bearing_liabilities / balance_sheet_model.TOTASSET) * 100
 
     def make_profile(self, code):
         """
@@ -150,7 +191,7 @@ class StockProfileFactory:
                                         Utils.formatFloat(model.TATURNRT, 2))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AccountReceivableTurnoverRate,
                                         Utils.formatFloat(model.ACCRECGTURNRT, 2))
-            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AssetLiabilityRate,
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AssetLiabilityRatio,
                                         Utils.formatFloat(model.ASSLIABRT, 2))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.CurrentRatio,
                                         Utils.formatFloat(model.CURRENTRT, 2))
@@ -213,6 +254,9 @@ class StockProfileFactory:
             prepaid = model.PREP
             occupation = account_payable - prepaid + advance_payment - account_receivable
             goodwill_rate = model.GOODWILL / model.RIGHAGGR
+            interest_bearing_liabilities = self._interest_bearing_liabilities(model)
+            interest_liability_ratio = self._interest_liability_ratio(interest_bearing_liabilities, model)
+            interest_liability_coverage = self._interest_liability_coverage(interest_bearing_liabilities, model)
 
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AccountPayable,
                                         round(account_payable / 1000000))
@@ -230,6 +274,10 @@ class StockProfileFactory:
                                         round(occupation / 1000000))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.GoodwillRate,
                                         round(goodwill_rate / 1000000))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.InterestLiabilityRatio,
+                                        Utils.formatFloat(interest_liability_ratio, 2))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.InterestLiabilityCoverage,
+                                        int(interest_liability_coverage))
 
         # 现金流量表数据
         models = self.cashflow_dao.getByCode(code)
@@ -329,7 +377,9 @@ class StockProfileFactory:
         ]
         # 偿债能力
         solvency_ability_columns = [
-            ProfileMetric.AssetLiabilityRate,
+            ProfileMetric.AssetLiabilityRatio,
+            ProfileMetric.InterestLiabilityRatio,
+            ProfileMetric.InterestLiabilityCoverage,
             ProfileMetric.CurrentRatio,
             ProfileMetric.QuickRatio,
         ]
@@ -369,7 +419,7 @@ class StockProfileFactory:
             ProfileMetric.AccountReceivableTurnoverRate,
             ProfileMetric.SalesRevenueRate,
             ProfileMetric.GoodwillRate,
-            ProfileMetric.AssetLiabilityRate,
+            ProfileMetric.AssetLiabilityRatio,
         ]
 
         df = pd.DataFrame.from_dict(profile, orient='index', columns=columns)
@@ -420,5 +470,5 @@ class StockProfileFactory:
 
 if __name__ == "__main__":
     stock_profile = StockProfileFactory()
-    profile = stock_profile.make_profile('600519')
+    profile = stock_profile.make_profile('603600')
     stock_profile.display_profile(profile)
