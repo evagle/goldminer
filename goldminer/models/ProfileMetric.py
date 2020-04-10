@@ -21,7 +21,7 @@ class ProfileMetric(Enum):
     FreeCashFlow = "自由现金流"  # 自由现金流
     InventoryTurnoverRate = "存货周转率"  # 存货周转率/次
     TotalAssetTurnoverRate = "总资产周转率"  # 总资产周转率/次
-    AccountReceivableTurnoverRate = "应收周转率"  # 应收账款周转率/次
+    AccountReceivableTurnoverRate = "应收周转率"  # 应收账款周转率/次=销售收入/平均应收账款
     AssetLiabilityRatio = "资产负债率"  # 资产负债率=总负债/总资产
     InterestLiabilityRatio = "有息负债率"  # 有息负债率=有息负债/总资产
     CurrentRatio = "流动比率"  # 流动比率
