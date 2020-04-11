@@ -1,16 +1,18 @@
 # coding: utf-8
 import math
-from datetime import date
+from datetime import date, timedelta
 
 import pandas as pd
 
 from goldminer.common.Utils import Utils
 from goldminer.models.ProfileMetric import ProfileMetric
 from goldminer.models.StockProfileModel import StockProfileModel
+from goldminer.models.models import BalanceSheet
 from goldminer.storage.BalanceSheetDao import BalanceSheetDao
 from goldminer.storage.CashflowStatementDao import CashflowStatementDao
 from goldminer.storage.DerivativeFinanceIndicatorDao import DerivativeFinanceIndicatorDao
 from goldminer.storage.IncomeStatementDao import IncomeStatementDao
+from goldminer.storage.StockDao import StockDao
 
 
 class StockProfileFactory:
@@ -19,6 +21,7 @@ class StockProfileFactory:
         self.income_dao = IncomeStatementDao()
         self.balance_sheet_dao = BalanceSheetDao()
         self.cashflow_dao = CashflowStatementDao()
+        self.stockDao = StockDao()
 
         self.code = None
         self._stockBars = None
@@ -42,7 +45,7 @@ class StockProfileFactory:
 
         return derivative_models
 
-    def _interest_bearing_liabilities(self, balance_sheet_model):
+    def _interest_bearing_liabilities(self, model: BalanceSheet):
         """
         来自理杏仁：https://www.lixinger.com/wiki/lwi/
         有息负债 = 负债合计 - 无息流动负债 - 无息非流动负债
@@ -55,7 +58,6 @@ class StockProfileFactory:
         :param balance_sheet_model: 资产负债表
         :return:
         """
-        model = balance_sheet_model
         interest_free_current_liabilities = model.NOTESPAYA + model.ACCOPAYA + model.ADVAPAYM + model.COPEWORKERSAL + \
                                             model.TAXESPAYA + model.OTHERPAY + model.DIVIPAYA + model.INTEPAYA + \
                                             model.OTHERCURRELIABI
@@ -63,14 +65,21 @@ class StockProfileFactory:
         interest_free_non_current_liabilities = model.TOTALNONCLIAB - model.LONGBORR - model.BDSPAYA
         return model.TOTLIAB - interest_free_current_liabilities - interest_free_non_current_liabilities
 
-    def _interest_liability_coverage(self, interest_bearing_liabilities, balance_sheet_model):
-        # 有息利润小于1万当做是0处理，有息负债覆盖率返回最大值1000%
+    def _interest_liability_coverage(self, interest_bearing_liabilities, model: BalanceSheet):
+        """
+        有息负债覆盖率=货币资金/有息负债
+        有息负债小于1万当做是0处理，有息负债覆盖率返回最大值1000%
+
+        另，老唐的定义里可以加上金融资产，即（货币资金+交易性金融资产+可供出售金融资产+买入返售金融资产+持有至到期投资）/ 有息负债，
+        这样算出来结果大都很大，没有多少意义，故此选择货币资金/有息负债
+        :param interest_bearing_liabilities:
+        :param model:
+        :return:
+        """
         if math.fabs(interest_bearing_liabilities) < 10000:
             return 1000
 
-        model = balance_sheet_model
-        interest_liability_coverage = (model.CURFDS + model.AVAISELLASSE + model.TRADFINASSET + model.PURCRESAASSET +
-                                       model.HOLDINVEDUE) / interest_bearing_liabilities * 100
+        interest_liability_coverage = model.CURFDS / interest_bearing_liabilities * 100
         interest_liability_coverage = min(interest_liability_coverage, 1000)
         interest_liability_coverage = max(interest_liability_coverage, -1000)
 
@@ -81,6 +90,51 @@ class StockProfileFactory:
         if math.fabs(interest_bearing_liabilities) < 10000:
             return 0
         return (interest_bearing_liabilities / balance_sheet_model.TOTASSET) * 100
+
+    def _product_assets(self, model: BalanceSheet):
+        """
+        生产性资产=固定资产+在建工程+工程物资+无形资产+商誉+长期待摊费用+递延所得税资产+递延所得税负债
+        :param balance_sheet_model:
+        :return:
+        """
+        return model.FIXEDASSENET + model.CONSPROG + model.ENGIMATE + model.INTAASSET + \
+               model.GOODWILL + model.LOGPREPEXPE + model.DEFETAXASSET + model.DEFEINCOTAXLIAB
+
+    def _investment_assets(self, model: BalanceSheet):
+        """
+        投资资产=交易性金融资产+持有至到期投资+可供出售金融资产+买入返售金融资产+长期股权投资+投资性房地产
+        :param balance_sheet_model:
+        :return:
+        """
+        return model.TRADFINASSET + model.HOLDINVEDUE + model.AVAISELLASSE + model.PURCRESAASSET + \
+               model.EQUIINVE + model.INVEPROP
+
+    def _operating_assets(self, model: BalanceSheet):
+        """
+        经营性资产=应收+长期应收款+存货
+        :return:
+        """
+        return self._account_receivable(model) + model.LONGRECE + model.INVE
+
+    def _account_payable(self, model: BalanceSheet):
+        """
+        应收=应付账款+应付手续费及佣金+应付分保账款+应付利息+应付票据+其他应付款
+        :param model:
+        :return:
+        """
+        return model.ACCOPAYA + model.COPEPOUN + model.COPEWITHREINRECE + \
+               model.INTEPAYA + model.NOTESPAYA + model.OTHERPAY
+
+    def _account_receivable(self, model: BalanceSheet):
+        """
+        应收=应收票据+应收账款+应收股利+应收出口退税+应收利息+其他应收款+应收保费+应收分保合同准备金+应收分保账款
+        :param model:
+        :return:
+        """
+        return model.ACCORECE + model.DIVIDRECE + model.EXPOTAXREBARECE + model.INTERECE + \
+               model.NOTESRECE + model.OTHERRECE + model.PREMRECE + model.REINCONTRESE + \
+               model.REINRECE
+
 
     def make_profile(self, code):
         """
@@ -167,10 +221,11 @@ class StockProfileFactory:
         :return: 个股Profile最新季度的数据加上所有年度数据按时间降序
         """
         profile = StockProfileModel(code)
+        publish_date = self.stockDao.getStockPublishDate(code)
 
         models = self.derivative_dao.getByCode(code)
         models = self._calc_npcut_growth(models)
-        selected = self._filter_annual_and_latest(models)
+        selected = self._filter_annual_and_latest(models, publish_date)
 
         for model in selected:
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.ROIC, Utils.formatFloat(model.ROIC, 2))
@@ -211,7 +266,7 @@ class StockProfileFactory:
 
         # 利润表数据
         models = self.income_dao.getByCode(code)
-        selected = self._filter_annual_and_latest(models)
+        selected = self._filter_annual_and_latest(models, publish_date)
 
         for model in selected:
             finance_ratio = model.FINEXPE / model.BIZINCO * 100
@@ -242,21 +297,25 @@ class StockProfileFactory:
 
         # 资产负债表数据
         models = self.balance_sheet_dao.getByCode(code)
-        selected = self._filter_annual_and_latest(models)
+        selected = self._filter_annual_and_latest(models, publish_date)
 
         for model in selected:
-            account_payable = model.ACCOPAYA + model.COPEPOUN + model.COPEWITHREINRECE + \
-                              model.INTEPAYA + model.NOTESPAYA + model.OTHERPAY
-            account_receivable = model.ACCORECE + model.DIVIDRECE + model.EXPOTAXREBARECE + model.INTERECE + \
-                                 model.NOTESRECE + model.OTHERRECE + model.PREMRECE + model.REINCONTRESE + \
-                                 model.REINRECE
+            account_payable = self._account_payable(model)
+            account_receivable = self._account_receivable(model)
             advance_payment = model.ADVAPAYM
             prepaid = model.PREP
             occupation = account_payable - prepaid + advance_payment - account_receivable
-            goodwill_rate = model.GOODWILL / model.RIGHAGGR
+            goodwill_rate = model.GOODWILL / model.RIGHAGGR * 100
             interest_bearing_liabilities = self._interest_bearing_liabilities(model)
             interest_liability_ratio = self._interest_liability_ratio(interest_bearing_liabilities, model)
             interest_liability_coverage = self._interest_liability_coverage(interest_bearing_liabilities, model)
+            other_receivable_ratio = model.OTHERRECE / model.TOTASSET * 100
+            other_pay_ratio = model.OTHERPAY / model.TOTASSET * 100
+            account_receivable_ratio = account_receivable / model.TOTASSET * 100
+            product_asset_ratio = self._product_assets(model) / model.TOTASSET * 100
+            monetary_funds_ratio = model.CURFDS / model.TOTASSET * 100
+            investment_asset_ratio = self._investment_assets(model) / model.TOTASSET * 100
+            operating_asset_ratio = self._operating_assets(model) / model.TOTASSET * 100
 
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AccountPayable,
                                         round(account_payable / 1000000))
@@ -273,15 +332,29 @@ class StockProfileFactory:
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.Occupation,
                                         round(occupation / 1000000))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.GoodwillRate,
-                                        round(goodwill_rate / 1000000))
+                                        Utils.formatFloat(goodwill_rate, 1))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.InterestLiabilityRatio,
                                         Utils.formatFloat(interest_liability_ratio, 2))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.InterestLiabilityCoverage,
                                         int(interest_liability_coverage))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.OtherReceivableRatio,
+                                        Utils.formatFloat(other_receivable_ratio, 1))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.OtherPayRatio,
+                                        Utils.formatFloat(other_pay_ratio, 1))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AccountReceivableRatio,
+                                        Utils.formatFloat(account_receivable_ratio, 1))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.ProductAssetRatio,
+                                        Utils.formatFloat(product_asset_ratio, 1))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.MonetaryFundsRatio,
+                                        Utils.formatFloat(monetary_funds_ratio, 1))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.InvestmentAssetRatio,
+                                        Utils.formatFloat(investment_asset_ratio, 1))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.OperatingAssetRatio,
+                                        Utils.formatFloat(operating_asset_ratio, 1))
 
         # 现金流量表数据
         models = self.cashflow_dao.getByCode(code)
-        selected = self._filter_annual_and_latest(models)
+        selected = self._filter_annual_and_latest(models, publish_date)
         for model in selected:
             biz_net_cashflow = model.BIZNETCFLOW
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BIZCashFlow,
@@ -295,18 +368,21 @@ class StockProfileFactory:
 
         return profile
 
-    def _filter_annual_and_latest(self, models):
+    def _filter_annual_and_latest(self, models, publish_date):
         selected = []
         while len(models) > 0 and models[0].end_date.month != 12:
             selected.append(models[0])
             models.pop(0)
         count = 0
         for model in models:
+            if model.end_date < publish_date - timedelta(days=365):
+                break
             if model.end_date.month == 12 and model.end_date.year >= 2005:
                 selected.append(model)
                 count += 1
             if count >= 10:
                 break
+
         return selected
 
     def _filter_annual_df(self, df: pd.DataFrame):
@@ -374,6 +450,7 @@ class StockProfileFactory:
             ProfileMetric.InventoryTurnoverRate,
             ProfileMetric.TotalAssetTurnoverRate,
             ProfileMetric.AccountReceivableTurnoverRate,
+            ProfileMetric.SalesRevenueRate,
         ]
         # 偿债能力
         solvency_ability_columns = [
@@ -413,13 +490,21 @@ class StockProfileFactory:
             ProfileMetric.CapitalExp,
         ]
 
-        # 排雷指标
-        risk_signal_columns = [
-            ProfileMetric.InventoryTurnoverRate,
-            ProfileMetric.AccountReceivableTurnoverRate,
-            ProfileMetric.SalesRevenueRate,
-            ProfileMetric.GoodwillRate,
+        # 资产负债表
+        balance_sheet_quality_columns = [
             ProfileMetric.AssetLiabilityRatio,
+            ProfileMetric.GoodwillRate,
+            ProfileMetric.OtherReceivableRatio,
+            ProfileMetric.OtherPayRatio,
+            ProfileMetric.AccountReceivableRatio,
+        ]
+
+        # 资产负债表
+        balance_sheet_structure_columns = [
+            ProfileMetric.MonetaryFundsRatio,
+            ProfileMetric.OperatingAssetRatio,
+            ProfileMetric.ProductAssetRatio,
+            ProfileMetric.InvestmentAssetRatio,
         ]
 
         df = pd.DataFrame.from_dict(profile, orient='index', columns=columns)
@@ -462,13 +547,18 @@ class StockProfileFactory:
         cash_flow_df = self._sum_df(cash_flow_df)
         print(cash_flow_df)
 
-        print("\n============排雷指标============")
-        risk_df = df[[c.value for c in risk_signal_columns]]
-        risk_df = self._mean_df(risk_df, 2)
-        print(risk_df)
+        print("\n============资产负债表质量============")
+        balance_sheet_quality_df = df[[c.value for c in balance_sheet_quality_columns]]
+        balance_sheet_quality_df = self._mean_df(balance_sheet_quality_df, 2)
+        print(balance_sheet_quality_df)
+
+        print("\n============资产负债表结构============")
+        balance_sheet_structure_df = df[[c.value for c in balance_sheet_structure_columns]]
+        balance_sheet_structure_df = self._mean_df(balance_sheet_structure_df, 2)
+        print(balance_sheet_structure_df)
 
 
 if __name__ == "__main__":
     stock_profile = StockProfileFactory()
-    profile = stock_profile.make_profile('603600')
+    profile = stock_profile.make_profile('300003')
     stock_profile.display_profile(profile)
