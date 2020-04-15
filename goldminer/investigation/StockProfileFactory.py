@@ -316,6 +316,7 @@ class StockProfileFactory:
             monetary_funds_ratio = model.CURFDS / model.TOTASSET * 100
             investment_asset_ratio = self._investment_assets(model) / model.TOTASSET * 100
             operating_asset_ratio = self._operating_assets(model) / model.TOTASSET * 100
+            other_asset_ratio = (model.OTHERCURRASSE + model.OTHERNONCASSE) / model.TOTASSET * 100
 
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AccountPayable,
                                         round(account_payable / 1000000))
@@ -351,6 +352,8 @@ class StockProfileFactory:
                                         Utils.formatFloat(investment_asset_ratio, 1))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.OperatingAssetRatio,
                                         Utils.formatFloat(operating_asset_ratio, 1))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.OtherAssetRatio,
+                                        Utils.formatFloat(other_asset_ratio, 1))
 
         # 现金流量表数据
         models = self.cashflow_dao.getByCode(code)
@@ -490,7 +493,7 @@ class StockProfileFactory:
             ProfileMetric.CapitalExp,
         ]
 
-        # 资产负债表
+        # 资产负债表质量
         balance_sheet_quality_columns = [
             ProfileMetric.AssetLiabilityRatio,
             ProfileMetric.GoodwillRate,
@@ -499,12 +502,13 @@ class StockProfileFactory:
             ProfileMetric.AccountReceivableRatio,
         ]
 
-        # 资产负债表
+        # 资产负债表结构
         balance_sheet_structure_columns = [
             ProfileMetric.MonetaryFundsRatio,
             ProfileMetric.OperatingAssetRatio,
             ProfileMetric.ProductAssetRatio,
             ProfileMetric.InvestmentAssetRatio,
+            ProfileMetric.OtherAssetRatio
         ]
 
         df = pd.DataFrame.from_dict(profile, orient='index', columns=columns)
@@ -560,5 +564,5 @@ class StockProfileFactory:
 
 if __name__ == "__main__":
     stock_profile = StockProfileFactory()
-    profile = stock_profile.make_profile('300003')
+    profile = stock_profile.make_profile('600673')
     stock_profile.display_profile(profile)

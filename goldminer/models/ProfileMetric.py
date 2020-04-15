@@ -3,8 +3,8 @@ from enum import Enum
 
 
 class ProfileMetric(Enum):
-    GrossProfitMargin = "毛利率"  # 毛利率
-    NetProfitMargin = "净利率"  # 净利率
+    GrossProfitMargin = "毛利率"  # 毛利率=（主营业务收入-主营业务成本）/主营业务收入×100%
+    NetProfitMargin = "净利率"  # 净利率=[净利润/（营业收入+营业外收入）]×100%
     ThreeFeeRatio = "三费"  # 三费占比
     SalesRatio = "销售"
     ManagementRatio = "管理"
@@ -58,4 +58,5 @@ class ProfileMetric(Enum):
     ProductAssetRatio = "生产资产占比"  # 生产性资产占比=生产性资产/总资产
     # 投资资产占比=投资资产(=交易性金融资产+持有至到期投资+可供出售金融资产+买入返售金融资产
     # +长期股权投资+投资性房地产)/总资产
-    InvestmentAssetRatio = "投资资产占比"
+    InvestmentAssetRatio = "投资资产占比"  # (交易性金融资产+持有至到期投资+可供出售金融资产+买入返售金融资产+长期股权投资+投资性房地产)/总资产
+    OtherAssetRatio = "其他资产占比"  # 其他资产占比=(其他流动资产+其他非流动资产)/总资产
