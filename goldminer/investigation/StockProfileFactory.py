@@ -400,16 +400,18 @@ class StockProfileFactory:
         return df.loc[pd.Index(filtered_indexes)]
 
     def _sum_df(self, df: pd.DataFrame):
-        # df = self._filter_annual_df(df)
-        df.loc["SUM"] = df.sum()
+        sum = df.sum()
+        sum = sum.rename("SUM")
+        df = df.append(sum)
         return df
 
     def _mean_df(self, df: pd.DataFrame, precision=None):
-        # df = self._filter_annual_df(df)
         if precision:
-            df.loc["MEAN"] = df.mean().apply(lambda x: Utils.formatFloat(x, 2))
+            mean = df.mean().apply(lambda x: Utils.formatFloat(x, 2))
         else:
-            df.loc["MEAN"] = df.mean()
+            mean = df.mean()
+        mean = mean.rename("MEAN")
+        df = df.append(mean)
         return df
 
     def display_profile(self, profile):
@@ -568,5 +570,5 @@ class StockProfileFactory:
 
 if __name__ == "__main__":
     stock_profile = StockProfileFactory()
-    profile = stock_profile.make_profile('000423')
+    profile = stock_profile.make_profile('600519')
     stock_profile.display_profile(profile)

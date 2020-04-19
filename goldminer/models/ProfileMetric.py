@@ -4,7 +4,7 @@ from enum import Enum
 
 class ProfileMetric(Enum):
     GrossProfitMargin = "毛利率"  # 毛利率=（主营业务收入-主营业务成本）/主营业务收入×100%
-    NetProfitMargin = "净利率"  # 净利率=[净利润/（营业收入+营业外收入）]×100%
+    NetProfitMargin = "净利率"  # 净利率=净利润/(营业收入+营业外收入)×100% = (核心利润+营业外收入-营业外支出)/(营业收入+营业外收入)*100%
     ThreeFeeRatio = "三费费用"  # 三费占比
     SalesRatio = "销售费用"
     ManagementRatio = "管理费用"
@@ -20,7 +20,7 @@ class ProfileMetric(Enum):
     InvestCashFlow = "投资现金流"  # 投资活动产生现金流量净额 INVNETCASHFLOW
     FinancialCashFlow = "筹资现金流"  # 筹资活动产生现金流量净额 FINNETCFLOW
     FreeCashFlow = "自由现金流"  # 自由现金流
-    InventoryTurnoverRate = "存货周转率"  # 存货周转率/次
+    InventoryTurnoverRate = "存货周转率"  # 存货周转率/次=销售收入/平均存货
     TotalAssetTurnoverRate = "总资产周转率"  # 总资产周转率/次
     AccountReceivableTurnoverRate = "应收周转率"  # 应收账款周转率/次=销售收入/平均应收账款
     AssetLiabilityRatio = "资产负债率"  # 资产负债率=总负债/总资产
