@@ -5,10 +5,11 @@ from enum import Enum
 class ProfileMetric(Enum):
     GrossProfitMargin = "毛利率"  # 毛利率=（主营业务收入-主营业务成本）/主营业务收入×100%
     NetProfitMargin = "净利率"  # 净利率=[净利润/（营业收入+营业外收入）]×100%
-    ThreeFeeRatio = "三费"  # 三费占比
-    SalesRatio = "销售"
-    ManagementRatio = "管理"
-    FinanceRatio = "财务"
+    ThreeFeeRatio = "三费费用"  # 三费占比
+    SalesRatio = "销售费用"
+    ManagementRatio = "管理费用"
+    FinanceRatio = "财务费用"
+    RDExpenseRatio = "研发费用"
     ROIC = "ROIC"  # 投入资本回报率
     ROE = "ROE"  # 净资产回报率
     ROA = "ROA"  # 总资产回报率

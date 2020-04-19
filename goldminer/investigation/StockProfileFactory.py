@@ -294,6 +294,8 @@ class StockProfileFactory:
                                         Utils.formatFloat(core_profit_margin, 2))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.CoreProfitRate,
                                         Utils.formatFloat(core_profit / model.PERPROFIT, 2))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.RDExpenseRatio,
+                                        Utils.formatFloat(model.DEVEEXPE * 100 / model.BIZINCO, 2))
 
         # 资产负债表数据
         models = self.balance_sheet_dao.getByCode(code)
@@ -373,9 +375,10 @@ class StockProfileFactory:
 
     def _filter_annual_and_latest(self, models, publish_date):
         selected = []
-        while len(models) > 0 and models[0].end_date.month != 12:
+        if len(models) > 0 and models[0].end_date.month != 12:
             selected.append(models[0])
             models.pop(0)
+
         count = 0
         for model in models:
             if model.end_date < publish_date - timedelta(days=365):
@@ -397,12 +400,12 @@ class StockProfileFactory:
         return df.loc[pd.Index(filtered_indexes)]
 
     def _sum_df(self, df: pd.DataFrame):
-        df = self._filter_annual_df(df)
+        # df = self._filter_annual_df(df)
         df.loc["SUM"] = df.sum()
         return df
 
     def _mean_df(self, df: pd.DataFrame, precision=None):
-        df = self._filter_annual_df(df)
+        # df = self._filter_annual_df(df)
         if precision:
             df.loc["MEAN"] = df.mean().apply(lambda x: Utils.formatFloat(x, 2))
         else:
@@ -430,7 +433,8 @@ class StockProfileFactory:
             ProfileMetric.ThreeFeeRatio,
             ProfileMetric.SalesRatio,
             ProfileMetric.ManagementRatio,
-            ProfileMetric.FinanceRatio
+            ProfileMetric.FinanceRatio,
+            ProfileMetric.RDExpenseRatio
         ]
         # 盈利能力
         profit_ability_columns = [
@@ -564,5 +568,5 @@ class StockProfileFactory:
 
 if __name__ == "__main__":
     stock_profile = StockProfileFactory()
-    profile = stock_profile.make_profile('600673')
+    profile = stock_profile.make_profile('000423')
     stock_profile.display_profile(profile)
