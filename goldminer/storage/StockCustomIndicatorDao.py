@@ -75,3 +75,10 @@ class StockCustomIndicatorDao(BaseDao):
             .order_by(StockCustomIndicator.trade_date.asc()) \
             .all()
         return result
+
+    def delete_by_code(self, code: str):
+        if not code:
+            return 0
+
+        self.session.query(StockCustomIndicator).filter(StockCustomIndicator.code == code).delete()
+        return self.session.commit()
