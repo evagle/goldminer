@@ -59,6 +59,11 @@ class StockDailyBarSpider(GMBaseSpiderV3):
 
         bars = list(filter(lambda bar: bar.adj_factor is not None, bars))
 
+        ## check invalid close
+        for bar in bars:
+            if bar.close < 0.1 or bar.close > 2000:
+                raise Exception("Found invalid close value")
+
         logger.info("[Download Stock Bars][%s] count = %d\n" % (symbol, len(bars)))
         return bars
 
@@ -94,8 +99,8 @@ class StockDailyBarSpider(GMBaseSpiderV3):
     def reload(self, code):
         logger.info("Delete old bars and download all bars again for code {}".format(code))
         self.stockBarDao.delete_by_code(code)
-        self.download_bars(code)
-
+        bars = self.download_bars(code)
+        self.stockBarDao.bulkSave(bars)
 
 if __name__ == "__main__":
     spider = StockDailyBarSpider()
