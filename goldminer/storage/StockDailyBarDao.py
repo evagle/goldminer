@@ -49,7 +49,7 @@ class StockDailyBarDao(BaseDao):
         result = sorted(result, key=lambda x: x.trade_date, reverse=False)
 
         if adjust is not None and adjust == "prev":
-            result = StockDailyBar.pre_adjust(result)
+            result = StockDailyBarDao.pre_adjust(result)
         return result
 
     def getByDate(self, trade_date: str) -> List[StockDailyBar]:

@@ -15,6 +15,8 @@ class ProfileMetric(Enum):
     ROA = "ROA"  # 总资产回报率
     IncomeGrowth = "营收增速"  # 营收增速
     NetProfitGrowth = "净利润增速"  # 净利润增速
+    TotalAssetGrowth = "总资产增速"
+    NetAssetGrowth = "净资产增速"
     NetProfitCutGrowth = "扣非增速"  # 扣非净利润增速
     BIZCashFlow = "经营现金流"  # 经营活动产生现金流量净额 BIZNETCFLOW
     InvestCashFlow = "投资现金流"  # 投资活动产生现金流量净额 INVNETCASHFLOW
