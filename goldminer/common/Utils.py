@@ -110,21 +110,6 @@ class Utils:
         return weeklyBars
 
     @staticmethod
-    def pre_adjust(bars):
-        if bars is None or len(bars) == 0:
-            return bars
-
-        factor = bars[-1].adj_factor
-        for bar in bars:
-            bar.high = float(Decimal(bar.high) * bar.adj_factor / factor)
-            bar.low = float(Decimal(bar.low) * bar.adj_factor / factor)
-            bar.close = float(Decimal(bar.close) * bar.adj_factor / factor)
-            bar.open = float(Decimal(bar.open) * bar.adj_factor / factor)
-            bar.pre_close = float(Decimal(bar.pre_close) * bar.adj_factor / factor)
-
-        return bars
-
-    @staticmethod
     def sma(bars, periods, field='close'):
         if len(bars) == 0 or len(periods) == 0:
             return None
