@@ -43,7 +43,7 @@ class ProfileMetric(Enum):
     NetProfit = "净利润"
     NetProfitCut = "扣非净利润"
     CoreProfit = "核心利润"  # 核心利润 = 毛利润-三费-税金及附加=（主营）营业收入-营业成本-三费-税金及附加
-    CoreProfitMargin = "核心利润率"  # 核心利润率 = 核心利润/营业收入
+    CoreProfitMargin = "核心利率"  # 核心利润率 = 核心利润/营业收入
     CoreProfitGrowth = "核心增长率"  # 核心利润增长率
 
     # 核心利润比 = 核心利润/营业利润，越大说明运营利润的贡献占比越高。

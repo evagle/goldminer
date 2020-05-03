@@ -466,11 +466,11 @@ class StockProfileFactory:
         ]
         # 盈利能力
         profit_ability_columns = [
+            ProfileMetric.ROE,
+            ProfileMetric.ROA,
             ProfileMetric.GrossProfitMargin,
             ProfileMetric.CoreProfitMargin,
             ProfileMetric.NetProfitMargin,
-            ProfileMetric.ROE,
-            ProfileMetric.ROA,
             ProfileMetric.ProfitCashRate,
             ProfileMetric.CoreProfitRate,
         ]
@@ -598,5 +598,5 @@ class StockProfileFactory:
 
 if __name__ == "__main__":
     stock_profile = StockProfileFactory()
-    profile = stock_profile.make_profile('000651')
+    profile = stock_profile.make_profile('002473')
     stock_profile.display_profile(profile)
