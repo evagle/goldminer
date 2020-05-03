@@ -340,6 +340,7 @@ class StockProfileFactory:
             investment_asset_ratio = self._investment_assets(model) / model.TOTASSET * 100
             operating_asset_ratio = self._operating_assets(model) / model.TOTASSET * 100
             other_asset_ratio = (model.OTHERCURRASSE + model.OTHERNONCASSE) / model.TOTASSET * 100
+            prepaid_ratio = model.PREP / model.TOTASSET * 100
 
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AccountPayable,
                                         round(account_payable / 1000000))
@@ -377,6 +378,8 @@ class StockProfileFactory:
                                         Utils.formatFloat(operating_asset_ratio, 1))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.OtherAssetRatio,
                                         Utils.formatFloat(other_asset_ratio, 1))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.PrepaidRatio,
+                                        Utils.formatFloat(prepaid_ratio, 1))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.NetAssetGrowth,
                                         Utils.formatFloat(model.RIGHAGGR_GROWTH, 1))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.TotalAssetGrowth,
@@ -534,6 +537,7 @@ class StockProfileFactory:
             ProfileMetric.OtherReceivableRatio,
             ProfileMetric.OtherPayRatio,
             ProfileMetric.AccountReceivableRatio,
+            ProfileMetric.PrepaidRatio,
         ]
 
         # 资产负债表结构
