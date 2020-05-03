@@ -123,9 +123,9 @@ class FinancialReportCrawler:
             os.makedirs(folder)
 
         if is_update:
-            output_file = folder + os.path.sep + year + "Q" + str(type.value) + "Update.pdf"
+            output_file = folder + os.path.sep + announcement['secName'] + year + "Q" + str(type.value) + "Update.pdf"
         else:
-            output_file = folder + os.path.sep + year + "Q" + str(type.value) + ".pdf"
+            output_file = folder + os.path.sep + announcement['secName'] + year + "Q" + str(type.value) + ".pdf"
         url = self._pdf_base_url + announcement['adjunctUrl']
 
         self._download_file(url, output_file)
