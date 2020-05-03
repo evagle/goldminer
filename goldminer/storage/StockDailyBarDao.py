@@ -65,4 +65,9 @@ class StockDailyBarDao(BaseDao):
             .all()
         return result
 
+    def delete_by_code(self, code: str):
+        if not code:
+            return 0
 
+        self.session.query(StockDailyBar).filter(StockDailyBar.code == code).delete()
+        return self.session.commit()

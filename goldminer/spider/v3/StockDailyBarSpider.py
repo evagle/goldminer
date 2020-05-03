@@ -91,6 +91,11 @@ class StockDailyBarSpider(GMBaseSpiderV3):
         self.stockBarDao.insertOrReplace(bars)
         logger.info("Save {} bars for code {}\n".format(len(bars), code))
 
+    def reload(self, code):
+        logger.info("Delete old bars and download all bars again for code {}".format(code))
+        self.stockBarDao.delete_by_code(code)
+        self.download_bars(code)
+
 
 if __name__ == "__main__":
     spider = StockDailyBarSpider()
