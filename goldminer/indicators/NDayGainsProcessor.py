@@ -38,19 +38,19 @@ class NDayGainsProcessor(BaseIndicatorProcessor):
 
         bars = self.stockBarNoneDao.getN(code, limit=limit)
         for i in range(len(bars)):
-            key = (code, bars[i].trade_date)
+            bar = bars[i]
+            key = (code, bar.trade_date)
             if key in modelsDict:
                 model = modelsDict[key]
             else:
                 model = StockCustomIndicator()
                 model.code = code
-                model.trade_date = bars[i].trade_date
+                model.trade_date = bar.trade_date
 
             for n in [50, 120, 250]:
                 if i < n:
                     continue
 
-                bar = bars[i]
                 if bar.trade_date < startDate:
                     continue
 
@@ -61,10 +61,11 @@ class NDayGainsProcessor(BaseIndicatorProcessor):
                     if close > 0:
                         break
 
-                gain = (bars[i].close - close) / close * 100 if close > 0 else 0
+                gain = (bar.close - close) / close * 100 if close > 0 else 0
                 # 涨幅1000倍，抛异常
                 if gain > 100000:
-                    raise Exception("Abnormal gain detected: {}, bar {}".format(gain, bars[i]))
+                    raise Exception("Abnormal gain detected: {}, bar {}".format(gain, bar))
+
                 gain = Utils.formatFloat(gain, 6)
                 attr = "gain" + str(n)
                 oldval = getattr(model, attr)
