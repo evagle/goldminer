@@ -45,6 +45,26 @@ class StockProfileFactory:
 
         return derivative_models
 
+    def _calc_total_asset_growth(self, balance_models):
+        dic = {}
+        for model in balance_models:
+            key = (model.end_date.year, model.end_date.month)
+            dic[key] = model
+
+        for model in balance_models:
+            model.TOTASSET_GROWTH = 0
+            model.RIGHAGGR_GROWTH = 0
+            pre_key = (model.end_date.year - 1, model.end_date.month)
+            if pre_key in dic:
+                pre_model = dic[pre_key]
+                if pre_model.TOTASSET != 0:
+                    model.TOTASSET_GROWTH = (model.TOTASSET - pre_model.TOTASSET) / pre_model.TOTASSET * 100
+                if pre_model.RIGHAGGR != 0:
+                    model.RIGHAGGR_GROWTH = (model.RIGHAGGR - pre_model.RIGHAGGR) / pre_model.RIGHAGGR * 100
+
+        return balance_models
+
+
     def _interest_bearing_liabilities(self, model: BalanceSheet):
         """
         来自理杏仁：https://www.lixinger.com/wiki/lwi/
@@ -299,6 +319,7 @@ class StockProfileFactory:
 
         # 资产负债表数据
         models = self.balance_sheet_dao.getByCode(code)
+        models = self._calc_total_asset_growth(models)
         selected = self._filter_annual_and_latest(models, publish_date)
 
         for model in selected:
@@ -356,6 +377,11 @@ class StockProfileFactory:
                                         Utils.formatFloat(operating_asset_ratio, 1))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.OtherAssetRatio,
                                         Utils.formatFloat(other_asset_ratio, 1))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.NetAssetGrowth,
+                                        Utils.formatFloat(model.RIGHAGGR_GROWTH, 1))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.TotalAssetGrowth,
+                                        Utils.formatFloat(model.TOTASSET_GROWTH, 1))
+
 
         # 现金流量表数据
         models = self.cashflow_dao.getByCode(code)
@@ -453,6 +479,8 @@ class StockProfileFactory:
             ProfileMetric.IncomeGrowth,
             ProfileMetric.NetProfitGrowth,
             ProfileMetric.NetProfitCutGrowth,
+            ProfileMetric.TotalAssetGrowth,
+            ProfileMetric.NetAssetGrowth
         ]
         # 运营能力
         operation_ability_columns = [
@@ -570,5 +598,5 @@ class StockProfileFactory:
 
 if __name__ == "__main__":
     stock_profile = StockProfileFactory()
-    profile = stock_profile.make_profile('600519')
+    profile = stock_profile.make_profile('000651')
     stock_profile.display_profile(profile)
