@@ -390,7 +390,11 @@ class StockProfileFactory:
         models = self.cashflow_dao.getByCode(code)
         selected = self._filter_annual_and_latest(models, publish_date)
         for model in selected:
-            biz_net_cashflow = model.BIZNETCFLOW
+            if math.fabs(model.BIZNETCFLOW) < 100:
+                biz_net_cashflow = model.BIZCASHINFL - model.BIZCASHOUTF
+            else:
+                biz_net_cashflow = model.BIZNETCFLOW
+
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BIZCashFlow,
                                         round(biz_net_cashflow / 1000000))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.InvestCashFlow,
