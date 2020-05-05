@@ -236,4 +236,4 @@ if __name__ == "__main__":
     crawler = FinancialReportCrawler()
     args = crawler.parse_args()
     if args.code:
-        crawler.get_announcements_by_code(args.code, datetime(2005, 1, 1).date(), datetime(2020, 1, 1).date())
+        crawler.get_announcements_by_code(args.code, datetime(2005, 1, 1).date(), datetime(2025, 1, 1).date())
