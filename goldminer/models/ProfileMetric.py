@@ -51,7 +51,7 @@ class ProfileMetric(Enum):
     # 与核心利润相比，营业利润多了后面几项与经营无关的收益即：公允价值变动收益+投资收益+汇兑收益+资产处置收益+其他收益
     CoreProfitRate = "核心利润比"
     CapitalExp = "资本开支"  # Capital Expenditures = 购建固定资产、无形资产和其他长期资产所支付的现金
-    SalesRevenueRate = "销售收现率"  # = 销售商品提供劳务收到的现金/营业收入
+    SalesRevenueRate = "收现率"  # = 销售商品提供劳务收到的现金/营业收入
     GoodwillRate = "商誉占比"  # = 商誉/净资产
     OtherReceivableRatio = "其他应收比"  # 其他应收款占总资产比 = 其他应收款余额÷总资产×100 %, 大于10%就很危险
     OtherPayRatio = "其他应付比"  # 其他应付款占总资产比 = 其他应付款余额÷总资产×100 %, 优秀的公司接近0

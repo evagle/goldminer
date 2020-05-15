@@ -478,6 +478,7 @@ class StockProfileFactory:
             ProfileMetric.GrossProfitMargin,
             ProfileMetric.CoreProfitMargin,
             ProfileMetric.NetProfitMargin,
+            ProfileMetric.SalesRevenueRate,
             ProfileMetric.ProfitCashRate,
             ProfileMetric.CoreProfitRate,
         ]
@@ -494,7 +495,6 @@ class StockProfileFactory:
             ProfileMetric.InventoryTurnoverRate,
             ProfileMetric.TotalAssetTurnoverRate,
             ProfileMetric.AccountReceivableTurnoverRate,
-            ProfileMetric.SalesRevenueRate,
         ]
         # 偿债能力
         solvency_ability_columns = [
@@ -606,5 +606,5 @@ class StockProfileFactory:
 
 if __name__ == "__main__":
     stock_profile = StockProfileFactory()
-    profile = stock_profile.make_profile('002473')
+    profile = stock_profile.make_profile('600519')
     stock_profile.display_profile(profile)
