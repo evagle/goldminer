@@ -28,6 +28,9 @@ class StockAnalysis:
             ProfileMetric.ROE,
             ProfileMetric.GrossProfitMargin,
             ProfileMetric.ThreeFeeRatio,
+            ProfileMetric.ManagementRatio,
+            ProfileMetric.FinanceRatio,
+            ProfileMetric.RDExpenseRatio
         ]
 
         # 盈利能力
@@ -98,6 +101,7 @@ class StockAnalysis:
             ProfileMetric.OtherReceivableRatio,
             ProfileMetric.OtherPayRatio,
             ProfileMetric.AccountReceivableRatio,
+            ProfileMetric.PrepaidRatio,
         ]
 
         # 资产负债表结构
@@ -106,6 +110,7 @@ class StockAnalysis:
             ProfileMetric.OperatingAssetRatio,
             ProfileMetric.ProductAssetRatio,
             ProfileMetric.InvestmentAssetRatio,
+            ProfileMetric.OtherAssetRatio
         ]
 
     def _mean(self, data, n):
