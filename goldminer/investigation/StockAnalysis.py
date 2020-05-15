@@ -29,6 +29,7 @@ class StockAnalysis:
             ProfileMetric.GrossProfitMargin,
             ProfileMetric.ThreeFeeRatio,
         ]
+
         # 盈利能力
         self.__profit_ability_columns = [
             ProfileMetric.GrossProfitMargin,
@@ -36,22 +37,25 @@ class StockAnalysis:
             ProfileMetric.NetProfitMargin,
             ProfileMetric.ROE,
             ProfileMetric.ROA,
+            ProfileMetric.SalesRevenueRate,
             ProfileMetric.ProfitCashRate,
             ProfileMetric.CoreProfitRate,
         ]
+
         # 成长能力
         self.__growth_ability_columns = [
             ProfileMetric.IncomeGrowth,
             ProfileMetric.NetProfitGrowth,
             ProfileMetric.NetProfitCutGrowth,
         ]
+
         # 运营能力
         self.__operation_ability_columns = [
             ProfileMetric.InventoryTurnoverRate,
             ProfileMetric.TotalAssetTurnoverRate,
             ProfileMetric.AccountReceivableTurnoverRate,
-            ProfileMetric.SalesRevenueRate,
         ]
+
         # 偿债能力
         self.__solvency_ability_columns = [
             ProfileMetric.AssetLiabilityRatio,
@@ -299,6 +303,8 @@ if __name__ == "__main__":
     profiles = []
 
     codes = ['600580', '002249', '002176', '300660', '603728', '000922', '603583', '002801']
+    codes = ['600519', '000858', '002304', '000568', '000860', '600809', '000596']
+
     for code in codes:
         profiles.append(profile_factory.make_profile(code))
 
