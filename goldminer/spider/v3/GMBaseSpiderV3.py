@@ -8,7 +8,7 @@ from goldminer.common.GMConsts import ADJUST_NONE
 
 class GMBaseSpiderV3:
     def __init__(self):
-        set_serv_addr("140.143.64.121:7001")
+        set_serv_addr("127.0.0.1:7001")
         set_token('a0998908534d317105b2184afbe436a4104dc51b')
 
     def currentTick(self, symbols, fields=''):
@@ -16,21 +16,21 @@ class GMBaseSpiderV3:
 
     # Support both stock and index, distinguish by symbol
     def getHistory(self, symbol, frequency, start_time, end_time, fields=None, skip_suspended=True,
-                fill_missing=None, adjust=ADJUST_NONE, adjust_end_time='', df=False):
+                   fill_missing=None, adjust=ADJUST_NONE, adjust_end_time='', df=False):
         return history(symbol, frequency, start_time, end_time, fields, skip_suspended, \
                        fill_missing, adjust, adjust_end_time, df)
 
     def getHistoryN(self, symbol, frequency, count, end_time=None, fields=None, skip_suspended=True,
-          fill_missing=None, adjust=ADJUST_NONE, adjust_end_time='', df=False):
+                    fill_missing=None, adjust=ADJUST_NONE, adjust_end_time='', df=False):
         return history_n(symbol, frequency, count, end_time, field, skip_suspended, \
                          fill_missing, adjust, adjust_end_time, df)
 
-    def getFundamentals(self, table, symbols, start_date, end_date, fields=None, filter=None, order_by=None, limit=1000, df=False):
+    def getFundamentals(self, table, symbols, start_date, end_date, fields=None, filter=None, order_by=None, limit=1000,
+                        df=False):
         return get_fundamentals(table, symbols, start_date, end_date, fields, filter, order_by, limit, df)
 
     def getFundamentalsN(table, symbols, end_date, fields=None, filter=None, order_by=None, count=1, df=False):
         return get_fundamentals_n(table, symbols, end_date, fields, filter, order_by, count, df)
-
 
     def getInstruments(self, symbols=None, exchanges=None, sec_types=None, names=None, skip_suspended=True, \
                        skip_st=True, fields=None, df=False):
@@ -75,7 +75,7 @@ class GMBaseSpiderV3:
                         val = val + timedelta(hours=8)
                         setattr(model, key, val.date())
                     else:
-                        raise Exception("GMBaseSpiderV3: Date format error. data="+raw)
+                        raise Exception("GMBaseSpiderV3: Date format error. data={}".format(raw))
                 else:
                     setattr(model, key, val)
         return model

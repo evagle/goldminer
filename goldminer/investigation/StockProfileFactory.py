@@ -341,6 +341,8 @@ class StockProfileFactory:
             operating_asset_ratio = self._operating_assets(model) / model.TOTASSET * 100
             other_asset_ratio = (model.OTHERCURRASSE + model.OTHERNONCASSE) / model.TOTASSET * 100
             prepaid_ratio = model.PREP / model.TOTASSET * 100
+            account_payable_ratio = account_payable / model.TOTASSET * 100
+            advance_payment_ratio = advance_payment / model.TOTASSET * 100
 
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AccountPayable,
                                         round(account_payable / 1000000))
@@ -384,7 +386,10 @@ class StockProfileFactory:
                                         Utils.formatFloat(model.RIGHAGGR_GROWTH, 1))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.TotalAssetGrowth,
                                         Utils.formatFloat(model.TOTASSET_GROWTH, 1))
-
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AccountPayableRatio,
+                                        Utils.formatFloat(account_payable_ratio, 1))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AdvancePaymentRatio,
+                                        Utils.formatFloat(advance_payment_ratio, 1))
 
         # 现金流量表数据
         models = self.cashflow_dao.getByCode(code)
@@ -446,6 +451,28 @@ class StockProfileFactory:
         mean = mean.rename("MEAN")
         df = df.append(mean)
         return df
+
+    def _compound_mean(self, data, n):
+        growths = []
+        i = 0
+        total = 1
+        for end_date in data.keys():
+            if not isinstance(end_date, date):
+                continue
+            if i >= n:
+                break
+            if end_date.month == 12:
+                growths.append(data[end_date])
+                i += 1
+        if len(growths) == 0:
+            return 0
+
+        growths.reverse()
+        for g in growths:
+            total = math.fabs(total) * (1 + g / 100)
+
+        compound_growth = Utils.formatFloat(math.pow(math.fabs(total), 1 / len(growths)) * 100 - 100, 2)
+        return compound_growth if total > 0 else -compound_growth
 
     def display_profile(self, profile):
         profile = profile.as_dict()
@@ -538,10 +565,12 @@ class StockProfileFactory:
         balance_sheet_quality_columns = [
             ProfileMetric.AssetLiabilityRatio,
             ProfileMetric.GoodwillRate,
+            ProfileMetric.AccountReceivableRatio,
+            ProfileMetric.AccountPayableRatio,
+            ProfileMetric.PrepaidRatio,
+            ProfileMetric.AdvancePaymentRatio,
             ProfileMetric.OtherReceivableRatio,
             ProfileMetric.OtherPayRatio,
-            ProfileMetric.AccountReceivableRatio,
-            ProfileMetric.PrepaidRatio,
         ]
 
         # 资产负债表结构
@@ -567,12 +596,14 @@ class StockProfileFactory:
 
         print("\n============成长能力============")
         growth_ability_df = df[[c.value for c in growth_ability_columns]].copy()
-        growth_ability_df.loc["MEAN"] = growth_ability_df.mean().apply(lambda x: Utils.formatFloat(x, 2))
+        growth_ability_df.loc["MEAN5"] = growth_ability_df.apply(lambda col: self._compound_mean(col, 5))
+        growth_ability_df.loc["MEAN10"] = growth_ability_df.apply(lambda col: self._compound_mean(col, 10))
         print(growth_ability_df)
 
         print("\n============运营能力============")
         operation_ability_df = df[[c.value for c in operation_ability_columns]].copy()
         operation_ability_df.loc["MEAN"] = operation_ability_df.mean().apply(lambda x: Utils.formatFloat(x, 2))
+
         print(operation_ability_df)
 
         print("\n============偿债能力============")
@@ -593,12 +624,12 @@ class StockProfileFactory:
         cash_flow_df = self._sum_df(cash_flow_df)
         print(cash_flow_df)
 
-        print("\n============资产负债表质量============")
+        print("\n============资产质量============")
         balance_sheet_quality_df = df[[c.value for c in balance_sheet_quality_columns]]
         balance_sheet_quality_df = self._mean_df(balance_sheet_quality_df, 2)
         print(balance_sheet_quality_df)
 
-        print("\n============资产负债表结构============")
+        print("\n============资产结构============")
         balance_sheet_structure_df = df[[c.value for c in balance_sheet_structure_columns]]
         balance_sheet_structure_df = self._mean_df(balance_sheet_structure_df, 2)
         print(balance_sheet_structure_df)
@@ -606,5 +637,5 @@ class StockProfileFactory:
 
 if __name__ == "__main__":
     stock_profile = StockProfileFactory()
-    profile = stock_profile.make_profile('600519')
+    profile = stock_profile.make_profile('600809')
     stock_profile.display_profile(profile)

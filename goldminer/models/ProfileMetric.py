@@ -55,6 +55,7 @@ class ProfileMetric(Enum):
     GoodwillRate = "商誉占比"  # = 商誉/净资产
     OtherReceivableRatio = "其他应收比"  # 其他应收款占总资产比 = 其他应收款余额÷总资产×100 %, 大于10%就很危险
     OtherPayRatio = "其他应付比"  # 其他应付款占总资产比 = 其他应付款余额÷总资产×100 %, 优秀的公司接近0
+    AccountPayableRatio = "应付占比"  # 应付账款占总资产比 = (应付账款+应付票据)/总资产*100%
     MonetaryFundsRatio = "货币资金比"  # 货币资金占比=货币资金/总资产
     # 经营性资产占比 =（应收xx+长期应收+存货）/总资产
     OperatingAssetRatio = "经营资产占比"
@@ -65,5 +66,6 @@ class ProfileMetric(Enum):
     # +长期股权投资+投资性房地产)/总资产
     InvestmentAssetRatio = "投资资产占比"  # (交易性金融资产+持有至到期投资+可供出售金融资产+买入返售金融资产+长期股权投资+投资性房地产)/总资产
     OtherAssetRatio = "其他资产占比"  # 其他资产占比=(其他流动资产+其他非流动资产)/总资产
-    PrepaidRatio = "预付占比"  # 其他资产占比=(其他流动资产+其他非流动资产)/总资产
+    PrepaidRatio = "预付占比"  # 预付占比=预付账款/总资产
+    AdvancePaymentRatio = "预收占比"  # 预收占比=预收账款/总资产
     BizCost = "营业成本"

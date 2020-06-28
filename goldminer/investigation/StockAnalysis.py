@@ -30,6 +30,7 @@ class StockAnalysis:
             ProfileMetric.ThreeFeeRatio,
             ProfileMetric.ManagementRatio,
             ProfileMetric.FinanceRatio,
+            ProfileMetric.SalesRatio,
             ProfileMetric.RDExpenseRatio
         ]
 
@@ -62,6 +63,7 @@ class StockAnalysis:
         # 偿债能力
         self.__solvency_ability_columns = [
             ProfileMetric.AssetLiabilityRatio,
+            ProfileMetric.InterestLiabilityRatio,
             ProfileMetric.CurrentRatio,
             ProfileMetric.QuickRatio,
         ]
@@ -98,9 +100,10 @@ class StockAnalysis:
         self.__balance_sheet_quality_columns = [
             ProfileMetric.AssetLiabilityRatio,
             ProfileMetric.GoodwillRate,
+            ProfileMetric.AccountReceivableRatio,
+            ProfileMetric.AccountPayableRatio,
             ProfileMetric.OtherReceivableRatio,
             ProfileMetric.OtherPayRatio,
-            ProfileMetric.AccountReceivableRatio,
             ProfileMetric.PrepaidRatio,
         ]
 
@@ -221,6 +224,16 @@ class StockAnalysis:
             print("\n---------" + metric.value + "---------")
             print(df)
 
+        print("\n============杜邦分析============")
+        for metric in self.__dupont_analysis_columns:
+            df = pd.DataFrame.from_dict(report[metric], orient='index')
+            df = df.rename(lambda x: x.name, axis=0)
+            df = df.sort_values(by='MEAN5', axis=0, ascending=False)
+            df = self.move_column_to_head(df, "MEAN10")
+            df = self.move_column_to_head(df, "MEAN5")
+            print("\n---------" + metric.value + "---------")
+            print(df)
+
         print("\n============盈利能力============")
         for metric in self.__profit_ability_columns:
             df = pd.DataFrame.from_dict(report[metric], orient='index')
@@ -261,15 +274,7 @@ class StockAnalysis:
             print("\n---------" + metric.value + "---------")
             print(df)
 
-        print("\n============杜邦分析============")
-        for metric in self.__dupont_analysis_columns:
-            df = pd.DataFrame.from_dict(report[metric], orient='index')
-            df = df.rename(lambda x: x.name, axis=0)
-            df = df.sort_values(by='MEAN5', axis=0, ascending=False)
-            df = self.move_column_to_head(df, "MEAN10")
-            df = self.move_column_to_head(df, "MEAN5")
-            print("\n---------" + metric.value + "---------")
-            print(df)
+
 
         print("\n============现金流============")
         for metric in self.__cash_flow_columns:
@@ -308,7 +313,7 @@ if __name__ == "__main__":
     profiles = []
 
     codes = ['600580', '002249', '002176', '300660', '603728', '000922', '603583', '002801']
-    codes = ['600519', '000858', '002304', '000568', '000860', '600809', '000596']
+    codes = ['600519', '000858', '002304', '000568', '600809', '000596', '603369', '600779']
 
     for code in codes:
         profiles.append(profile_factory.make_profile(code))
