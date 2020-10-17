@@ -61,7 +61,7 @@ class StockDailyBarSpider(GMBaseSpiderV3):
 
         ## check invalid close
         for bar in bars:
-            if bar.close < 0.1 or bar.close > 2000:
+            if bar.close < 0.1 or bar.close > 3000:
                 raise Exception("Found invalid close value")
 
         logger.info("[Download Stock Bars][%s] count = %d\n" % (symbol, len(bars)))
