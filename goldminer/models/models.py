@@ -839,7 +839,7 @@ class Indexes(Base):
     end_date = Column(DateTime, nullable=False)
     base_point = Column(Float(asdecimal=True))
     weight_rule = Column(String(64), nullable=False)
-    publisher = Column(String(64), nullable=False)
+    publisher = Column(String(64), nullable=True)
     description = Column(Text, nullable=False)
     analysis = Column(Text, nullable=True)
     importance = Column(Integer, nullable=False)
