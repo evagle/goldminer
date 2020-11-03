@@ -445,7 +445,7 @@ class StockProfileFactory:
 
     def _mean_df(self, df: pd.DataFrame, precision=None):
         if precision:
-            mean = df.mean().apply(lambda x: Utils.formatFloat(x, 2))
+            mean = df.mean().apply(lambda x: Utils.formatFloat(x, precision))
         else:
             mean = df.mean()
         mean = mean.rename("MEAN")
@@ -582,6 +582,19 @@ class StockProfileFactory:
             ProfileMetric.OtherAssetRatio
         ]
 
+        # 成长动力分解
+        growth_engine_analysis_columns = [
+            ProfileMetric.NetProfitGrowth,
+            ProfileMetric.NetProfitCutGrowth,
+            ProfileMetric.IncomeGrowth,
+            ProfileMetric.NetProfitMargin,
+            ProfileMetric.GrossProfitMargin,
+            ProfileMetric.ThreeFeeRatio,
+            ProfileMetric.SalesRatio,
+            ProfileMetric.ManagementRatio,
+            ProfileMetric.FinanceRatio,
+        ]
+
         df = pd.DataFrame.from_dict(profile, orient='index', columns=columns)
         df.columns = df.columns.map(lambda x: x.value)
         print("\n============护城河============")
@@ -634,8 +647,13 @@ class StockProfileFactory:
         balance_sheet_structure_df = self._mean_df(balance_sheet_structure_df, 2)
         print(balance_sheet_structure_df)
 
+        print("\n============成长动力分解============")
+        growth_engine_analysis_df = df[[c.value for c in growth_engine_analysis_columns]]
+        growth_engine_analysis_df = self._mean_df(growth_engine_analysis_df, 2)
+        print(growth_engine_analysis_df)
+
 
 if __name__ == "__main__":
     stock_profile = StockProfileFactory()
-    profile = stock_profile.make_profile('600809')
+    profile = stock_profile.make_profile('000651')
     stock_profile.display_profile(profile)
