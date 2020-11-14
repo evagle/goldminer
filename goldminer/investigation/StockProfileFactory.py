@@ -275,7 +275,7 @@ class StockProfileFactory:
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.FreeCashFlow,
                                         int(model.FCFF / 1000000))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.EquityMultiplier,
-                                        Utils.formatFloat(model.EM, 2))
+                                        Utils.formatFloat(model.EMCONMS, 2))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.NetProfitCut,
                                         model.NPCUT)
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.ProfitCashRate,
@@ -655,5 +655,5 @@ class StockProfileFactory:
 
 if __name__ == "__main__":
     stock_profile = StockProfileFactory()
-    profile = stock_profile.make_profile('000651')
+    profile = stock_profile.make_profile('600380')
     stock_profile.display_profile(profile)
