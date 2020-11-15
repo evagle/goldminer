@@ -284,6 +284,7 @@ class StockProfileFactory:
                                         Utils.formatFloat(model.SCASHREVTOOPIRT, 2))
 
 
+
         # 利润表数据
         models = self.income_dao.getByCode(code)
         selected = self._filter_annual_and_latest(models, publish_date)
@@ -343,6 +344,8 @@ class StockProfileFactory:
             prepaid_ratio = model.PREP / model.TOTASSET * 100
             account_payable_ratio = account_payable / model.TOTASSET * 100
             advance_payment_ratio = advance_payment / model.TOTASSET * 100
+            invetory_rate = model.INVE / model.TOTASSET * 100
+            fixed_assets_rate = model.FIXEDASSENET / model.TOTASSET * 100
 
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AccountPayable,
                                         round(account_payable / 1000000))
@@ -390,6 +393,10 @@ class StockProfileFactory:
                                         Utils.formatFloat(account_payable_ratio, 1))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AdvancePaymentRatio,
                                         Utils.formatFloat(advance_payment_ratio, 1))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.InventoryRate,
+                                        Utils.formatFloat(invetory_rate, 1))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.FixedAssetsRate,
+                                        Utils.formatFloat(fixed_assets_rate, 1))
 
         # 现金流量表数据
         models = self.cashflow_dao.getByCode(code)
@@ -490,8 +497,9 @@ class StockProfileFactory:
 
         # 护城河
         competence_columns = [
+            ProfileMetric.ROE,
             ProfileMetric.GrossProfitMargin,
-            ProfileMetric.ROIC,
+            ProfileMetric.NetProfitMargin,
             ProfileMetric.ThreeFeeRatio,
             ProfileMetric.SalesRatio,
             ProfileMetric.ManagementRatio,
@@ -502,6 +510,7 @@ class StockProfileFactory:
         profit_ability_columns = [
             ProfileMetric.ROE,
             ProfileMetric.ROA,
+            ProfileMetric.ROIC,
             ProfileMetric.GrossProfitMargin,
             ProfileMetric.CoreProfitMargin,
             ProfileMetric.NetProfitMargin,
@@ -565,6 +574,8 @@ class StockProfileFactory:
         balance_sheet_quality_columns = [
             ProfileMetric.AssetLiabilityRatio,
             ProfileMetric.GoodwillRate,
+            ProfileMetric.InventoryRate,
+            ProfileMetric.FixedAssetsRate,
             ProfileMetric.AccountReceivableRatio,
             ProfileMetric.AccountPayableRatio,
             ProfileMetric.PrepaidRatio,
@@ -655,5 +666,5 @@ class StockProfileFactory:
 
 if __name__ == "__main__":
     stock_profile = StockProfileFactory()
-    profile = stock_profile.make_profile('600380')
+    profile = stock_profile.make_profile('002511')
     stock_profile.display_profile(profile)
