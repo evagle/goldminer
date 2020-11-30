@@ -141,23 +141,23 @@ class FinancialReportCrawler:
 
         if temp_size >= total_size * 0.5:
             if temp_size != total_size:
-                self.__logger.warn("{} is downloaded but file size different with remote.".format(output_file))
+                self.__logger.warning("{} is downloaded but file size different with remote.".format(output_file))
             else:
                 self.__logger.info("{} is already downloaded.".format(output_file))
             return
 
         self.__logger.info(
             "start to download {} from url {}\ntotal size={}, start size={}" \
-                .format(output_file, url, total_size, temp_size))
+                .format(output_file, url, total_size, 0))
 
-        headers = {'Range': 'bytes=%d-' % temp_size}
-        response = requests.get(url, stream=True, verify=False, headers=headers)
-        with open(output_file, "ab") as f:
-            for chunk in response.iter_content(chunk_size=1024):
-                if chunk:
-                    temp_size += len(chunk)
-                    f.write(chunk)
-                    f.flush()
+        # headers = {'Range': 'bytes=%d-' % temp_size}
+        with requests.request("POST", url, headers={}) as response:
+            with open(output_file, "wb") as f:
+                for chunk in response.iter_content(chunk_size=1024):
+                    if chunk:
+                        temp_size += len(chunk)
+                        f.write(chunk)
+                        f.flush()
 
     def get_announcements_by_code(self, code, start_date: date, end_date: date):
         stock = "{},{}".format(code, self.get_org_id(code))
@@ -235,5 +235,6 @@ class FinancialReportCrawler:
 if __name__ == "__main__":
     crawler = FinancialReportCrawler()
     args = crawler.parse_args()
+    args.code = '002841'
     if args.code:
         crawler.get_announcements_by_code(args.code, datetime(2005, 1, 1).date(), datetime(2025, 1, 1).date())
