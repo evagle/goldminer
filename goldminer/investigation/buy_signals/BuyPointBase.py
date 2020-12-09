@@ -2,8 +2,8 @@
 import math
 
 import numpy as np
-import talib
 
+from goldminer.common.Utils import Utils
 from goldminer.spider.tushare.TSStockBarSpider import TSStockBarSpider
 from goldminer.storage.IndexPrimaryIndicatorDao import IndexPrimaryIndicatorDao
 from goldminer.storage.StockDailyBarDao import StockDailyBarDao
@@ -30,7 +30,7 @@ class BuyPointBase:
         if closes is None:
             return False
         for period in periods:
-            sma = talib.SMA(closes, period)
+            sma = Utils.SMA(closes, period)
             for i in range(len(bars)):
                 setattr(bars[i], "sma" + str(period), sma[i])
         return True

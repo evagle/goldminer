@@ -5,7 +5,6 @@
 '''
 
 import numpy as np
-import talib
 
 from goldminer.common.Utils import Utils
 from goldminer.storage.IndexDailyBarDao import IndexDailyBarDao
@@ -25,11 +24,12 @@ class MidtermIndexSignal:
         if np.isnan(np.mean(closes)):
             return (-1, -1)
 
-        sma10 = talib.SMA(closes, 9)
+        sma10 = Utils.SMA(closes, 9)
+
         for i in range(n):
             weekly_bars[i].sma10 = sma10[i]
 
-        sma20 = talib.SMA(closes, 20)
+        sma20 = Utils.SMA(closes, 20)
         for i in range(n):
             weekly_bars[i].sma20 = sma20[i]
 

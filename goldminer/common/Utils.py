@@ -4,7 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 
 import numpy as np
-import talib
+import pandas as pd
 import xlrd
 
 from goldminer.common import GMConsts
@@ -123,7 +123,7 @@ class Utils:
                 attr = 'sma' + str(n)
             else:
                 attr = 'sma_{}{}'.format(field, str(n))
-            sma_n = talib.SMA(values, n)
+            sma_n = Utils.SMA(values, n)
 
             for i in range(len(values)):
                 setattr(bars[i], attr, sma_n[i])
@@ -162,6 +162,10 @@ class Utils:
                 return None
             format = "%m/%d/%Y"
         return datetime.strptime(datestr, format).date()
+
+    @staticmethod
+    def SMA(array, window):
+        return pd.DataFrame(array).rolling(window=window).mean()[0].values.tolist()
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 # coding: utf-8
 import numpy as np
-import talib
+
+from goldminer.common.Utils import Utils
 
 
 def MAX(bars, field, periods):
@@ -10,7 +11,8 @@ def MAX(bars, field, periods):
     values = [getattr(bar, field) for bar in bars]
 
     for period in periods:
-        max = talib.MAX(np.array(values), period)
+        # TBD
+        max = Utils.MAX(np.array(values), period)
         attr = "max{}{}".format(field, period)
         for i in range(len(bars)):
             setattr(bars[i], attr, max[i])
@@ -24,7 +26,8 @@ def MIN(bars, field, periods):
     values = [getattr(bar, field) for bar in bars]
 
     for period in periods:
-        min = talib.MIN(np.array(values), period)
+        # TBD
+        min = Utils.MIN(np.array(values), period)
         attr = "min{}{}".format(field, period)
         for i in range(len(bars)):
             setattr(bars[i], attr, min[i])
@@ -38,7 +41,7 @@ def SMA(bars, field, periods):
     values = [getattr(bar, field) for bar in bars]
 
     for period in periods:
-        sma = talib.SMA(np.array(values), period)
+        sma = Utils.SMA(np.array(values), period)
         attr = "sma{}{}".format(field, period)
         for i in range(len(bars)):
             setattr(bars[i], attr, sma[i])

@@ -40,8 +40,8 @@ from datetime import datetime
 
 import numpy as np
 import pandas as pd
-import talib
 
+from goldminer.common.Utils import Utils
 from goldminer.investigation.buy_signals.BuyPointBase import BuyPointBase
 from goldminer.models.models import TradingDerivativeIndicator, PrimaryFinanceIndicator, IncomeStatement
 from goldminer.storage.StockDao import StockDao
@@ -64,23 +64,23 @@ class MonthReverse(BuyPointBase):
         if np.isnan(np.mean(closes)):
             return (-1, -1)
 
-        sma10 = talib.SMA(closes, 10)
+        sma10 = Utils.SMA(closes, 10)
         for i in range(n):
             bars[i].sma10 = sma10[i]
 
-        sma20 = talib.SMA(closes, 20)
+        sma20 = Utils.SMA(closes, 20)
         for i in range(n):
             bars[i].sma20 = sma20[i]
 
-        sma50 = talib.SMA(closes, 50)
+        sma50 = Utils.SMA(closes, 50)
         for i in range(n):
             bars[i].sma50 = sma50[i]
 
-        sma120 = talib.SMA(closes, 120)
+        sma120 = Utils.SMA(closes, 120)
         for i in range(n):
             bars[i].sma120 = sma120[i]
 
-        sma250 = talib.SMA(closes, 250)
+        sma250 = Utils.SMA(closes, 250)
         for i in range(n):
             bars[i].sma250 = sma250[i]
             if sma250[i] > 0:

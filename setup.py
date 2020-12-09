@@ -21,18 +21,17 @@ setup(name='GoldMinder',
       license='priviate',
       install_requires=[
           'numpy',
-          'pandas',
+          'pandas>=1.1.4',
           'pymysql',
           'xlrd',
           'tushare',
           'bs4',
           'sqlalchemy',
-          'TA-Lib',
           'lxml',
           'requests',
           'fake-useragent',
           'pdfplumber',
-          'gm'
+#          'gm'
       ],
       classifiers=[
           'Development Status :: 1 - Development/Unstable',

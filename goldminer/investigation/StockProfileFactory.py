@@ -1,5 +1,6 @@
 # coding: utf-8
 import math
+from builtins import int, round, min
 from datetime import date, timedelta
 
 import pandas as pd
@@ -607,6 +608,8 @@ class StockProfileFactory:
         ]
 
         df = pd.DataFrame.from_dict(profile, orient='index', columns=columns)
+
+
         df.columns = df.columns.map(lambda x: x.value)
         print("\n============护城河============")
         competence_df = df[[c.value for c in competence_columns]].copy()
@@ -666,5 +669,5 @@ class StockProfileFactory:
 
 if __name__ == "__main__":
     stock_profile = StockProfileFactory()
-    profile = stock_profile.make_profile('002511')
+    profile = stock_profile.make_profile('300792')
     stock_profile.display_profile(profile)
