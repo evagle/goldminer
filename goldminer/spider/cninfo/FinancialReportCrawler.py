@@ -193,6 +193,8 @@ class FinancialReportCrawler:
                 continue
             if title.find("更正") >= 0:
                 continue
+            if title.find("英文版") >= 0:
+                continue
             if title in visited:
                 continue
             self.download_announcement(stock_model, announcement, GMConsts.FINANCIAL_REPORT_ROOT)
@@ -235,6 +237,5 @@ class FinancialReportCrawler:
 if __name__ == "__main__":
     crawler = FinancialReportCrawler()
     args = crawler.parse_args()
-    args.code = '002841'
     if args.code:
         crawler.get_announcements_by_code(args.code, datetime(2005, 1, 1).date(), datetime(2025, 1, 1).date())
