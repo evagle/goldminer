@@ -31,7 +31,7 @@ class ProfileMetric(Enum):
     QuickRatio = "速动比率"  # 速动比率
     InterestLiabilityCoverage = "有息覆盖率"  # 有息负债覆盖率=（货币资金）/ 有息负债
     EquityMultiplier = "权益乘数"  # 权益乘数=总资产/股东权益(净资产)
-    AccountPayable = "应付"
+    AccountPayable = "应付"  # 应付账款+应付手续费及佣金+应付分保账款+应付利息+应付票据+其他应付款
     AccountReceivable = "应收"  # 应收票据+应收账款+应收股利+应收出口退税+应收利息+其他应收款+应收保费+应收分保合同准备金+应收分保账款
     AccountReceivableRatio = "应收占比"  # 应收占比=应收/总资产
     AdvancePayment = "预收"
@@ -41,6 +41,7 @@ class ProfileMetric(Enum):
     Occupation = "总占款"
     ProfitCashRate = "净现比"
     NetProfit = "净利润"
+    NetProfitRaw = "净利润Raw"
     NetProfitCut = "扣非净利润"
     CoreProfit = "核心利润"  # 核心利润 = 毛利润-三费-税金及附加=（主营）营业收入-营业成本-三费-税金及附加
     CoreProfitMargin = "核心利率"  # 核心利润率 = 核心利润/营业收入
@@ -51,6 +52,7 @@ class ProfileMetric(Enum):
     # 与核心利润相比，营业利润多了后面几项与经营无关的收益即：公允价值变动收益+投资收益+汇兑收益+资产处置收益+其他收益
     CoreProfitRate = "核心利润比"
     CapitalExp = "资本开支"  # Capital Expenditures = 购建固定资产、无形资产和其他长期资产所支付的现金
+    CapitalExpProfitRate = "资本开支利润比"
     SalesRevenueRate = "收现率"  # = 销售商品提供劳务收到的现金/营业收入
     GoodwillRate = "商誉占比"  # = 商誉/净资产
     InventoryRate = "存货占比"  # = 存货/总资产
@@ -71,3 +73,25 @@ class ProfileMetric(Enum):
     PrepaidRatio = "预付占比"  # 预付占比=预付账款/总资产
     AdvancePaymentRatio = "预收占比"  # 预收占比=预收账款/总资产
     BizCost = "营业成本"
+
+    # 资产负债表结构项目, BS: short for Balance Sheet
+    # 1. 货币资金
+    BSCash = "货币资金"
+    # 2. 应收：应收账款，应收票据，应收款项融资，其他应收款，合同资产，长期应收款
+    BSReceivable = "应收"
+    # 3. 预付：预付款项
+    BSPrepayment = "预付"
+    # 4. 存货
+    BSInventories = "存货"
+    # 5. 固定资产：固定资产，在建工程，工程物资
+    BSFixedAssests = "固定资产"
+    # 6. 商誉：无形资产，商誉，开发支出
+    BSGoodWill = "商誉"
+    # 7. 金融资产：交易性金融资产，以公允价值计量且变动计入当期损益的金融资产，衍生金融资产，买入反售金融资产，发放贷款及垫款，
+    # 可供出售金融资产，债券投资，其他债券投资，持有至到期投资，长期股权投资，其他权益工具投资，其他非流动金融资产，投资性房地产，
+    # 持有待售资产，以公允价值计量且变动计入其他综合收益的金融资产
+    BSFinancialAssets = "金融资产"
+    # 8. 其他生产资产：生产性生物资产，油气资产，使用权资产，长期待摊费用，递延所得税资产
+    BSOtherProductiveAssets = "其他生产资产"
+    # 9. 其他资产：其他流动资产，其他非流动资产，一年内到期非流动资产
+    BSOtherAssets = "其他资产"

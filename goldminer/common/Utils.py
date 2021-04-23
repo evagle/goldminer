@@ -58,6 +58,10 @@ class Utils:
             format += "0"
         return float(Decimal(value).quantize(Decimal(format)))
 
+    @staticmethod
+    def formatCashUnit(value):
+        return Utils.formatFloat(float(Decimal(value) / Decimal(GMConsts.CASH_UNIT)), 2)
+
     # 四分法 interquartile range (IQR)
     # https://en.wikipedia.org/wiki/Interquartile_range#Examples
     @staticmethod

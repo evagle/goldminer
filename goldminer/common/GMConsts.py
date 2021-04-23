@@ -21,3 +21,6 @@ TRADE_INIT_DATE = date(2005, 1, 1)
 GET_FUNDAMENTAL_BATCH_SIZE = 40
 
 FINANCIAL_REPORT_ROOT = "/Users/abing/Documents/财报/"
+
+# 单位亿元
+CASH_UNIT = 1e8

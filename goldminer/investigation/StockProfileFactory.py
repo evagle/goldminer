@@ -2,9 +2,11 @@
 import math
 from builtins import int, round, min
 from datetime import date, timedelta
+from decimal import Decimal
 
 import pandas as pd
 
+from goldminer.common import GMConsts
 from goldminer.common.Utils import Utils
 from goldminer.models.ProfileMetric import ProfileMetric
 from goldminer.models.StockProfileModel import StockProfileModel
@@ -72,7 +74,7 @@ class StockProfileFactory:
         有息负债 = 负债合计 - 无息流动负债 - 无息非流动负债
 
         【无息流动负债】 = 【应付票据和应付账款 + 预收款项 + 合同负债 + 应付职工薪酬 + 应交税费 + 其他应付款 + 应付股利 + 应付利息 + 其他流动负债】，该公式也源于神奇网站，其核心思想是这部分是无息的，而除此之外的是有息的，比如应付票据、短期借款、一年内到期的非流动负债等等。
-        【无息非流动负债】 = 【非流动负债合计 - 长期借款 - 应付债券】，该公式源于神奇网站，其核心思想是，非流动负债中，除长期借款和应付债券是有息的外，其他全部是无息的。
+        【无息非流动负债】 = 【非流动负债合计 - 长期借款 - 应付债券 - 租赁负债】，该公式源于神奇网站，其核心思想是，非流动负债中，除长期借款和应付债券是有息的外，其他全部是无息的。
         对于房地产企业，用户还需要注意其【长期股权投资】、【少数股东权益】以及【对外担保金额变化】等方面的数据。
         自2018年Q3起，大部分公司开始采用新版的会计准则，合同负债从预收账款里分离出来，应付票据和应付账款合并成一个，所以我们也做了相应调整，具体而言就是在无息流动负债里增加了【应付票据】以及【合同负债】。
 
@@ -139,7 +141,7 @@ class StockProfileFactory:
 
     def _account_payable(self, model: BalanceSheet):
         """
-        应收=应付账款+应付手续费及佣金+应付分保账款+应付利息+应付票据+其他应付款
+        应付=应付账款+应付手续费及佣金+应付分保账款+应付利息+应付票据+其他应付款
         :param model:
         :return:
         """
@@ -156,6 +158,26 @@ class StockProfileFactory:
                model.NOTESRECE + model.OTHERRECE + model.PREMRECE + model.REINCONTRESE + \
                model.REINRECE
 
+    def _financial_assets(self, model: BalanceSheet):
+        """
+        广义金融资产=交易性金融资产，以公允价值计量且变动计入当期损益的金融资产，衍生金融资产，买入返售金融资产，发放贷款及垫款，
+         可供出售金融资产，债券投资，其他债券投资，持有至到期投资，长期股权投资，其他权益工具投资，其他非流动金融资产，投资性房地产，
+         持有待售资产，以公允价值计量且变动计入其他综合收益的金融资产
+        """
+        return model.TRADFINASSET + model.DERIFINAASSET + model.PURCRESAASSET + model.LENDANDLOAN + \
+               model.AVAISELLASSE + model.HOLDINVEDUE + model.EQUIINVE + model.OTHEQUIN + \
+               model.INVEPROP + model.ACCHELDFORS
+    def _other_productive_assets(self, model: BalanceSheet):
+        """
+        其他生产资产：生产性生物资产，油气资产，使用权资产，长期待摊费用，递延所得税资产
+        """
+        return model.PRODASSE + model.HYDRASSET + model.LOGPREPEXPE + model.DEFETAXASSET
+
+    def _other_assets(self, model: BalanceSheet):
+        """
+        其他资产：其他流动资产，其他非流动资产，一年内到期的非流动资产
+        """
+        return model.OTHERCURRASSE + model.OTHERNONCASSE + model.EXPINONCURRASSET
 
     def make_profile(self, code):
         """
@@ -274,7 +296,7 @@ class StockProfileFactory:
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.QuickRatio,
                                         Utils.formatFloat(model.QUICKRT, 2))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.FreeCashFlow,
-                                        int(model.FCFF / 1000000))
+                                        Utils.formatCashUnit(model.FCFF))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.EquityMultiplier,
                                         Utils.formatFloat(model.EMCONMS, 2))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.NetProfitCut,
@@ -308,8 +330,10 @@ class StockProfileFactory:
                                         Utils.formatFloat(sales_ratio, 2))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.GrossProfitMargin,
                                         Utils.formatFloat(gross_profit_margin, 2))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.NetProfitRaw,
+                                        model.NETPROFIT)
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.NetProfit,
-                                        round(model.NETPROFIT / 1000000))
+                                        Utils.formatCashUnit(model.NETPROFIT))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.CoreProfit,
                                         core_profit)
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.CoreProfitMargin,
@@ -347,21 +371,24 @@ class StockProfileFactory:
             advance_payment_ratio = advance_payment / model.TOTASSET * 100
             invetory_rate = model.INVE / model.TOTASSET * 100
             fixed_assets_rate = model.FIXEDASSENET / model.TOTASSET * 100
+            financial_assets = self._financial_assets(model)
+            other_productive_assets = self._other_productive_assets(model)
+            other_assets = self._other_assets(model)
 
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AccountPayable,
-                                        round(account_payable / 1000000))
+                                        Utils.formatCashUnit(account_payable))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AccountReceivable,
-                                        round(account_receivable / 1000000))
+                                        Utils.formatCashUnit(account_receivable))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.AdvancePayment,
-                                        round(advance_payment / 1000000))
+                                        Utils.formatCashUnit(advance_payment))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.Prepaid,
-                                        round(prepaid / 1000000))
+                                        Utils.formatCashUnit(prepaid))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.Upstream,
-                                        round((account_payable - prepaid) / 1000000))
+                                        Utils.formatCashUnit(account_payable))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.Downstream,
-                                        round((advance_payment - account_receivable) / 1000000))
+                                        Utils.formatCashUnit(advance_payment - account_receivable))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.Occupation,
-                                        round(occupation / 1000000))
+                                        Utils.formatCashUnit(occupation))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.GoodwillRate,
                                         Utils.formatFloat(goodwill_rate, 1))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.InterestLiabilityRatio,
@@ -398,6 +425,25 @@ class StockProfileFactory:
                                         Utils.formatFloat(invetory_rate, 1))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.FixedAssetsRate,
                                         Utils.formatFloat(fixed_assets_rate, 1))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BSCash,
+                                        Utils.formatCashUnit(model.CURFDS))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BSReceivable,
+                                        Utils.formatCashUnit(account_receivable))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BSPrepayment,
+                                        Utils.formatCashUnit(model.PREP))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BSInventories,
+                                        Utils.formatCashUnit(model.INVE))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BSFixedAssests,
+                                        Utils.formatCashUnit(model.FIXEDASSENET + model.CONSPROG + model.ENGIMATE))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BSGoodWill,
+                                        Utils.formatCashUnit(model.GOODWILL + model.INTAASSET + model.DEVEEXPE))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BSFinancialAssets,
+                                        Utils.formatCashUnit(financial_assets))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BSOtherProductiveAssets,
+                                        Utils.formatCashUnit(other_productive_assets))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BSOtherAssets,
+                                        Utils.formatCashUnit(other_assets))
+
 
         # 现金流量表数据
         models = self.cashflow_dao.getByCode(code)
@@ -409,13 +455,16 @@ class StockProfileFactory:
                 biz_net_cashflow = model.BIZNETCFLOW
 
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BIZCashFlow,
-                                        round(biz_net_cashflow / 1000000))
+                                        Utils.formatCashUnit(biz_net_cashflow))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.InvestCashFlow,
-                                        round(model.INVNETCASHFLOW / 1000000))
+                                        Utils.formatCashUnit(model.INVNETCASHFLOW))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.FinancialCashFlow,
-                                        round(model.FINNETCFLOW / 1000000))
+                                        Utils.formatCashUnit(model.FINNETCFLOW))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.CapitalExp,
-                                        round(model.ACQUASSETCASH / 1000000))
+                                        Utils.formatCashUnit(model.ACQUASSETCASH))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.CapitalExpProfitRate,
+                                        Utils.formatFloat(model.ACQUASSETCASH /
+                                                          Decimal(profile.get_metric(model.end_date, ProfileMetric.NetProfitRaw)), 2))
 
         return profile
 
@@ -517,6 +566,7 @@ class StockProfileFactory:
             ProfileMetric.NetProfitMargin,
             ProfileMetric.SalesRevenueRate,
             ProfileMetric.ProfitCashRate,
+            ProfileMetric.CapitalExpProfitRate,
             ProfileMetric.CoreProfitRate,
         ]
         # 成长能力
@@ -587,11 +637,15 @@ class StockProfileFactory:
 
         # 资产负债表结构
         balance_sheet_structure_columns = [
-            ProfileMetric.MonetaryFundsRatio,
-            ProfileMetric.OperatingAssetRatio,
-            ProfileMetric.ProductAssetRatio,
-            ProfileMetric.InvestmentAssetRatio,
-            ProfileMetric.OtherAssetRatio
+            ProfileMetric.BSCash,
+            ProfileMetric.BSReceivable,
+            ProfileMetric.BSPrepayment,
+            ProfileMetric.BSInventories,
+            ProfileMetric.BSFixedAssests,
+            ProfileMetric.BSGoodWill,
+            ProfileMetric.BSFinancialAssets,
+            ProfileMetric.BSOtherProductiveAssets,
+            ProfileMetric.BSOtherAssets,
         ]
 
         # 成长动力分解
