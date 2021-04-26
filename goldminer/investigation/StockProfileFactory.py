@@ -67,6 +67,26 @@ class StockProfileFactory:
 
         return balance_models
 
+    def _accounts_payable(self, model: BalanceSheet):
+        """
+        应付(无息)=应付账款 + 应付票据 + 应付职工薪酬 + 应交税费 + 应付股利 + 应付手续费及佣金 + 应付分保账款+ 应付利息+其他应付款
+        而根据2018年财政部15号文件，【应付利息】和【应付股利】被并入【其他应付款】，理杏仁认为【其他应付款】属于无息负债
+        """
+        return model.NOTESPAYA + model.ACCOPAYA + model.COPEWORKERSAL + model.TAXESPAYA + model.DIVIPAYA + model.COPEPOUN + \
+               model.COPEWITHREINRECE + model.INTEPAYA + model.OTHERPAY
+
+
+    def _advance_receipts(self, model: BalanceSheet):
+        """
+        预收 = 预收款项 + 合同负债（掘金数据库暂时无合同负债）
+        """
+        return model.ADVAPAYM
+
+    def _other_interest_free_liabilities(self, model: BalanceSheet):
+        """
+        其他无息负债 = 其他流动负债 + 无息非流动负债（= 非流动负债合计 - 长期借款 - 应付债券 - 租赁负债）
+        """
+        return model.OTHERCURRELIABI + (model.TOTALNONCLIAB - model.LONGBORR - model.BDSPAYA)
 
     def _interest_bearing_liabilities(self, model: BalanceSheet):
         """
@@ -81,12 +101,10 @@ class StockProfileFactory:
         :param balance_sheet_model: 资产负债表
         :return:
         """
-        interest_free_current_liabilities = model.NOTESPAYA + model.ACCOPAYA + model.ADVAPAYM + model.COPEWORKERSAL + \
-                                            model.TAXESPAYA + model.OTHERPAY + model.DIVIPAYA + model.INTEPAYA + \
-                                            model.OTHERCURRELIABI
+        interest_free_current_liabilities = self._accounts_payable(model) + self._advance_receipts(model)
+        other_interest_free_liabilities = self._other_interest_free_liabilities(model)
 
-        interest_free_non_current_liabilities = model.TOTALNONCLIAB - model.LONGBORR - model.BDSPAYA
-        return model.TOTLIAB - interest_free_current_liabilities - interest_free_non_current_liabilities
+        return model.TOTLIAB - interest_free_current_liabilities - other_interest_free_liabilities
 
     def _interest_liability_coverage(self, interest_bearing_liabilities, model: BalanceSheet):
         """
@@ -139,14 +157,7 @@ class StockProfileFactory:
         """
         return self._account_receivable(model) + model.LONGRECE + model.INVE
 
-    def _account_payable(self, model: BalanceSheet):
-        """
-        应付=应付账款+应付手续费及佣金+应付分保账款+应付利息+应付票据+其他应付款
-        :param model:
-        :return:
-        """
-        return model.ACCOPAYA + model.COPEPOUN + model.COPEWITHREINRECE + \
-               model.INTEPAYA + model.NOTESPAYA + model.OTHERPAY
+
 
     def _account_receivable(self, model: BalanceSheet):
         """
@@ -349,7 +360,7 @@ class StockProfileFactory:
         selected = self._filter_annual_and_latest(models, publish_date)
 
         for model in selected:
-            account_payable = self._account_payable(model)
+            account_payable = self._accounts_payable(model)
             account_receivable = self._account_receivable(model)
             advance_payment = model.ADVAPAYM
             prepaid = model.PREP
@@ -443,7 +454,14 @@ class StockProfileFactory:
                                         Utils.formatCashUnit(other_productive_assets))
             self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BSOtherAssets,
                                         Utils.formatCashUnit(other_assets))
-
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BSPayable,
+                                        Utils.formatCashUnit(self._accounts_payable(model)))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BSAdvanceReceipts,
+                                        Utils.formatCashUnit(self._advance_receipts(model)))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BSOtherInterestFreeLiabilities,
+                                        Utils.formatCashUnit(self._other_interest_free_liabilities(model)))
+            self._add_metric_to_profile(profile, model.end_date, ProfileMetric.BSInterestBearingLiabilities,
+                                        Utils.formatCashUnit(self._interest_bearing_liabilities(model)))
 
         # 现金流量表数据
         models = self.cashflow_dao.getByCode(code)
@@ -619,6 +637,7 @@ class StockProfileFactory:
             ProfileMetric.FinancialCashFlow,
             ProfileMetric.FreeCashFlow,
             ProfileMetric.CapitalExp,
+            ProfileMetric.CapitalExpProfitRate
         ]
 
         # 资产负债表质量
@@ -636,7 +655,7 @@ class StockProfileFactory:
         ]
 
         # 资产负债表结构
-        balance_sheet_structure_columns = [
+        balance_sheet_assets_structure_columns = [
             ProfileMetric.BSCash,
             ProfileMetric.BSReceivable,
             ProfileMetric.BSPrepayment,
@@ -646,6 +665,14 @@ class StockProfileFactory:
             ProfileMetric.BSFinancialAssets,
             ProfileMetric.BSOtherProductiveAssets,
             ProfileMetric.BSOtherAssets,
+        ]
+
+        # 资产负债表负债结构
+        balance_sheet_liabilities_structure_columns = [
+            ProfileMetric.BSPayable,
+            ProfileMetric.BSAdvanceReceipts,
+            ProfileMetric.BSOtherInterestFreeLiabilities,
+            ProfileMetric.BSInterestBearingLiabilities
         ]
 
         # 成长动力分解
@@ -711,9 +738,14 @@ class StockProfileFactory:
         print(balance_sheet_quality_df)
 
         print("\n============资产结构============")
-        balance_sheet_structure_df = df[[c.value for c in balance_sheet_structure_columns]]
+        balance_sheet_structure_df = df[[c.value for c in balance_sheet_assets_structure_columns]]
         balance_sheet_structure_df = self._mean_df(balance_sheet_structure_df, 2)
         print(balance_sheet_structure_df)
+
+        print("\n============负债结构============")
+        balance_sheet_liabilities_structure_df = df[[c.value for c in balance_sheet_liabilities_structure_columns]]
+        balance_sheet_liabilities_structure_df = self._mean_df(balance_sheet_liabilities_structure_df, 2)
+        print(balance_sheet_liabilities_structure_df)
 
         print("\n============成长动力分解============")
         growth_engine_analysis_df = df[[c.value for c in growth_engine_analysis_columns]]

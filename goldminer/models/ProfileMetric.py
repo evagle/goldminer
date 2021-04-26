@@ -95,3 +95,8 @@ class ProfileMetric(Enum):
     BSOtherProductiveAssets = "其他生产资产"
     # 9. 其他资产：其他流动资产，其他非流动资产，一年内到期非流动资产
     BSOtherAssets = "其他资产"
+
+    BSPayable = "应付"
+    BSAdvanceReceipts = "预收"
+    BSOtherInterestFreeLiabilities = "其他无息负债"
+    BSInterestBearingLiabilities = "有息负债"

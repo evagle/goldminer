@@ -127,7 +127,10 @@ class StockAnalysis:
             if end_date.month == 12:
                 sum += data[end_date]
                 i += 1
-        return Utils.formatFloat(sum / i, 2)
+        if i == 0:
+            return 0
+        else:
+            return Utils.formatFloat(sum / i, 2)
 
     # 计算增长率的复合增速
     def _compound_mean(self, data, n):
@@ -296,7 +299,7 @@ class StockAnalysis:
             print("\n---------" + metric.value + "---------")
             print(df)
 
-        print("\n============资产负债表质量============")
+        print("\n============资产结构============")
         for metric in self.__balance_sheet_structure_columns:
             df = pd.DataFrame.from_dict(report[metric], orient='index')
             df = df.rename(lambda x: x.name, axis=0)
@@ -315,6 +318,7 @@ if __name__ == "__main__":
     codes = ['600580', '002249', '002176', '300660', '603728', '000922', '603583', '002801']
     codes = ['600519', '000858', '002304', '000568', '600809', '000596', '603369', '600779']
     codes = ["600380", "600276", "000963", "000513", "600521", "002437", "600402","600079","002773","002262"]
+    codes = ["300792", "605136", "003010", "002094"] # 壹网壹创，丽人丽妆，若羽臣，青岛金王
 
     for code in codes:
         profiles.append(profile_factory.make_profile(code))
